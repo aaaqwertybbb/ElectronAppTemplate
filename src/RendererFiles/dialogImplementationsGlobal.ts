@@ -376,7 +376,7 @@ function DIALOG_FindAll_checkboxMatchWord_onchange() {
     }
 }
 
-async function DIALOG_Settings_Create_async() {
+export async function DIALOG_Settings_Create_async() {
     let dialogBody = document.getElementById('DIALOG_body');
     if (!dialogBody) return;
 
@@ -385,30 +385,6 @@ async function DIALOG_Settings_Create_async() {
     buttonTheme.textContent = 'Theme';
     buttonTheme.addEventListener('click', DIALOG_buttonTheme_onclick);
     dialogBody.appendChild(buttonTheme);
-
-    let checkboxTrueTabsFalseSpaces = document.createElement('input');
-    checkboxTrueTabsFalseSpaces.type = 'checkbox';
-    checkboxTrueTabsFalseSpaces.id = 'SETTINGS_trueTabs_falseSpaces';
-    checkboxTrueTabsFalseSpaces.checked = DIALOG_Settings_trueTabs_falseSpaces; // Optional: sets the initial state to checked
-    checkboxTrueTabsFalseSpaces.addEventListener('change', DIALOG_checkboxTrueTabsFalseSpaces_onchange);
-    dialogBody.appendChild(checkboxTrueTabsFalseSpaces);
-	// -----------------------------------------------------------
-    let label_for_checkboxTrueTabsFalseSpaces = document.createElement('label');
-    label_for_checkboxTrueTabsFalseSpaces.htmlFor = 'SETTINGS_trueTabs_falseSpaces';
-    label_for_checkboxTrueTabsFalseSpaces.textContent = 'trueTabs_falseSpaces';
-    dialogBody.appendChild(label_for_checkboxTrueTabsFalseSpaces);
-    
-    let checkboxEditorDebugShowAdjacentCharacters = document.createElement('input');
-    checkboxEditorDebugShowAdjacentCharacters.type = 'checkbox';
-    checkboxEditorDebugShowAdjacentCharacters.id = 'SETTINGS_editorDebugShowAdjacentCharacters';
-    checkboxEditorDebugShowAdjacentCharacters.checked = DIALOG_Settings_editorDebugShowAdjacentCharacters; // Optional: sets the initial state to checked
-    checkboxEditorDebugShowAdjacentCharacters.addEventListener('change', DIALOG_checkboxEditorDebugShowAdjacentCharacters_onchange);
-    dialogBody.appendChild(checkboxEditorDebugShowAdjacentCharacters);
-	// -----------------------------------------------------------
-    let label_for_checkboxEditorDebugShowAdjacentCharacters = document.createElement('label');
-    label_for_checkboxEditorDebugShowAdjacentCharacters.htmlFor = 'SETTINGS_editorDebugShowAdjacentCharacters';
-    label_for_checkboxEditorDebugShowAdjacentCharacters.textContent = 'editorDebugShowAdjacentCharacters';
-    dialogBody.appendChild(label_for_checkboxEditorDebugShowAdjacentCharacters);
 }
 
 async function DIALOG_Settings_Delete_async() {

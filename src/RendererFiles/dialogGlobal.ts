@@ -3,7 +3,7 @@
 import "./fieldBuffer"
 //__#__
 
-import "./dialogImplementationsGlobal"
+import { DIALOG_Settings_Create_async } from "./dialogImplementationsGlobal"
 
 const get_DialogKind_None = () => "None";
 const get_DialogKind_FindAll = () => "FindAll";
