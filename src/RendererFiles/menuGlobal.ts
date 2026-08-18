@@ -410,14 +410,6 @@ function MENU_setCursorIndex(index) {
     MENU_render_request(get_MENUrenderKind_Cursor());
 }
 
-// My only public C# repo is terrible too lol
-// I threw it together to get a basic language server started I need time to revisit it
-// "he keeps saying oh it's like C#... let's see what kind of C# he writes... well this C# code is even worse than his javascript"
-
-// my body is in emotional pain but ima silently grind this out
-
-// mainly I feel anxious, I feel like a clown. I feel like I'm completely incompetent at coding.
-
 function MENU_validateCursor() {
     if (MENU_cursorIndex >= MENU_ArrayFrom_menuOptionList_children.length) {
         if (MENU_ArrayFrom_menuOptionList_children.length > 0) {
