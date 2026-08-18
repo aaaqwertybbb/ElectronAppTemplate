@@ -571,5 +571,3 @@ and then as desired ask AI for their input. That's where it shines.
 72 hours 51 minutes in the last 18 days across all characters
 
 */
-
-
