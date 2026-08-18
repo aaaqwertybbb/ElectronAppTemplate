@@ -63,9 +63,13 @@ let MENU_ticketId_drawn = 0;
 These settings didn't change it and it was so annoying I could never stand the peek view but I just dealt with it:
 "references.preferredLocation": "view",
 "editor.gotoLocation.multipleReferences": "gotoAndPeek"
+
+you know what.
+You don't fully know what you got until you lose it.
+That peek was kinda nice actually.
 */
 
-let MENU_context: any | null = null;
+let MENU_context: string | null = null;
 let MENU_target: any | null = null;
 
 let MENU_restoreFocusToElement: HTMLElement | null = null;
@@ -298,7 +302,7 @@ function MENU_render_do_Set() {
     }
 }
 
-async function menuSet(context: any, target: any, optionList, left, top, NOTshouldFocus, index, onHideAction) {
+async function menuSet(context: string, target: any, optionList, left, top, NOTshouldFocus, index, onHideAction) {
     MENU_ticketId_pending = MENU_ticketId_counter++;
     
     // TODO: These 'if (MENU_optionList)' and 'if (MENU_ArrayFrom_menuOptionList_children)' won't work because for some reason you decided that a menu could be "empty", thus these could be null and no longer would indicate that whether only the state function ran or both the state function and the render function ran or etc...
