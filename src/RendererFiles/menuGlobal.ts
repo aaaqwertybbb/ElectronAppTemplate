@@ -601,6 +601,10 @@ Dinner:
 
 just breakfast and dinner I think.
 
+I literally sit here watching "The Quiet - Run" on loop.
+For hours doing nothing
+just ruminating until I go to sleep
+
 */
 
 
