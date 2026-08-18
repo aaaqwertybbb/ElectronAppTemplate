@@ -3,6 +3,8 @@
 import "./fieldBuffer"
 //__#__
 
+import "./dialogImplementationsGlobal"
+
 const get_DialogKind_None = () => "None";
 const get_DialogKind_FindAll = () => "FindAll";
 const get_DialogKind_Settings = () => "Settings";
@@ -145,7 +147,7 @@ async function DIALOG_render_do_Show() {
     }
 }
 
-async function DIALOG_show_async(dialogKind, onResizeAction) {    
+export async function DIALOG_show_async(dialogKind, onResizeAction) {    
     DIALOG_SHOW_restoreFocusToElement = document.activeElement;
     DIALOG_SHOW_currentDialogKind = dialogKind;
     DIALOG_SHOW_onResizeAction = onResizeAction;

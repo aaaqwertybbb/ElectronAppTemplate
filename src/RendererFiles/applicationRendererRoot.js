@@ -1,3 +1,5 @@
+import { DIALOG_show_async } from './dialogGlobal';
+
 /**
  * This value ought to be an int (no decimal places) due to its high frequency usage in drawing UI,
  * and visually this having decimal places being of little to no value to the user when you could just ceil whatever height measurement you get.
@@ -13,22 +15,22 @@ function init() {
         .getElementById('HEADER_buttonSettings')
         .addEventListener('click', HEADER_buttonSettings_onClick);
 
-    window.myAPI.onMessage(window_myAPI_onMessage);
-
-    const EDITOR_gotoF_button = document.getElementById('EDITOR_gotoF');
-    EDITOR_gotoF_button.addEventListener('click', window.myAPI.editorDocumentSymbolsRequest);
-    document.body.addEventListener('keydown', documentBody_onKeyDown);
-
-    requestAnimationFrame(APP_render_init);
+    //window.myAPI.onMessage(window_myAPI_onMessage);
+//
+    //const EDITOR_gotoF_button = document.getElementById('EDITOR_gotoF');
+    //EDITOR_gotoF_button.addEventListener('click', window.myAPI.editorDocumentSymbolsRequest);
+    //document.body.addEventListener('keydown', documentBody_onKeyDown);
+//
+    //requestAnimationFrame(APP_render_init);
 }
 
 /**
  * TODO: "Nothing stops you" from interacting with the UI thus it is possible to do things pre-initialization? TODO: Don't let this be the case?
  */
 function APP_render_init() {
-    APP_measureLineHeightAndCharacterWidth();
-    EXPLORER_init();
-    EDITOR_init();
+    //APP_measureLineHeightAndCharacterWidth();
+    //EXPLORER_init();
+    //EDITOR_init();
 }
 
 function APP_measureLineHeightAndCharacterWidth() {
@@ -194,5 +196,5 @@ async function documentBody_onKeyDown(event) {
 }
 
 async function HEADER_buttonSettings_onClick() {
-    return DIALOG_show_async(get_DialogKind_Settings());
+    return DIALOG_show_async("Settings");
 }
