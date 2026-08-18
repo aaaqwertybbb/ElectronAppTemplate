@@ -605,6 +605,10 @@ I literally sit here watching "The Quiet - Run" on loop.
 For hours doing nothing
 just ruminating until I go to sleep
 
+"dude's been spiking his blood sugar for lunch everyday like a goober"
+
+that is probably it to be honest.
+
 */
 
 
