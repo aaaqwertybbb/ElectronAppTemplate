@@ -59,6 +59,11 @@ let MENU_ticketId_pending = 0;
 let MENU_ticketId_drawn = 0;
 
 // rebound shift+f12 finally it isn't a setting I tried the settings you gotta change the keybind itself I swapped shift+alt+f12 and shift+12
+/*
+These settings didn't change it and it was so annoying I could never stand the peek view but I just dealt with it:
+"references.preferredLocation": "view",
+"editor.gotoLocation.multipleReferences": "gotoAndPeek"
+*/
 
 let MENU_context: any | null = null;
 let MENU_target: any | null = null;
