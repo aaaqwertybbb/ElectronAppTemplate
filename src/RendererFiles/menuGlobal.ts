@@ -587,6 +587,20 @@ my mood is completely all over and maybe it always is idk
 I keep sitting here in my room crying at night not playing videogames or anything
 like wtf am I doing right now
 
+I need to change it so I eat rice with the 1lb of 98% fat free chicken instead of the 8 nutrigrain bars for lunch I think
+
+then it'd be
+
+Breakfast:
+- 1 lb of 98% fat free chicken with sriracha for breakfast
+- calculate the amount of calories of rice you need
+
+Dinner:
+- 1 lb of 98% fat free chicken with sriracha for breakfast
+- calculate the amount of calories of rice you need
+
+just breakfast and dinner I think.
+
 */
 
 
