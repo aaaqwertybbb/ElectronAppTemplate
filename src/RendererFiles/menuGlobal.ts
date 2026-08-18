@@ -584,6 +584,9 @@ I've been eating:
 I don't feel great
 my mood is completely all over and maybe it always is idk
 
+I keep sitting here in my room crying at night not playing videogames or anything
+like wtf am I doing right now
+
 */
 
 
