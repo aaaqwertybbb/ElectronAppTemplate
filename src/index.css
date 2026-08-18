@@ -1,0 +1,328 @@
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  background-color: var(--primary-background-color);
+  color: var(--primary-foreground-color);
+  color-scheme: var(--color-scheme);
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE 10+ and Edge */
+  user-select: none; /* Standard syntax */
+}
+
+#HEADER {
+  background-color: var(--secondary-background-color);
+  color: var(--secondary-foreground-color);
+  border-bottom: 1px solid var(--primary-border-color);
+  height: var(--header-height);
+}
+
+#BODY {
+  display: flex;
+  /* -1 for header border bottom */
+  height: calc(100% - var(--header-height) - 1px);
+}
+
+#EXPLORER {
+    width: 200px;
+    height: 100%;
+}
+
+.treeView_node {
+  height: var(--APP-line-height);
+  white-space: nowrap;
+}
+
+#FOOTER {
+}
+
+#MENU {
+  position: fixed;
+  min-width: 25px;
+  min-height: 25px;
+  background-color: var(--secondary-background-color);
+  color: var(--secondary-foreground-color);
+  border: 1px solid var(--primary-border-color);
+  padding-left: 4px;
+  padding-right: 4px;
+  /* the padding-top needs to be accounted for in the js code anywhere calculation of which option was clicked is done, as well any other scenarios that might follow the pattern */
+  padding-top: 4px;
+  padding-bottom: 1px;
+}
+
+  #MENU:focus #MENU_cursor {
+    background-color: var(--primary-active-with-focus-background-color);
+  }
+
+#MENU_cursor {
+  background-color: var(--primary-active-no-focus-background-color);
+  height: var(--APP-line-height);
+  position: absolute;
+  /* -8px is the sum of the padding left and padding right of the menu */
+  width: calc(100% - 8px);
+}
+
+#MENU_optionList {
+  cursor: default;
+  display: contents;
+}
+
+.menuOption {
+  height: var(--APP-line-height);
+  white-space: nowrap;
+  position: relative;
+}
+
+#TOOLTIP {
+  position: fixed;
+  min-width: 25px;
+  min-height: 25px;
+  background-color: var(--secondary-background-color);
+  color: var(--secondary-foreground-color);
+  border: 1px solid var(--primary-border-color);
+  padding-left: 4px;
+  padding-right: 4px;
+  /* the padding-top needs to be accounted for in the js code anywhere calculation of which option was clicked is done, as well any other scenarios that might follow the pattern */
+  padding-top: 4px;
+  padding-bottom: 1px;
+}
+
+.LIST_moveChildNodes {
+  position: relative;
+  overflow: scroll;
+}
+
+  .LIST_moveChildNodes:focus .LIST_moveChildNodes_cursor {
+    background-color: var(--primary-active-with-focus-background-color);
+  }
+
+.LIST_moveChildNodes_virtualization {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+}
+
+.LIST_moveChildNodes_cursor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: var(--primary-active-no-focus-background-color);
+  position: absolute;
+  width: 100%;
+}
+
+.LIST_moveChildNodes_itemList {
+  display: contents;
+}
+
+#AUTOCOMPLETE {
+  position: fixed;
+  width: 200px;
+  height: 100px;
+  background-color: var(--secondary-background-color);
+  color: var(--secondary-foreground-color);
+  border: 1px solid var(--primary-border-color);
+  padding-left: 4px;
+  padding-right: 4px;
+  /* the padding-top needs to be accounted for in the js code anywhere calculation of which option was clicked is done, as well any other scenarios that might follow the pattern */
+  padding-top: 4px;
+  padding-bottom: 1px;
+  overflow: scroll;
+}
+
+  #AUTOCOMPLETE:focus #AUTOCOMPLETE_cursor {
+    background-color: var(--primary-active-with-focus-background-color);
+  }
+
+#AUTOCOMPLETE_virtualization {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+}
+
+#AUTOCOMPLETE_cursor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: var(--primary-active-no-focus-background-color);
+  position: absolute;
+  width: 100%;
+  height: var(--APP-line-height);
+}
+
+#AUTOCOMPLETE_itemList {
+  display: contents;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/*#AUTOCOMPLETE_ITEM {
+  
+}*/
+
+.TREEVIEW {
+  position: relative;
+  overflow: scroll;
+  outline: none;
+  width: 100%;
+  height: 100%;
+}
+
+  .TREEVIEW:focus .TREEVIEW_cursor {
+    background-color: var(--primary-active-with-focus-background-color);
+  }
+
+.TREEVIEW_virtualization {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+}
+
+.TREEVIEW_cursor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: var(--primary-active-no-focus-background-color);
+  position: absolute;
+  width: 100%;
+}
+
+.TREEVIEW_itemList {
+  display: contents;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.unselectable {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE 10+ and Edge */
+  user-select: none; /* Standard syntax */
+}
+
+#WIDGET {
+    position: fixed;
+    left: 0;
+    top: 0;
+    background-color: var(--primary-active-no-focus-background-color);
+    padding: 10px;
+    border: 1px solid var(--primary-border-color);
+}
+
+/* .eN (i.e.: Editor Not_yet_syntax_highlighted) */
+.eN {
+  color: var(--editor-syntax-operatorAssignment-color);
+}
+
+#DIALOG {
+  position: fixed;
+  width: 60vw;
+  height: 60vh;
+  left: 20vw;
+  top: 20vh;
+  background-color: var(--secondary-background-color);
+  color: var(--secondary-foreground-color);
+  border: 1px solid var(--primary-border-color);
+}
+
+#DIALOG_toolbar {
+  display: flex;
+  justify-content: space-between;
+  height: calc(2 * var(--EDITOR-line-height));
+  border-bottom: 1px solid var(--primary-border-color);
+  background-color: var(--secondary-background-color);
+  position: relative;
+}
+
+#DIALOG_body {
+  /* TODO: -9px is somewhat not understood I think it has to do with the borders but I'm not overly interested in looking into this right now. */
+  height: calc(100% - (2 * var(--EDITOR-line-height)) - 9px);
+  background-color: var(--secondary-background-color);
+  position: relative;
+}
+
+#DIALOG_resize {
+  position: absolute;
+  left: -8px;
+  top: -8px;
+  width: calc(100% + 16px);
+  height: calc(100% + 16px);
+}
+
+#DIALOG_FindAll_searchResultsDiv {
+  height: calc(100% - (2 * var(--APP-line-height)) - 2px);
+}
+
+:root {
+  --header-height: 25px;
+  --APP-line-height: 20px;
+}
+
+button:focus {
+	/*
+	When programmatically focusing a button with javascript,
+	the outline does not necessarily appear due to user-agent heuristics that determine whether the outline should appear.
+	
+	But, setting an outline yourself causes the outline to always appear regardless of the heuristics.
+	
+	This is important because some keyboard input moves focus to another "section" of app,
+	and leverages "known to exist" button elements as places to put the user's focus to.
+	
+	But without this, the user doesn't have any feedback for where their focus went (given my user-agent's heuristics, this was my experience).
+	*/
+	outline: 3px solid var(--primary-focus-outline);
+}
+
+input:focus {
+	outline: 3px solid var(--primary-focus-outline);
+}
+
+select:focus {
+  outline: 3px solid var(--primary-focus-outline);
+}
+
+/*
+propertyName: rgb(120, 200, 210)
+types: rgb(70, 165, 215)
+locals: rgb(170, 150, 215)
+functions: rgb(85, 193, 85)
+*/
+
+.dark-theme {
+  --primary-background-color: rgb(30, 30, 30);
+  --primary-foreground-color: rgb(187, 187, 187);
+  --secondary-background-color: rgb(38, 38, 40);
+  --secondary-foreground-color: rgb(212, 212, 212);
+  --primary-border-color: rgb(212, 212, 212);
+  --light-border-color: rgb(126, 126, 126);
+  --color-scheme: dark;
+  --primary-active-with-focus-background-color: rgb(22, 71, 104);
+  --primary-active-no-focus-background-color: rgb(65, 65, 65);
+  --primary-focus-outline: rgb(185, 185, 185);
+  --editor-syntax-operatorAssignment-color: rgb(70, 165, 215);
+  --editor-cursor-color-focused: rgb(6, 138, 255);
+}
+
+.light-theme {
+  --primary-background-color: white;
+  --primary-foreground-color: black;
+  --secondary-background-color: rgb(255, 246, 220);
+  --secondary-foreground-color: black;
+  --primary-border-color: black;
+  --light-border-color: rgb(126, 126, 126);
+  --color-scheme: light;
+  --primary-active-with-focus-background-color: #98d6f1;
+  --primary-active-no-focus-background-color: rgb(220, 220, 220);
+  --primary-focus-outline: black;
+  --editor-syntax-operatorAssignment-color: rgb(70, 165, 215);
+  --editor-cursor-color-focused: rgb(0, 0, 255);
+}
