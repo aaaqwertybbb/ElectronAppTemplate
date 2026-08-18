@@ -1,4 +1,6 @@
-- there's somewhat of a responsibility on my end to ensure that someone who doesn't know that bundlers or some other weird thing I'm implementing already exists so that they don't foolishly do this in a job scenario as I'm just doing it for fun.
+I mess about with a custom bundler "preprocessor.cjs", don't do this, I'm just seeing what happens.
+
+I use JavaScript, don't do this, probably you want typescript, I'm just seeing what happens.
 
 =============
 
@@ -7,46 +9,3 @@
 > npm run build
 
 > npm run start
-
-==============
-
-
-# OLD README.md COMES AFTER THIS POINT JUST USE THE FIRST 3 COMMANDS AT TOP OF THIS FILE
-
-
-
-# (Quick start - less performant than making the .exe) Run app from source code:
-Open the '/' directory of this repository then execute this terminal command (npm install only needs be ran one time, i.e.: not necessary to run everytime you want to run the app):
-
-> npm install
-
-> npm run
-
-# (Making the .exe) :
-Open the '/' directory of this repository then execute this terminal command (npm install only needs be ran one time, i.e.: not necessary to run everytime you want to run the app):
-
-> npm install
-
-> npm run make
-
-> I don't know how to do this but I see they make an installer and an exe.
-
-> maybe you run the installer then the exe? I'm not sure I'm gonna run the installer then the exe myself until I figure out how to do it.
-
-> C:\Users\hunte\Repos\Bbb\out\make\squirrel.windows\x64
-
-> my-app-1.0.0 Setup.exe
-
-> Something along the lines of: cd "/out/my-app-win32-x64/"
-
-> Then there will be a file "my-app.exe"
-
-
-# Web developer tools
-While focusing the running application press
-> ctrl shift i
-
-Alternatively:
-> Press the alt key to temporarily toggle showing the "electron application menu thing" at the top of the application.
-
-> Go to the menu for 'View' > 'Toggle Developer Tools'
