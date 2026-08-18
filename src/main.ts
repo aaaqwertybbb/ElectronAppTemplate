@@ -72,7 +72,7 @@ if (require('electron-squirrel-startup')) {
 function isValidAbsolutePath(absolutePath) {
     // The provided absolute file path is validated.
     // If the absolute file path is NOT recognized, then an empty enumeration is returned.
-    if (absolutePath !== openedDirectory & !database.contains(absolutePath)) return false;
+    if (absolutePath !== openedDirectory && !database.contains(absolutePath)) return false;
 
 	return true;
 }
@@ -102,13 +102,11 @@ const createWindow = () => {
 	ipcMain.handle('get-filesystem-entry-by-id-array', getFilesystemEntryById_ARRAY);
 	ipcMain.handle('editor-read-all-text', editorReadAllText);
 	ipcMain.handle('set-clipboard', setClipboard);
-	ipcMain.handle('editor-set-clipboard', editorSetClipboard);
 	ipcMain.handle('read-clipboard', readClipboard);
 	ipcMain.handle('new-file', newFile);
 	ipcMain.handle('delete-file', deleteFile);
 	ipcMain.handle('rename-file', renameFile);
 	ipcMain.handle('save-file', saveFile);
-	ipcMain.handle('editor-save-file', editorSaveFile);
 	ipcMain.handle('copy-clipboard-absolute-path-to-directory', copyClipboardAbsolutePathToDirectory);
 
 	mainWindowCapture = mainWindow;
@@ -252,7 +250,9 @@ function hasBOM(filePath) {
 		fs.closeSync(fd);
 		return {
 			text: bufferaaa.toString(),
-			fileStartsWithBom: true
+			fileStartsWithBom: true,
+			formattedAbsolutePath: null,
+			extension: null,
 		};
 	}
 	else {
@@ -261,7 +261,9 @@ function hasBOM(filePath) {
 		fs.closeSync(fd);
 		return {
 			text: bufferaaa.toString(),
-			fileStartsWithBom: false
+			fileStartsWithBom: false,
+			formattedAbsolutePath: null,
+			extension: null,
 		};
 	}
 
@@ -471,19 +473,6 @@ async function setClipboard(event, text) {
 	}
 }
 
-async function editorSetClipboard(event, uint8Array, offset, length, EDITOR_lineEndString) {
-	try {
-		if (!EDITOR_lineEndString)
-			EDITOR_lineEndString = '\n';
-
-		clipboard.writeText(MAIN_decode_experimental_textonly(uint8Array, offset, length, EDITOR_lineEndString));
-	}
-	catch (err) {
-		console.error("Error setting clipboard:", err);
-		return [];
-	}
-}
-
 async function readClipboard(event) {
 	try {
 		return clipboard.readText();
@@ -615,7 +604,8 @@ async function renameFile(event, absolutePath, filename, isDirectory) {
 		console.error("Error renaming file:", err);
 		return {
 			success: false,
-			pathId: pathId
+			pathId: null,
+			absolutePath: null,
 		};
 	}
 }
@@ -631,26 +621,6 @@ async function saveFile(event, absolutePath, text) {
 		}
 
 		fs.writeFile(absolutePath, text, () => {});
-	}
-	catch (err) {
-		console.error("Error saving file:", err);
-		return [];
-	}
-}
-
-async function editorSaveFile(event, absolutePath, uint8Array, count, EDITOR_lineEndString, EDITOR_fileStartsWithBom) {
-	if (!isValidAbsolutePath(absolutePath)) return;
-
-	try {
-		const stats = fs.statSync(absolutePath);
-		if (stats.isDirectory()) {
-			throw new Error('The destination path is a directory');
-		}
-
-		if (!EDITOR_lineEndString)
-			EDITOR_lineEndString = '\n';
-
-		fs.writeFile(absolutePath, MAIN_decode_experimental_textonly(uint8Array, /*start*/ 0, count, EDITOR_lineEndString, EDITOR_fileStartsWithBom), () => {});
 	}
 	catch (err) {
 		console.error("Error saving file:", err);
@@ -683,7 +653,7 @@ async function copyClipboardAbsolutePathToDirectory(event, directory, menuOption
 			fs.cpSync(sourceFile, destinationFile, { force: false, errorOnExist: true, recursive: true });
 			let pathId = database.addAbsolutePath(destinationFile, filename);
 			let sourceFileWasDeleted = false;
-			if (sourceWasMenuOptionCut & fs.existsSync(destinationFile)) {
+			if (sourceWasMenuOptionCut && fs.existsSync(destinationFile)) {
 				fs.rmSync(sourceFile, { recursive: true });
 				sourceFileWasDeleted = true;
 			}
@@ -700,7 +670,7 @@ async function copyClipboardAbsolutePathToDirectory(event, directory, menuOption
 			fs.copyFileSync(sourceFile, destinationFile, fs.constants.COPYFILE_EXCL);
 			let pathId = database.addAbsolutePath(destinationFile, filename);
 			let sourceFileWasDeleted = false;
-			if (sourceWasMenuOptionCut & fs.existsSync(destinationFile)) {
+			if (sourceWasMenuOptionCut && fs.existsSync(destinationFile)) {
 				fs.unlinkSync(sourceFile);
 				sourceFileWasDeleted = true;
 			}

@@ -3,7 +3,7 @@
   "productName": "my-app",
   "version": "1.0.0",
   "description": "My Electron application description",
-  "main": "src/main.cjs",
+  "main": "dist/main.cjs",
   "private": true,
   "type": "module",
   "scripts": {
@@ -38,6 +38,7 @@
     "@electron-forge/plugin-auto-unpack-natives": "^7.11.1",
     "@electron-forge/plugin-fuses": "^7.11.1",
     "@electron/fuses": "^1.8.0",
+    "@types/node": "^26.2.0",
     "electron": "40.6.0"
   }
 }
