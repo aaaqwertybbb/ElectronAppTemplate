@@ -65,6 +65,10 @@ const DIALOG_minLeft = 8;
 const DIALOG_minHeight = 100;
 const DIALOG_minWidth = 100;
 
+export function DIALOG_Settings_isDark_SETTER(isDark: boolean) {
+    DIALOG_Settings_isDark = isDark;
+}
+
 function DIALOG_render_request(renderKind: number) {
     if (DIALOG_renderKindArray[DIALOG_renderKindArray.length - 1] !== renderKind) {
         DIALOG_renderKindArray.push(renderKind);
