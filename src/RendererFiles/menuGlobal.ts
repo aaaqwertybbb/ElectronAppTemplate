@@ -571,3 +571,20 @@ and then as desired ask AI for their input. That's where it shines.
 72 hours 51 minutes in the last 18 days across all characters
 
 */
+
+
+
+/*
+I've been eating:
+
+- 1 lb of 98% fat free chicken with sriracha for breakfast
+- 8 strawberry nutrigrain bars for lunch
+- 1 lb of 98% fat free chicken with sriracha for dinner
+
+I don't feel great
+my mood is completely all over and maybe it always is idk
+
+*/
+
+
+
