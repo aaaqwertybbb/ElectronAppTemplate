@@ -24,14 +24,14 @@ class MenuOption {
      * If submenu is not null, the commandKind will be overriden to be get_CommandKind_Submenu()
      * @type {MenuOption[]}
      */
-    submenu = null;
+    submenu: MenuOption[] | null = null;
 
     /**
      * @param {CommandKind} commandKind 
      * @param {string} text 
      * @param {MenuOption[]} submenu If submenu is not null, the commandKind will be overriden to be get_CommandKind_Submenu()
      */
-    constructor(commandKind, text, submenu) {
+    constructor(commandKind: number, text: string, submenu: MenuOption[]) {
         this.commandKind = commandKind;
         this.text = text;
         if (submenu) {
@@ -58,16 +58,18 @@ let MENU_ticketId_counter = 1;
 let MENU_ticketId_pending = 0;
 let MENU_ticketId_drawn = 0;
 
-let MENU_context = null;
-let MENU_target = null;
+// rebound shift+f12 finally it isn't a setting I tried the settings you gotta change the keybind itself I swapped shift+alt+f12 and shift+12
 
-let MENU_restoreFocusToElement = null;
+let MENU_context: any | null = null;
+let MENU_target: any | null = null;
+
+let MENU_restoreFocusToElement: HTMLElement | null = null;
 
 ////////
 ////////
 ////////
 
-let MENU_recentBoundingClientRectTop = null;
+let MENU_recentBoundingClientRectTop: DOMRect | null = null;
 
 let MENU_cursorIndex = 0;
 /** By duplicating this you guarantee the initial cursor index is what was expected. */
@@ -79,21 +81,21 @@ let MENU_left = 0;
 let MENU_top = 0;
 let MENU_SET_NOTshouldFocus = false;
 
-let MENU_renderKindArray = [];
+let MENU_renderKindArray: number[] = [];
 let MENU_isRenderPending = false;
 
 let MENU_renderKind_Set_countOfPendingRequests = 0;
 
-let MENU_optionList = null;
+let MENU_optionList: MenuOption[] | null = null;
 /** TODO: Perhaps use 'MENU_optionList' instead? */
-let MENU_ArrayFrom_menuOptionList_children = null;
+let MENU_ArrayFrom_menuOptionList_children: HTMLElement[] | null = null;
 
 let MENU_NOTshouldFocus = false;
 
 // TODO: maybe the menu should always be empty, and just be some div that moves left top positions and you can put anything you want in it.
 
 /** a delegate of kind: () => Promise */
-let MENU_onHideAction = null;
+let MENU_onHideAction: (() => Promise<void>) | null = null;
 
 let MENU_last_handled_ticketId = 0;
 
@@ -102,7 +104,7 @@ const get_MENUrenderKind_Cursor = () => 1;
 const get_MENUrenderKind_Set = () => 2;
 const get_MENUrenderKind_Hide = () => 3;
 
-function MENU_render_request(renderKind) {
+function MENU_render_request(renderKind: number) {
     if (MENU_renderKindArray[MENU_renderKindArray.length - 1] !== renderKind) {
         MENU_renderKindArray.push(renderKind);
         if (renderKind === get_MENUrenderKind_Set()) MENU_renderKind_Set_countOfPendingRequests++;
@@ -155,7 +157,7 @@ function MENU_render_do_Hide() {
     }
 }
 
-async function MENU_state_do_hide(shouldRestoreFocus) {
+async function MENU_state_do_hide(shouldRestoreFocus: boolean) {
 
     if (MENU_onHideAction) {
         await MENU_onHideAction();
@@ -176,7 +178,7 @@ async function MENU_state_do_hide(shouldRestoreFocus) {
     }
 }
 
-async function menuHide(shouldRestoreFocus) {
+async function menuHide(shouldRestoreFocus: boolean) {
     // TODO: Don't put this line here when you could instead just think about async code and figure out the truth of what will happen...
     // ...I'm anxious and can't think straight I swear...
     MENU_last_handled_ticketId = MENU_ticketId_drawn;
@@ -216,17 +218,17 @@ function MENU_render_do_Set() {
             optionElement.textContent = entry.text;
 
             if (entry.submenu) {
-                optionElement.setAttribute("data-command-kind", get_CommandKind_Submenu());
+                optionElement.setAttribute("data-command-kind", `${get_CommandKind_Submenu()}`);
                 optionElement.textContent += '>';
             }
             else {
-                optionElement.setAttribute("data-command-kind", entry.commandKind);
+                optionElement.setAttribute("data-command-kind", `${entry.commandKind}`);
             }
 
             optionListElement.appendChild(optionElement);
         }
 
-        MENU_ArrayFrom_menuOptionList_children = Array.from(optionListElement.children);
+        MENU_ArrayFrom_menuOptionList_children = Array.from(optionListElement.children) as HTMLElement[];
     }
 
     //////////
@@ -279,14 +281,19 @@ function MENU_render_do_Set() {
     }
     MENU_render_do_Cursor();
 
-    MENU_restoreFocusToElement = document.activeElement;
+    if (document.activeElement instanceof HTMLElement) {
+        MENU_restoreFocusToElement = document.activeElement;
+    }
+    else {
+        MENU_restoreFocusToElement = null;
+    }
 
     if (!MENU_SET_NOTshouldFocus) {
         menuElement.focus();
     }
 }
 
-async function menuSet(context, target, optionList, left, top, NOTshouldFocus, index, onHideAction) {
+async function menuSet(context: any, target: any, optionList, left, top, NOTshouldFocus, index, onHideAction) {
     MENU_ticketId_pending = MENU_ticketId_counter++;
     
     // TODO: These 'if (MENU_optionList)' and 'if (MENU_ArrayFrom_menuOptionList_children)' won't work because for some reason you decided that a menu could be "empty", thus these could be null and no longer would indicate that whether only the state function ran or both the state function and the render function ran or etc...
@@ -317,7 +324,7 @@ async function menuSet(context, target, optionList, left, top, NOTshouldFocus, i
     MENU_render_request(get_MENUrenderKind_Set());
 }
 
-function MENU_onMouseMove(event) {
+function MENU_onMouseMove(event: MouseEvent) {
     // then cancel the throttle? That's what you were actually doing with the thing?
 
     if (!MENU_recentBoundingClientRectTop) {
