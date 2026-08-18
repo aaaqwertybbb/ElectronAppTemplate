@@ -612,6 +612,8 @@ that is probably it to be honest.
 I'm gonna go to the store and find rice that I can eat with the chicken instead of the nutrigrain bars that way
 I eat the breakfast and dinner and then both meals have rice with it and maybe it is blood sugar related
 
+(I'm going right now) if you want anything just text me
+
 */
 
 
