@@ -96,3 +96,6 @@ preprocessor/
 
 # build output
 build/
+
+# dist output
+dist/

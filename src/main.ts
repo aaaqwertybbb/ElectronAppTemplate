@@ -2,13 +2,13 @@
 // I don't want to touch the originally scaffolded "if (require('electron-squirrel-startup'))" at the moment.
 // thus this file is staying common js.
 
-const { app, BrowserWindow, dialog, ipcMain, clipboard } = require('electron');
-const path = require('node:path');
-const fs = require('fs');
-const AppDatabase = require('./Database/database').default;
-const { spawn } = require('node:child_process');
-const { URI } = require('vscode-uri');
-const os = require('os');
+import { app, BrowserWindow, dialog, ipcMain, clipboard } from 'electron';
+import path from 'node:path';
+import fs from 'fs';
+import AppDatabase from './Database/database';
+import { spawn } from 'node:child_process';
+import { URI } from 'vscode-uri';
+import os from 'os';
 
 if (!app.isPackaged) {
 	app.setPath('userData', path.join(app.getPath('appData'), 'my-app-Debug'));
@@ -92,7 +92,7 @@ const createWindow = () => {
 	// and load the index.html of the app.
 	mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
-	mainWindow.isMenuBarVisible(false);
+	mainWindow.setMenuBarVisibility(false);
 
 	// Handle the request from the renderer process
 	ipcMain.handle('choose-directory', chooseDirectory);
@@ -162,7 +162,7 @@ function MAIN_encodeMessageObject(messageObject) {
  * and applies a common sorting prior to returning results.
  * */
 function wrap_readdirSync_getChildList(parentAbsolutePath) {
-	let childList = fs.readdirSync(parentAbsolutePath, { withFileTypes: true });
+	const childList: (fs.Dirent<string> | any)[] = fs.readdirSync(parentAbsolutePath, { withFileTypes: true });
 	for (var i = 0; i < childList.length; i++) {
 		let filename = childList[i].name;
 		let isDirectory = childList[i].isDirectory();
@@ -200,7 +200,7 @@ function wrap_readdirSync_getChildList(parentAbsolutePath) {
  * TODO: As well I believe checking the filename alone (not checking the childIsDirectory) is sufficient.
  */
 function wrap_readdirSync_indexOf(parentAbsolutePath, childFilename, childIsDirectory) {
-	let childList = fs.readdirSync(parentAbsolutePath, { withFileTypes: true });
+	const childList: (fs.Dirent<string> | any)[] = fs.readdirSync(parentAbsolutePath, { withFileTypes: true });
 	for (var i = 0; i < childList.length; i++) {
 		let filename = childList[i].name;
 		let isDirectory = childList[i].isDirectory();

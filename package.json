@@ -3,9 +3,8 @@
   "productName": "my-app",
   "version": "1.0.0",
   "description": "My Electron application description",
-  "main": "dist/main.cjs",
+  "main": "dist/main.js",
   "private": true,
-  "type": "module",
   "scripts": {
     "prebuild": "node preprocessor.cjs",
     "build": "babel preprocessor/__PREPROCESSEDbundle__.js -o build/__COMPILEDbundle__.js",
