@@ -1,5 +1,9 @@
+import { DIALOG_Settings_isDark } from './dialogGlobal';
 
 class DIALOG_FindAll_TreeViewDirector {
+    actualData: null;
+    nodeList: TreeViewNodeList;
+    component: TreeViewComponent;
 
     constructor() {
         /** @type {Array} object or string */
@@ -278,104 +282,6 @@ class DIALOG_FindAll_TreeViewDirector {
     }
 }
 
-/** @type {DIALOG_FindAll_TreeViewDirector} */
-let DIALOG_FindAll_TreeViewDirector_instance = null;
-
-async function DIALOG_FindAll_Create_async() {
-    let dialogBody = document.getElementById('DIALOG_body');
-
-    let searchTextInput = document.createElement('input');
-    searchTextInput.type = "text";
-    searchTextInput.placeholder = 'find all';
-    searchTextInput.id = 'DIALOG_FindAll_searchTextInput';
-    searchTextInput.style.marginLeft = '5px';
-    searchTextInput.style.marginTop = '5px';
-    searchTextInput.style.height = 'var(--APP-line-height)';
-    searchTextInput.addEventListener('keydown', DIALOG_FindAll_searchTextInput_onkeydown);
-    dialogBody.appendChild(searchTextInput);
-    searchTextInput.focus();
-    
-    let divOptions = document.createElement('div');
-    divOptions.style.height = 'var(--APP-line-height)';
-    divOptions.style.whiteSpace = 'nowrap';
-    let checkboxMatchWord = document.createElement('input');
-    checkboxMatchWord.type = 'checkbox';
-    checkboxMatchWord.id = 'DIALOG_FindAll_checkboxMatchWord';
-    checkboxMatchWord.checked = DIALOG_FindAll_options_matchWord;
-    checkboxMatchWord.addEventListener('change', DIALOG_FindAll_checkboxMatchWord_onchange);
-    divOptions.appendChild(checkboxMatchWord);
-    let label_for_checkboxMatchWord = document.createElement('label');
-    label_for_checkboxMatchWord.htmlFor = 'DIALOG_FindAll_checkboxMatchWord';
-    label_for_checkboxMatchWord.textContent = 'matchWord ';
-    divOptions.appendChild(label_for_checkboxMatchWord);
-    // TODO: The dialog body doesn't currently have an overflow scrollbar, so this will just clip if text goes offscreen due to...
-    // ...the encompassing div having 'white-space: nowrap' style.
-    // But this behavior is contrary to the ctrl+f. So I wanted to note it in some way with some immediacy before I continued.
-    let spanNotes = document.createElement('span');
-    spanNotes.id = 'DIALOG_FindAll_spanNotes';
-    spanNotes.className = 'eC';
-    divOptions.appendChild(spanNotes);
-    dialogBody.appendChild(divOptions);
-
-    // TODO: Remove 'searchResultsDiv'? It is pointlessly wrapping.
-    let searchResultsDiv = document.createElement('div');
-    searchResultsDiv.id = 'DIALOG_FindAll_searchResultsDiv';
-    dialogBody.appendChild(searchResultsDiv);
-}
-
-async function DIALOG_FindAll_Delete_async() {
-    let searchTextInput = document.getElementById('DIALOG_FindAll_searchTextInput');
-    if (searchTextInput) {
-        searchTextInput.removeEventListener('keydown', DIALOG_FindAll_searchTextInput_onkeydown);
-    }
-    
-    let checkboxMatchWord = document.getElementById('DIALOG_FindAll_checkboxMatchWord');
-    if (checkboxMatchWord) {
-    	checkboxMatchWord.removeEventListener('change', DIALOG_FindAll_checkboxMatchWord_onchange);
-    }
-
-    DIALOG_FindAll_TreeViewDirector_instance = null;
-}
-
-async function DIALOG_FindAll_searchTextInput_onkeydown(event) {
-    if (event.key === 'Enter') {
-        let dialogBody = document.getElementById('DIALOG_body');
-        if (!dialogBody) return;
-        let searchResultsDiv = document.getElementById('DIALOG_FindAll_searchResultsDiv');
-        if (!searchResultsDiv) return;
-        let searchTextInput = document.getElementById('DIALOG_FindAll_searchTextInput');
-        if (!searchTextInput) return;
-        let spanNotes = document.getElementById('DIALOG_FindAll_spanNotes');
-	    if (spanNotes) {
-	        spanNotes.textContent = '';
-	    }
-
-        let search = searchTextInput.value;
-        if (!search) {
-            return;
-        }
-
-        let results = await window.myAPI.findAll(search, DIALOG_FindAll_options_matchWord);
-        if (!DIALOG_FindAll_TreeViewDirector_instance) {
-            DIALOG_FindAll_TreeViewDirector_instance = new DIALOG_FindAll_TreeViewDirector();
-        }
-        DIALOG_FindAll_TreeViewDirector_instance.setData_causes_state_reset(results);
-        DIALOG_FindAll_TreeViewDirector_instance.component.draw_create_request(searchResultsDiv, null);
-    }
-}
-
-function DIALOG_FindAll_checkboxMatchWord_onchange() {
-	// for an onchange event, event.target might always be precise?
-	let checkboxMatchWord = document.getElementById('DIALOG_FindAll_checkboxMatchWord');
-    if (checkboxMatchWord) {
-    	DIALOG_FindAll_options_matchWord = checkboxMatchWord.checked;
-    	let spanNotes = document.getElementById('DIALOG_FindAll_spanNotes');
-	    if (spanNotes) {
-	        spanNotes.textContent = 'NOTE: changing \'matchWord\' here does not re-do the search';
-	    }
-    }
-}
-
 export async function DIALOG_Settings_Create_async() {
     let dialogBody = document.getElementById('DIALOG_body');
     if (!dialogBody) return;
@@ -387,7 +293,7 @@ export async function DIALOG_Settings_Create_async() {
     dialogBody.appendChild(buttonTheme);
 }
 
-async function DIALOG_Settings_Delete_async() {
+export async function DIALOG_Settings_Delete_async() {
     let dialogBody = document.getElementById('DIALOG_body');
     if (!dialogBody) return;
     
@@ -418,55 +324,6 @@ function DIALOG_buttonTheme_onclick() {
         document.body.classList.remove('light-theme');
         document.body.classList.add('dark-theme');
     }
-}
-
-function DIALOG_checkboxTrueTabsFalseSpaces_onchange() {
-    let checkboxTrueTabsFalseSpaces = document.getElementById('SETTINGS_trueTabs_falseSpaces');
-    if (!checkboxTrueTabsFalseSpaces) return;
-
-    DIALOG_Settings_trueTabs_falseSpaces = checkboxTrueTabsFalseSpaces.checked;
-    if (DIALOG_Settings_trueTabs_falseSpaces) {
-        EDITOR_on_tab_bytes = EDITOR_tab_tabsbytes;
-    }
-    else {
-        EDITOR_on_tab_bytes = EDITOR_tab_spacesbytes;
-    }
-}
-
-function DIALOG_checkboxEditorDebugShowAdjacentCharacters_onchange() {
-    let checkboxEditorDebugShowAdjacentCharacters = document.getElementById('SETTINGS_editorDebugShowAdjacentCharacters');
-    if (!checkboxEditorDebugShowAdjacentCharacters) return;
-
-    DIALOG_Settings_editorDebugShowAdjacentCharacters = checkboxEditorDebugShowAdjacentCharacters.checked;
-    EDITOR_drawCursor(EDITOR_primaryCursor);
-}
-
-async function DIALOG_DocumentSymbol_Create_async() {
-    let dialogBody = document.getElementById('DIALOG_body');
-    if (!dialogBody) return;
-
-    if (EDITOR_documentSymbolResult) {
-        let div = document.createElement('div');
-        div.textContent = 'EDITOR_documentSymbolResult.length: ' + EDITOR_documentSymbolResult.length;
-        div.style.height = APP_lineHeight + 'px';
-        div.style.whiteSpace = 'nowrap';
-        dialogBody.appendChild(div);
-        EDITOR_listComponent.rootElement.style.height = `calc(100% - ${div.style.height})`;
-        EDITOR_listComponent.draw_create(dialogBody, null);
-    }
-    else {
-        dialogBody.textContent = 'EDITOR_documentSymbolResult is falsey';
-    }
-}
-
-async function DIALOG_DocumentSymbol_Delete_async() {
-    let dialogBody = document.getElementById('DIALOG_body');
-    if (!dialogBody) return;
-    if (EDITOR_listComponent) {
-        EDITOR_listComponent.draw_delete();
-        EDITOR_listComponent = null;
-    }
-    EDITOR_documentSymbolResult = null;
 }
 
 //let DEBUG_listData = null;

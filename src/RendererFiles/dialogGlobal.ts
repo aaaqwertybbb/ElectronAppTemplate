@@ -3,7 +3,7 @@
 import "./fieldBuffer"
 //__#__
 
-import { DIALOG_Settings_Create_async } from "./dialogImplementationsGlobal"
+import { DIALOG_Settings_Create_async, DIALOG_Settings_Delete_async } from "./dialogImplementationsGlobal"
 
 const get_DialogKind_None = () => "None";
 const get_DialogKind_FindAll = () => "FindAll";
@@ -23,7 +23,7 @@ let DIALOG_windowExists = false;
 let DIALOG_hasBeenMeaasured = false;
 
 let DIALOG_SHOW_restoreFocusToElement = null;
-let DIALOG_SHOW_currentDialogKind = get_DialogKind_None();
+let DIALOG_SHOW_currentDialogKind: string = get_DialogKind_None();
 let DIALOG_SHOW_onResizeAction = null;
 
 /**
@@ -48,11 +48,11 @@ let DIALOG_after_Y = 0;
 
 let DIALOG_FindAll_options_matchWord = false;
 
-let DIALOG_Settings_isDark = true;
+export let DIALOG_Settings_isDark = true;
 let DIALOG_Settings_trueTabs_falseSpaces = true;
 let DIALOG_Settings_editorDebugShowAdjacentCharacters = false;
 
-let DIALOG_renderKindArray = [];
+let DIALOG_renderKindArray: number[] = [];
 let DIALOG_isRenderPending = false;
 
 //let DIALOG_ArrayFrom_menuOptionList_children = [];
@@ -62,7 +62,7 @@ const get_DIALOGrenderKind_Show = () => 1;
 const get_DIALOGrenderKind_Hide = () => 2;
 const get_DIALOGrenderKind_DimensionsChanged = () => 3;
 
-function DIALOG_render_request(renderKind) {
+function DIALOG_render_request(renderKind: number) {
     if (DIALOG_renderKindArray[DIALOG_renderKindArray.length - 1] !== renderKind) {
         DIALOG_renderKindArray.push(renderKind);
     }
@@ -136,18 +136,12 @@ async function DIALOG_render_do_Show() {
     DIALOG_createWindow();
 
     switch (DIALOG_currentDialogKind) {
-        case get_DialogKind_FindAll():
-            return DIALOG_FindAll_Create_async();
         case get_DialogKind_Settings():
             return DIALOG_Settings_Create_async();
-        case get_DialogKind_DocumentSymbol():
-            return DIALOG_DocumentSymbol_Create_async();
-        case get_DialogKind_Debug():
-            return DIALOG_Debug_Create_async();
     }
 }
 
-export async function DIALOG_show_async(dialogKind, onResizeAction) {    
+export async function DIALOG_show_async(dialogKind: string, onResizeAction) {
     DIALOG_SHOW_restoreFocusToElement = document.activeElement;
     DIALOG_SHOW_currentDialogKind = dialogKind;
     DIALOG_SHOW_onResizeAction = onResizeAction;
@@ -159,17 +153,8 @@ async function DIALOG_render_do_Hide() {
     if (!DIALOG_element) return;
 
     switch (DIALOG_currentDialogKind) {
-        case get_DialogKind_FindAll():
-            await DIALOG_FindAll_Delete_async();
-            break;
         case get_DialogKind_Settings():
             await DIALOG_Settings_Delete_async();
-            break;
-        case get_DialogKind_DocumentSymbol():
-            await DIALOG_DocumentSymbol_Delete_async();
-            break;
-        case get_DialogKind_Debug():
-            await DIALOG_Debug_Delete_async();
             break;
     }
 
@@ -714,6 +699,7 @@ function DIALOG_deleteWindow() {
     DIALOG_after_Y = 0;
 
     let toolbar = document.getElementById('DIALOG_toolbar');
+    if (!toolbar) throw new Error('getElementById for DIALOG_resize was null');
     toolbar.removeEventListener('mousedown', DIALOG_toolbar_onmousedown);
 
     document.body.classList.remove('unselectable');
@@ -724,9 +710,12 @@ function DIALOG_deleteWindow() {
     window.removeEventListener('resize', DIALOG_window_onresize);
 
     let resize = document.getElementById('DIALOG_resize');
+    if (!resize) throw new Error('getElementById for DIALOG_resize was null');
     resize.removeEventListener('mouseenter', DIALOG_resize_onmouseenter);
     resize.removeEventListener('mousedown', DIALOG_resize_onmousedown);
+    
 
     let closeButton = document.getElementById('DIALOG_closeButton');
+    if (!closeButton) throw new Error('getElementById for closeButton was null');
     closeButton.removeEventListener('click', DIALOG_closeButton_onclick);
 }
