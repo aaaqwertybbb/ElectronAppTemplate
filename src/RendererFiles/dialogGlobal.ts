@@ -14,17 +14,17 @@ const get_DialogKind_Debug = () => "Debug";
 let DIALOG_currentDialogKind = get_DialogKind_None();
 
 /** A delegate of the form: () => {} */
-let DIALOG_onResizeAction = null;
-let DIALOG_restoreFocusToElement = null;
+let DIALOG_onResizeAction: (() => void) | null = null;
+let DIALOG_restoreFocusToElement: HTMLElement | null = null;
 let DIALOG_HIDE_shouldRestoreFocus = true;
 
 let DIALOG_windowExists = false;
 
 let DIALOG_hasBeenMeaasured = false;
 
-let DIALOG_SHOW_restoreFocusToElement = null;
+let DIALOG_SHOW_restoreFocusToElement: HTMLElement | null = null;
 let DIALOG_SHOW_currentDialogKind: string = get_DialogKind_None();
-let DIALOG_SHOW_onResizeAction = null;
+let DIALOG_SHOW_onResizeAction: (() => void) | null = null;
 
 /**
  * defaults to viewport size then getBoundingClientRect says the exact pixels upon trying to resize
@@ -54,8 +54,6 @@ let DIALOG_Settings_editorDebugShowAdjacentCharacters = false;
 
 let DIALOG_renderKindArray: number[] = [];
 let DIALOG_isRenderPending = false;
-
-//let DIALOG_ArrayFrom_menuOptionList_children = [];
 
 const get_DIALOGrenderKind_None = () => 0;
 const get_DIALOGrenderKind_Show = () => 1;
@@ -141,8 +139,14 @@ async function DIALOG_render_do_Show() {
     }
 }
 
-export async function DIALOG_show_async(dialogKind: string, onResizeAction) {
-    DIALOG_SHOW_restoreFocusToElement = document.activeElement;
+export async function DIALOG_show_async(dialogKind: string, onResizeAction: (() => void) | null) {
+    if (document.activeElement instanceof HTMLElement) {
+        DIALOG_SHOW_restoreFocusToElement = document.activeElement;
+    }
+    else {
+        DIALOG_SHOW_restoreFocusToElement = null;
+    }
+
     DIALOG_SHOW_currentDialogKind = dialogKind;
     DIALOG_SHOW_onResizeAction = onResizeAction;
     DIALOG_render_request(get_DIALOGrenderKind_Show());
@@ -163,7 +167,7 @@ async function DIALOG_render_do_Hide() {
     DIALOG_onResizeAction = null;
     DIALOG_element.remove();
     DIALOG_currentDialogKind = get_DialogKind_None();
-    if (shouldRestoreFocus) {
+    if (DIALOG_HIDE_shouldRestoreFocus) {
         if (DIALOG_restoreFocusToElement) {
             DIALOG_restoreFocusToElement.focus();
         }
@@ -171,7 +175,7 @@ async function DIALOG_render_do_Hide() {
     }
 }
 
-function DIALOG_hide_request(shouldRestoreFocus) {
+function DIALOG_hide_request(shouldRestoreFocus: boolean) {
     DIALOG_HIDE_shouldRestoreFocus = shouldRestoreFocus;
     DIALOG_render_request(get_DIALOGrenderKind_Hide());
 }
@@ -180,7 +184,7 @@ function DIALOG_closeButton_onclick() {
     DIALOG_hide_request(true);
 }
 
-function DIALOG_resize_onmouseenter(event) {
+function DIALOG_resize_onmouseenter(event: MouseEvent) {
 
     const DIALOG_element = document.getElementById('DIALOG');
     if (!DIALOG_element) return;
@@ -199,7 +203,7 @@ function DIALOG_resize_onmouseenter(event) {
     DIALOG_resize_setCursor(event, dialogBoundingClientRect, resize);
 }
 
-function DIALOG_resize_onmousedown(event) {
+function DIALOG_resize_onmousedown(event: MouseEvent) {
     const DIALOG_element = document.getElementById('DIALOG');
     if (!DIALOG_element) return;
 
@@ -229,7 +233,7 @@ function DIALOG_resize_onmousedown(event) {
 /**
  * does not redraw, only preps the state to be redrawn
  */
-function DIALOG_n_resize_calcOnly(diff_Y, clientY) {
+function DIALOG_n_resize_calcOnly(diff_Y: number, clientY: number) {
     if (diff_Y < 0) {
         let absdiff_Y = Math.abs(diff_Y);
         if (DIALOG_top <= get_DIALOG_minTop()) {
@@ -259,7 +263,7 @@ function DIALOG_n_resize_calcOnly(diff_Y, clientY) {
 }
 
 /** does not redraw, only preps the state to be redrawn */
-function DIALOG_e_resize_calcOnly(diff_X, clientX) {
+function DIALOG_e_resize_calcOnly(diff_X: number, clientX: number) {
     if (diff_X < 0) {
         let absdiff_X = Math.abs(diff_X);
         if (DIALOG_width <= get_DIALOG_minWidth()) {
@@ -288,7 +292,7 @@ function DIALOG_e_resize_calcOnly(diff_X, clientX) {
 }
 
 /** does not redraw, only preps the state to be redrawn */
-function DIALOG_s_resize_calcOnly(diff_Y, clientY) {
+function DIALOG_s_resize_calcOnly(diff_Y: number, clientY: number) {
     if (diff_Y < 0) {
         let absdiff_Y = Math.abs(diff_Y);
         if (DIALOG_height <= get_DIALOG_minHeight()) {
@@ -320,7 +324,7 @@ function DIALOG_s_resize_calcOnly(diff_Y, clientY) {
 }
 
 /** does not redraw, only preps the state to be redrawn */
-function DIALOG_w_resize_calcOnly(diff_X, clientX) {
+function DIALOG_w_resize_calcOnly(diff_X: number, clientX: number) {
     if (diff_X < 0) {
         let absdiff_X = Math.abs(diff_X);
         if (DIALOG_left <= get_DIALOG_minLeft()) {
@@ -349,7 +353,7 @@ function DIALOG_w_resize_calcOnly(diff_X, clientX) {
     }
 }
 
-function DIALOG_resize_body_onmousemove(event) {
+function DIALOG_resize_body_onmousemove(event: MouseEvent) {
 
     const DIALOG_element = document.getElementById('DIALOG');
     if (!DIALOG_element) return;
@@ -416,7 +420,7 @@ function DIALOG_resize_body_onmousemove(event) {
     DIALOG_render_request(get_DIALOGrenderKind_DimensionsChanged());
 }
 
-function DIALOG_resize_setCursor(event, dialogBoundingClientRect, resize) {
+function DIALOG_resize_setCursor(event: MouseEvent, dialogBoundingClientRect: DOMRect, resize: HTMLElement) {
     let rX = event.clientX - dialogBoundingClientRect.left;
     let rY = event.clientY - dialogBoundingClientRect.top;
     // left to right
@@ -493,7 +497,7 @@ function DIALOG_window_onresize() {
     }
 }
 
-function DIALOG_toolbar_body_onmousemove(event) {
+function DIALOG_toolbar_body_onmousemove(event: MouseEvent) {
 
     const DIALOG_element = document.getElementById('DIALOG');
     if (!DIALOG_element) return;
@@ -605,7 +609,7 @@ function DIALOG_toolbar_body_onmousemove(event) {
     }
 }
 
-function DIALOG_toolbar_onmousedown(event) {
+function DIALOG_toolbar_onmousedown(event: MouseEvent) {
 
     const DIALOG_element = document.getElementById('DIALOG');
     if (!DIALOG_element) return;
@@ -699,7 +703,7 @@ function DIALOG_deleteWindow() {
     DIALOG_after_Y = 0;
 
     let toolbar = document.getElementById('DIALOG_toolbar');
-    if (!toolbar) throw new Error('getElementById for DIALOG_resize was null');
+    if (!toolbar) throw new Error('getElementById for DIALOG_toolbar was null');
     toolbar.removeEventListener('mousedown', DIALOG_toolbar_onmousedown);
 
     document.body.classList.remove('unselectable');
