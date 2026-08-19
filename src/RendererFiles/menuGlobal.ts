@@ -602,6 +602,8 @@ Paraphrase Google AI Overview:
 I also got iron:
 - solgar brand; "gentle iron" as iron bisglycinate 25mg 139%
 
+I'm gonna take the iron closer to bed time then. I go to sleep at 9:00 PM so I'll take the iron at like 7 PM? something like that?
+
 
 
 */
