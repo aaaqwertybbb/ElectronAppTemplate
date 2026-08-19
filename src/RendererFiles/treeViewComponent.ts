@@ -102,24 +102,24 @@
 // < you must use a dedicated build plugin that reads the entire type tree during compilation.
 // <
 // < ...
+//
+// way too much to do right now I'm not dealing with this until later (and even then only maybe)
 
 const TreeView_RenderKind = {
-  Active: "ACTIVE",
-  Pending: "PENDING",
+    None: 0,
+    Cursor: 1,
+    Create: 2,
+    Batch: 3,
+    Scroll: 4,
+    SetItems: 5,
+    FullReset: 6,
+    Scroll_PullDataDrawResult: 7,
+    Resize: 8,
 } as const;
 // Derive the type union from the object values
 type TreeView_RenderKind = typeof TreeView_RenderKind[keyof typeof TreeView_RenderKind];
-let userStatus: TreeView_RenderKind = TreeView_RenderKind.Active;
 
-const get_TREEVIEWrenderKind_None = () => 0;
-const get_TREEVIEWrenderKind_Cursor = () => 1;
-const get_TREEVIEWrenderKind_Create = () => 2;
-const get_TREEVIEWrenderKind_Batch = () => 3;
-const get_TREEVIEWrenderKind_Scroll = () => 4;
-const get_TREEVIEWrenderKind_SetItems = () => 5;
-const get_TREEVIEWrenderKind_FullReset = () => 6;
-const get_TREEVIEWrenderKind_Scroll_PullDataDrawResult = () => 7;
-const get_TREEVIEWrenderKind_Resize = () => 8;
+
 
 const get_TreeViewNodeKind_None = () => 0;
 const get_TreeViewNodeKind_isExpandable_isExpanded = () => 1;
@@ -152,7 +152,7 @@ class TreeViewComponent {
     scrollTimer: null;
     hasTrailingCall: boolean;
     beltIndexZero: number;
-    TREEVIEW_renderKindArray: number[];
+    TREEVIEW_renderKindArray: TreeView_RenderKind[];
     TREEVIEW_isRenderPending: boolean;
     TREEVIEW_ArrayFrom_itemListElement_children: never[];
     TREEVIEW_ArrayFrom_itemListElement_children_length: number;
@@ -235,7 +235,7 @@ class TreeViewComponent {
         this.LARGEST_DEPTH_SEEN_NOT_THE_CSS_JUST_THE_DEPTH = 0;
     }
 
-    TREEVIEW_render_request(renderKind: number) {
+    TREEVIEW_render_request(renderKind: TreeView_RenderKind) {
         if (this.TREEVIEW_renderKindArray[this.TREEVIEW_renderKindArray.length - 1] !== renderKind) {
             this.TREEVIEW_renderKindArray.push(renderKind);
         }
@@ -252,28 +252,28 @@ class TreeViewComponent {
         // Synchronously exhaust the item queue for this animation frame
         while (renderKind = this.TREEVIEW_renderKindArray.shift()) {
             switch (renderKind) {
-                case get_TREEVIEWrenderKind_Cursor():
+                case TreeView_RenderKind.Cursor:
                     this.TREEVIEW_render_do_Cursor();
                     break;
-                case get_TREEVIEWrenderKind_Create():
+                case TreeView_RenderKind.Create:
                     this.TREEVIEW_render_do_Create(timestamp);
                     break;
-                case get_TREEVIEWrenderKind_Batch():
+                case TreeView_RenderKind.Batch:
                     this.TREEVIEW_render_do_Batch(timestamp);
                     break;
-                case get_TREEVIEWrenderKind_Scroll():
+                case TreeView_RenderKind.Scroll:
                     this.TREEVIEW_render_do_Scroll(timestamp);
                     break;
-                case get_TREEVIEWrenderKind_Scroll_PullDataDrawResult():
+                case TreeView_RenderKind.Scroll_PullDataDrawResult:
                     this.TREEVIEW_render_do_Scroll_PullDataDrawResult();
                     break;
-                case get_TREEVIEWrenderKind_SetItems():
+                case TreeView_RenderKind.SetItems:
                     this.TREEVIEW_render_do_SetItems();
                     break;
-                case get_TREEVIEWrenderKind_FullReset():
+                case TreeView_RenderKind.FullReset:
                     this.TREEVIEW_render_do_FullReset(timestamp);
                     break;
-                case get_TREEVIEWrenderKind_Resize():
+                case TreeView_RenderKind.Resize:
                     this.TREEVIEW_render_do_Resize(timestamp);
                     break;
             }
@@ -310,7 +310,7 @@ class TreeViewComponent {
         this.SET_ITEMS_director = director;
         this.SET_ITEMS_itemHeightNumber = itemHeightNumber;
         this.SET_ITEMS_itemHeightStyleAttributeValueString = itemHeightStyleAttributeValueString;
-        this.TREEVIEW_render_request(get_TREEVIEWrenderKind_SetItems());
+        this.TREEVIEW_render_request(TreeView_RenderKind.SetItems);
     }
 
     TREEVIEW_render_do_Create(timestamp: number) {
@@ -354,7 +354,7 @@ class TreeViewComponent {
     draw_create_request(parentElement: HTMLElement, insertBeforeThisChild: HTMLElement | null | undefined) {
         this.TREEVIEW_draw_create_request_parentElement = parentElement;
         this.TREEVIEW_draw_create_request_insertBeforeThisChild = insertBeforeThisChild;
-        this.TREEVIEW_render_request(get_TREEVIEWrenderKind_Create());
+        this.TREEVIEW_render_request(TreeView_RenderKind.Create);
     }
 
     TREEVIEW_render_do_Batch(timestamp: number) {
@@ -472,7 +472,7 @@ class TreeViewComponent {
         this.length = length;
         this.onePositiveDiff_twoNegativeDiff_orThreeFullScreen = onePositiveDiff_twoNegativeDiff_orThreeFullScreen;
         this.caseThreeOrigin = caseThreeOrigin;
-        this.TREEVIEW_render_request(get_TREEVIEWrenderKind_Batch());
+        this.TREEVIEW_render_request(TreeView_RenderKind.Batch);
     }
 
     TREEVIEW_render_do_FullReset(timestamp: number) {
@@ -540,7 +540,7 @@ class TreeViewComponent {
      * so it is easier to just invoke this directly when you change totalCount?
      */
     draw_render_fullReset_request() {
-        this.TREEVIEW_render_request(get_TREEVIEWrenderKind_FullReset());
+        this.TREEVIEW_render_request(TreeView_RenderKind.FullReset);
     }
 
     /**
@@ -747,13 +747,13 @@ class TreeViewComponent {
      * TODO: intra-app resizes or movements will also invoke this; i.e.: if a list is shown in a dialog and the dialog is resized or moved.
      */
     event_windowResize() {
-        this.TREEVIEW_render_request(get_TREEVIEWrenderKind_Resize());
+        this.TREEVIEW_render_request(TreeView_RenderKind.Resize);
     }
 
     event_scroll() {
         this.lastReadNumber_scrollLeft = this.rootElement.scrollLeft;
         this.lastReadNumber_scrollTop = this.rootElement.scrollTop;
-        this.TREEVIEW_render_request(get_TREEVIEWrenderKind_Scroll());
+        this.TREEVIEW_render_request(TreeView_RenderKind.Scroll);
     }
 
     ensure_boundingClientRect() {
@@ -795,7 +795,7 @@ class TreeViewComponent {
     state_cursor_setIndex(index: number) {
         if (this.cursorIndex === index) return;
         this.cursorIndex = index;
-        this.TREEVIEW_render_request(get_TREEVIEWrenderKind_Cursor());
+        this.TREEVIEW_render_request(TreeView_RenderKind.Cursor);
     }
 
     /**
