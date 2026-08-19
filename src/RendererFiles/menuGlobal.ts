@@ -809,7 +809,13 @@ hold on pause... I take atomoxetine (strattera)
 > - The "Anhedonia" Watchout:
 >     - Some individuals report that if they take high doses of NAC for long periods, its glutamate-blending effect can make them feel a bit emotionally flat or "too neutral."
 
+=====
 
+I think TODO is just this:
+TODO:
+- [ ] magnesium supplement as 'Magnesium Glycinate (Bisglycinate)'
+    - [ ] take at dinner time preferably like 3 hours prior to the iron supplement
+- [ ] choline supplement as 'Citicoline (CDP-Choline):'
 
 
 
