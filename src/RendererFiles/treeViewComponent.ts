@@ -22,7 +22,7 @@
 // "I dunno it looks like this makes a javascript object in the end? Maybe it isn't"
 // all in all I wanna lean towards being idiomatic to start than idiotic.
 //
-// > I'm gonna ask:
+// I'm gonna ask:
 // > is the generated javascript resulting in an object allocation?:
 // > ```js
 // > const Status = {
@@ -34,6 +34,74 @@
 // < Yes, this code results in an object allocation at runtime.
 // < ...
 // < If your goal is absolute zero runtime allocation, you have two ways to achieve it:
+// < 
+// < 
+// < 1. The const enum Pattern (Zero Allocation)
+// < If you want to use a structural lookup in TypeScript but want zero objects allocated in your compiled JavaScript, use a const enum
+// < ```ts
+// < // TypeScript
+// < const enum Status {
+// <   Active = 0,
+// <   Pending = 1,
+// < }
+// < const userStatus = Status.Active;
+// < ```
+// < Compiled JavaScript:
+// < ```js
+// < // The object completely disappears. The value is just hardcoded.
+// < const userStatus = 0;
+// < ```
+// <
+// <
+// < 2. Pure Type Unions (Zero Allocation)
+// < If you do not actually need to reference an object at runtime (like calling Object.keys() or passing the whole dictionary around),
+// < you can bypass objects entirely using a pure string or number union type.
+// < ```ts
+// < // TypeScript
+// < type Status = 0 | 1; // Or 'active' | 'pending'
+// < 
+// < const userStatus: Status = 0;
+// < ```
+// < Compiled JavaScript:
+// < ```js
+// < // Standard primitive variable assignment. Zero allocation.
+// < const userStatus = 0;
+// < ```
+// < 
+// < Would you like to see how to configure const enum tracking across isolated modules, or do you want to see how to structure your pure type unions for better readability?
+
+// > "const enum tracking across isolated modules"
+
+// < The main challenge with const enum is that tools like Babel, esbuild, SWC, and Vite compile files one by one (isolated modules).
+// < Because they cannot see across files, they do not know what values to inline when you import a const enum from another file, which usually causes a build crash or runtime error
+// <
+// < To track and safely use const enum across isolated modules, you must configure your project using one of the two strategies below.
+// <
+// < Strategy 1: The Modern Standard (Preserve+Optimize)
+// < Instead of forcing the compiler to guess, you tell TypeScript to preserve the enum structure as a standard object while allowing modern bundlers to safely strip it out if it isn't used.
+// < 
+// < 1. Update tsconfig.json
+// < Set isolatedModules to true (which is required by modern tools) and tell TypeScript to output standard code for enums.
+// <
+// < ```json
+// < {
+// <   "compilerOptions": {
+// <     "isolatedModules": true,
+// <     "preserveConstEnums": true
+// <   }
+// < }
+// < ```
+// <
+// < 2. The Resulting Behavior
+// < - In development: The const enum acts like a regular object. Tools like Vite or esbuild can safely compile individual files without crashing.
+// < - In production: Modern tree-shaking bundlers flag the preserved object as a side-effect-free literal and completely strip it out if it is unused, giving you the best of both worlds.
+// <
+// <
+// < Strategy 2: Bundler-Specific Plugins
+// < If you absolute require strict compile-time inlining (zero object allocation) even across files,
+// < you must use a dedicated build plugin that reads the entire type tree during compilation.
+// <
+// < ...
 
 const TreeView_RenderKind = {
   Active: "ACTIVE",
