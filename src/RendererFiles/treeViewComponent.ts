@@ -105,6 +105,7 @@
 //
 // way too much to do right now I'm not dealing with this until later (and even then only maybe)
 
+
 const TreeView_RenderKind = {
     None: 0,
     Cursor: 1,
@@ -120,14 +121,18 @@ const TreeView_RenderKind = {
 type TreeView_RenderKind = typeof TreeView_RenderKind[keyof typeof TreeView_RenderKind];
 
 
+const TreeView_NodeKind = {
+    None: 0,
+    isExpandable_isExpanded: 1,
+    isExpandable_NOTisExpanded: 2,
+    NOTisExpandable_isExpanded: 3,
+    NOTisExpandable_NOTisExpanded: 4,
+} as const;
+// Derive the type union from the object values
+type TreeView_NodeKind = typeof TreeView_NodeKind[keyof typeof TreeView_NodeKind];
 
-const get_TreeViewNodeKind_None = () => 0;
-const get_TreeViewNodeKind_isExpandable_isExpanded = () => 1;
-const get_TreeViewNodeKind_isExpandable_NOTisExpanded = () => 2;
-const get_TreeViewNodeKind_NOTisExpandable_isExpanded = () => 3;
-const get_TreeViewNodeKind_NOTisExpandable_NOTisExpanded = () => 4;
 
-let TreeView_pooledNode_nodeKind = get_TreeViewNodeKind_None();
+let TreeView_pooledNode_nodeKind = TreeView_NodeKind.None;
 let TreeView_pooledNode_key = 0;
 let TreeView_pooledNode_depth = 0;
 
