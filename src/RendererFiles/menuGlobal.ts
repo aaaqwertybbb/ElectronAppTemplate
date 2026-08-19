@@ -658,4 +658,26 @@ Google AI Overview
 < - Coenzyme Q10 (CoQ10): A popular heart and cellular energy enzyme that is left out of the standard formula.
 < - Lutein / Zeaxanthin: Eye-health carotenoids commonly found in "Eye Health" formulas but skipped here.
 
+TODO:
+- [ ] magnesium supplement as ... yet to be decided
+- [ ] choline supplement as 'Citicoline (CDP-Choline):'
+
+=======
+
+Magnesium:
+
+< # Bioavailability and Common Types of Magnesium Pills
+< - Magnesium Glycinate (Bisglycinate): High bioavailability; bound to the amino acid glycine, making it very gentle on the stomach and ideal for sleep, relaxation, or general daily repletion
+< - Magnesium Citrate: High bioavailability; bound to citric acid. It is well-absorbed but has a osmotic laxative effect, making it helpful for occasional constipation
+< - Magnesium Malate: High bioavailability; bound to malic acid. It is often chosen for daytime use to support energy and muscle comfort
+< - Magnesium L-Threonate: Efficiently crosses the blood-brain barrier, making it a preferred choice targeted at cognitive and brain health support
+< - Magnesium Oxide: Low bioavailability (only a small fraction is absorbed). It is inexpensive and commonly used for heartburn or constipation rather than raising systemic magnesium levels
+<
+< # Tips for Choosing and Taking Pills
+< - Check Elemental Magnesium: Read the National Institutes of Health Fact Sheet to understand that the "Supplement Facts" label shows the amount of elemental magnesium, not the total weight of the compound
+< - Watch the Dosage: For most adults, a daily supplement dose of 250 mg to 500 mg is considered safe, and the upper limit from supplements alone is 350 mg to avoid diarrhea or stomach upset
+< - Split the Dose: If you take higher amounts, splitting your total daily intake into two or three smaller doses can improve overall absorption and minimize digestive side effects
+< - Timing: Taking your pill with a meal can reduce stomach irritation, though forms like glycinate are often taken in the evening to aid relaxation
+
+
 */
