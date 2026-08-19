@@ -746,5 +746,18 @@ Magnesium:
 <
 < Tip: Because CoQ10 is lipid-soluble, it should always be taken with a meal that contains healthy fats (like avocado, eggs, or olive oil) to maximize its absorption in your gut
 
+> Is this used for focus/adhd?
+
+< CoQ10 is not a standard first-line treatment for ADHD or focus, but emerging clinical research suggests it may be a helpful add-on therapy
+< While it does not work like traditional stimulant medications to instantly boost dopamine and norepinephrine,
+< scientists are studying CoQ10's effects on ADHD due to the compound's role in brain cell energy and its ability to combat oxidative stress
+<
+< # What the Research Says About CoQ10 and ADHD
+< - Improves ADHD Symptoms as an Add-on:
+<     - A randomized controlled trial published in PubMed studied children with ADHD who were not responding fully to their standard medication (atomoxetine).
+<     - Adding CoQ10 to their daily routine resulted in a significant improvement in hyperactivity, impulsivity, and learning problems compared to those taking a placebo
+< ...
+
+hold on pause... I take atomoxetine (strattera)
 
 */
