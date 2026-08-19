@@ -659,7 +659,7 @@ Google AI Overview
 < - Lutein / Zeaxanthin: Eye-health carotenoids commonly found in "Eye Health" formulas but skipped here.
 
 TODO:
-- [ ] magnesium supplement as ... yet to be decided
+- [ ] magnesium supplement as 'Magnesium Glycinate (Bisglycinate)'
 - [ ] choline supplement as 'Citicoline (CDP-Choline):'
 
 =======
@@ -678,6 +678,22 @@ Magnesium:
 < - Watch the Dosage: For most adults, a daily supplement dose of 250 mg to 500 mg is considered safe, and the upper limit from supplements alone is 350 mg to avoid diarrhea or stomach upset
 < - Split the Dose: If you take higher amounts, splitting your total daily intake into two or three smaller doses can improve overall absorption and minimize digestive side effects
 < - Timing: Taking your pill with a meal can reduce stomach irritation, though forms like glycinate are often taken in the evening to aid relaxation
+
+> I take an iron supplement at night to avoid overlapping with a calcium supplement that I take in the morning.
+> 
+> Can I take the magnesium at night with the iron supplement?
+
+< No, you should not take magnesium and iron at the exact same time. Much like the relationship between calcium and iron,
+< magnesium and iron compete for the same absorption pathways in your digestive tract. Taking them together will reduce how much iron your body absorbs,
+< making your iron supplement less effective.
+<
+< ...
+<
+< - Option A (Keep Iron at Night): If you prefer taking iron at bedtime, move your magnesium supplement to dinner time.
+<     - This naturally creates a safe 3-to-4-hour window before sleep, which prevents any absorption interference while still allowing magnesium to support evening muscle relaxation
+< - Option B (The Preferred Routine):
+<     - Clinical guides often suggest taking iron in the morning (on an empty stomach with a source of Vitamin C for maximum absorption),
+<       moving your calcium to lunchtime, and taking your magnesium at bedtime. This gives each mineral its own dedicated time to absorb fully without competition
 
 
 */
