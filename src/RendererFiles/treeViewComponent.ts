@@ -3,6 +3,25 @@
 
 /** See the "interface TreeViewDirector" towards the bottom of this file */
 
+// # TypeScript
+//     // Define the base object with 'as const'
+//     const Status = {
+//       Active: "ACTIVE",
+//       Pending: "PENDING",
+//     } as const;
+//     // Derive the type union from the object values
+//     type Status = typeof Status[keyof typeof Status];
+//     let userStatus: Status = Status.Active;
+//
+// # Generated JavaScript
+//    const Status = {
+//        Active: 0,
+//        Pending: 1,
+//    };
+//
+// "I dunno it looks like this makes a javascript object in the end? Maybe it isn't"
+// all in all I wanna lean towards being idiomatic to start than idiotic.
+
 const get_TREEVIEWrenderKind_None = () => 0;
 const get_TREEVIEWrenderKind_Cursor = () => 1;
 const get_TREEVIEWrenderKind_Create = () => 2;
@@ -12,6 +31,16 @@ const get_TREEVIEWrenderKind_SetItems = () => 5;
 const get_TREEVIEWrenderKind_FullReset = () => 6;
 const get_TREEVIEWrenderKind_Scroll_PullDataDrawResult = () => 7;
 const get_TREEVIEWrenderKind_Resize = () => 8;
+
+const get_TreeViewNodeKind_None = () => 0;
+const get_TreeViewNodeKind_isExpandable_isExpanded = () => 1;
+const get_TreeViewNodeKind_isExpandable_NOTisExpanded = () => 2;
+const get_TreeViewNodeKind_NOTisExpandable_isExpanded = () => 3;
+const get_TreeViewNodeKind_NOTisExpandable_NOTisExpanded = () => 4;
+
+let TreeView_pooledNode_nodeKind = get_TreeViewNodeKind_None();
+let TreeView_pooledNode_key = 0;
+let TreeView_pooledNode_depth = 0;
 
 /**
  * The director maintains a flat optimized list of every element i.e.: represent each element in a uint8array and each one is a byte that maps to the actual.
@@ -216,7 +245,6 @@ class TreeViewComponent {
         }
         this.TREEVIEW_draw_create_request_parentElement.insertBefore(this.rootElement, this.TREEVIEW_draw_create_request_insertBeforeThisChild);
         this.draw_addEvents();
-
 
         this.rootElement.style.width = '';
         this.rootElement.style.height = '';
@@ -751,12 +779,6 @@ class TreeViewComponent {
     */
 }
 
-const get_TreeViewNodeKind_None = () => 0;
-const get_TreeViewNodeKind_isExpandable_isExpanded = () => 1;
-const get_TreeViewNodeKind_isExpandable_NOTisExpanded = () => 2;
-const get_TreeViewNodeKind_NOTisExpandable_isExpanded = () => 3;
-const get_TreeViewNodeKind_NOTisExpandable_NOTisExpanded = () => 4;
-
 class TreeViewNodeList {
     data_literal;
     capacity_literal;
@@ -987,7 +1009,3 @@ class TreeViewNodeList {
         }
     }
 }
-
-let TreeView_pooledNode_nodeKind = get_TreeViewNodeKind_None();
-let TreeView_pooledNode_key = 0;
-let TreeView_pooledNode_depth = 0;
