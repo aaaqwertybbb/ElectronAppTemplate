@@ -604,6 +604,9 @@ I also got iron:
 
 I'm gonna take the iron closer to bed time then. I go to sleep at 9:00 PM so I'll take the iron at like 7 PM? something like that?
 
+I looked up what vitamin d3 as 'cholecalciferol' was.
+It "is safe and generally free of side effects...". "It is the natural form of vitamin your body makes from sunlight...".
+
 
 
 */
