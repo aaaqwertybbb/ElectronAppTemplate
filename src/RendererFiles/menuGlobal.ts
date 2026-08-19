@@ -817,6 +817,13 @@ TODO:
     - [ ] take at dinner time preferably like 3 hours prior to the iron supplement
 - [ ] choline supplement as 'Citicoline (CDP-Choline):'
 
+When it comes to each individual supplement, I avoided the ones that targeted "the brain and focus" because
+I firstly need to ensure that I'm hitting all the nutritional boxes
+like there was 'Magnesium L-Threonate' but I went with 'Magnesium Glycinate (Bisglycinate)' because I want
+the nutrition to be checked out firstly.
 
+Same goes for COQ10 and NAC, I just wanna check the nutritional boxes.
+
+The focus and energy I think will come from that alongside diet and exercise.
 
 */
