@@ -143,7 +143,7 @@ let TreeView_pooledNode_depth = 0;
  * 
  * You just keep flattening it into a byte array and map back and forth.
  */
-class TreeViewComponent {
+abstract class TreeViewComponent {
     rootElement: HTMLDivElement;
     virtualizationElement: HTMLDivElement;
     cursorElement: HTMLDivElement;
@@ -167,12 +167,10 @@ class TreeViewComponent {
     length: number;
     onePositiveDiff_twoNegativeDiff_orThreeFullScreen: number;
     caseThreeOrigin: number;
-    SET_ITEMS_director: TreeViewDirector | null;
     SET_ITEMS_itemHeightNumber: number;
     SET_ITEMS_itemHeightStyleAttributeValueString: string;
     WIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING: number;
     LARGEST_DEPTH_SEEN_NOT_THE_CSS_JUST_THE_DEPTH: number;
-    director: TreeViewDirector | null;
     itemHeightNumber: number;
     itemHeightStyleAttributeValueString: string;
     boundingClientRect: null;
@@ -231,7 +229,6 @@ class TreeViewComponent {
         this.onePositiveDiff_twoNegativeDiff_orThreeFullScreen = 0;
         this.caseThreeOrigin = 0;
 
-        this.SET_ITEMS_director = null;
         this.SET_ITEMS_itemHeightNumber = 0;
         this.SET_ITEMS_itemHeightStyleAttributeValueString = '';
 
@@ -293,12 +290,6 @@ class TreeViewComponent {
      */
     TREEVIEW_render_do_SetItems() {
 
-        if (!this.SET_ITEMS_director) {
-            throw new Error();
-        }
-
-        this.director = this.SET_ITEMS_director;
-
         this.itemListElement.innerHTML = '';
         this.virtualizationElement.style.height = 1 + 'px';
         this.state_cursor_setIndex(0);
@@ -308,7 +299,7 @@ class TreeViewComponent {
         this.itemHeightStyleAttributeValueString = this.SET_ITEMS_itemHeightStyleAttributeValueString;
 
         this.cursorElement.style.height = this.itemHeightStyleAttributeValueString;
-        this.itemHeightTotal = this.director.tvd_getTotalCount() * this.itemHeightNumber;
+        this.itemHeightTotal = this.getTotalCount() * this.itemHeightNumber;
         this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
         this.boundingClientRect = null;
     }
@@ -318,13 +309,8 @@ class TreeViewComponent {
      * @param {*} itemHeightNumber '50'; cursorTop = currentIndex * itemHeightNumber;
      * @param {*} itemHeightStyleAttributeValueString '50px'; div.style.height = itemHeightStyleAttributeValueString;
      */
-    setItems(director: TreeViewDirector, itemHeightNumber: number, itemHeightStyleAttributeValueString: string) {
-        
-        if (!director) {
-            throw new Error();
-        }
+    setItems(itemHeightNumber: number, itemHeightStyleAttributeValueString: string) {
 
-        this.SET_ITEMS_director = director;
         this.SET_ITEMS_itemHeightNumber = itemHeightNumber;
         this.SET_ITEMS_itemHeightStyleAttributeValueString = itemHeightStyleAttributeValueString;
         this.TREEVIEW_render_request(TreeView_RenderKind.SetItems);
@@ -876,6 +862,13 @@ class TreeViewComponent {
         this.lastReadNumber_offsetHeight = this.rootElement.offsetHeight;
     }
 
+    protected abstract getTotalCount(): number;
+
+    /** 
+     * @param {number} caseThreeOrigin if left undefined or (falsey but not 0), this will default to 'this.component.beltIndexZero'
+     */
+    protected abstract tvd_drawItem_BATCH(start: number, length: number, onePositiveDiff_twoNegativeDiff_orThreeFullScreen: number, caseThreeOrigin: number, timestamp: number): void;
+
     /*
     TODO: The TreeView after you resize it, you can continually scroll down and it keeps replacing more and more '~' lines
           even if you've scrolled through everything already.
@@ -1114,10 +1107,4 @@ class TreeViewNodeList {
             }
         }
     }
-}
-
-interface TreeViewDirector {
-    component: TreeViewComponent;
-
-    tvd_getTotalCount(): number;
 }
