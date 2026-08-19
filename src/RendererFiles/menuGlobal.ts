@@ -505,3 +505,21 @@ function MENU_ensure_boundingClientRect() {
 //let bodyElement = document.getElementById('ROOT');
 //bodyElement.addEventListener('mousedown', listenHandlerToCloseMenu, /*useCapturing*//* true);
 */
+
+/*
+I got the breakfast 1 lb of 98% fat free chicken with sriracha in front of me right now.
+
+one way to rephrase the goal is to eat 2 lbs of 98% fat free chicken every day
+Have you been doing that?
+yes
+
+Do you worry about the carbohydrates, fats, iron, calcium
+yes
+
+but you're still meeting that 2 lbs of 98% fat free chicken everyday
+
+as for the second part
+so long as you keep these things in mind you'll figure it out
+don't ignore them but don't sit there panic'ing to the point that
+it ends up screwing up your progress
+*/
