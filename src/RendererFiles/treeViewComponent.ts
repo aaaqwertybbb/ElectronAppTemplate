@@ -132,7 +132,7 @@ const TreeView_NodeKind = {
 type TreeView_NodeKind = typeof TreeView_NodeKind[keyof typeof TreeView_NodeKind];
 
 
-let TreeView_pooledNode_nodeKind = TreeView_NodeKind.None;
+let TreeView_pooledNode_nodeKind: TreeView_NodeKind = TreeView_NodeKind.None;
 let TreeView_pooledNode_key = 0;
 let TreeView_pooledNode_depth = 0;
 
@@ -159,7 +159,7 @@ abstract class TreeViewComponent {
     beltIndexZero: number;
     TREEVIEW_renderKindArray: TreeView_RenderKind[];
     TREEVIEW_isRenderPending: boolean;
-    TREEVIEW_ArrayFrom_itemListElement_children: never[];
+    TREEVIEW_ArrayFrom_itemListElement_children: HTMLElement[];
     TREEVIEW_ArrayFrom_itemListElement_children_length: number;
     TREEVIEW_draw_create_request_parentElement: HTMLElement | null;
     TREEVIEW_draw_create_request_insertBeforeThisChild: null;
@@ -171,14 +171,16 @@ abstract class TreeViewComponent {
     SET_ITEMS_itemHeightStyleAttributeValueString: string;
     WIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING: number;
     LARGEST_DEPTH_SEEN_NOT_THE_CSS_JUST_THE_DEPTH: number;
-    itemHeightNumber: number;
-    itemHeightStyleAttributeValueString: string;
-    boundingClientRect: null;
-    virtualCount: number;
-    virtualIndex_ofScrollTop: number;
-    cursorTranslateYNumber: number;
-    lastReadNumber_offsetWidth: number;
-    lastReadNumber_offsetHeight: number;
+    itemHeightNumber: number = 0;
+    itemHeightStyleAttributeValueString: string = '0px';
+    boundingClientRect_height: number = 0;
+    boundingClientRect_top: number = 0;
+    boundingClientRect_measurementsAreValid: boolean = false;
+    virtualCount: number = 0;
+    virtualIndex_ofScrollTop: number = 0;
+    cursorTranslateYNumber: number = 0;
+    lastReadNumber_offsetWidth: number = 0;
+    lastReadNumber_offsetHeight: number = 0;
     scrollEndDeadline: number = 0;
     /** Starting with an empty array so I can have undefined/null signify that the "TreeViewDirector" is "opting out" of this feature, thus the component should not allocate this on the "TreeViewDirector"'s behalf. */
     pullData_array = new Uint32Array(0);
@@ -305,7 +307,7 @@ abstract class TreeViewComponent {
         this.cursorElement.style.height = this.itemHeightStyleAttributeValueString;
         this.itemHeightTotal = this.getTotalCount() * this.itemHeightNumber;
         this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
-        this.boundingClientRect = null;
+        this.boundingClientRect_measurementsAreValid = false;
     }
 
     /**
@@ -378,7 +380,7 @@ abstract class TreeViewComponent {
     draw_delete() {
         if (!this.rootElement.parentElement) return;
         this.draw_removeEvents();
-        this.boundingClientRect = null;
+        this.boundingClientRect_measurementsAreValid = false;
         this.rootElement.parentElement.removeChild(this.rootElement);
     }
 
@@ -533,7 +535,7 @@ abstract class TreeViewComponent {
                 this.pullData_array_count = 0;
             }
 
-            this.TREEVIEW_ArrayFrom_itemListElement_children = Array.from(this.itemListElement.children);
+            this.TREEVIEW_ArrayFrom_itemListElement_children = Array.from(this.itemListElement.children) as HTMLElement[];
             this.TREEVIEW_ArrayFrom_itemListElement_children_length = this.TREEVIEW_ArrayFrom_itemListElement_children.length;
         }
 
@@ -558,10 +560,10 @@ abstract class TreeViewComponent {
      * ...thus, you should consider checking the x position of the event against the x position of the nodeElement.children[0].
      * @param {*} event 
      */
-    async event_click(event) {
+    async event_click(event: MouseEvent) {
         this.ensure_boundingClientRect();
 
-        let rY = event.clientY - this.boundingClientRect.top + this.lastReadNumber_scrollTop;
+        let rY = event.clientY - this.boundingClientRect_top + this.lastReadNumber_scrollTop;
         let indexItem = Math.floor(rY / this.itemHeightNumber);
         indexItem = this.state_cursor_validateIndex(indexItem);
 
@@ -577,7 +579,7 @@ abstract class TreeViewComponent {
         let divItem = this.TREEVIEW_ArrayFrom_itemListElement_children[beltIndexItem];
 
         if (event.target === divItem.children[0]) {
-            return this.director.tvd_expandCollapseIconWasClicked_async(divItem, indexItem);
+            return this.expandCollapseIconWasClicked_async(divItem, indexItem);
         }
         else {
             this.state_cursor_setIndex(indexItem);
@@ -587,7 +589,7 @@ abstract class TreeViewComponent {
     async event_dblclick(event: MouseEvent) {
         this.ensure_boundingClientRect();
 
-        let rY = event.clientY - this.boundingClientRect.top + this.lastReadNumber_scrollTop;
+        let rY = event.clientY - this.boundingClientRect_top + this.lastReadNumber_scrollTop;
         let indexItem = Math.floor(rY / this.itemHeightNumber);
         indexItem = this.state_cursor_validateIndex(indexItem);
 
@@ -621,7 +623,7 @@ abstract class TreeViewComponent {
         this.ensure_boundingClientRect();
 
         if (event.button === 2) {
-            let rY = event.clientY - this.boundingClientRect.top + this.lastReadNumber_scrollTop;
+            let rY = event.clientY - this.boundingClientRect_top + this.lastReadNumber_scrollTop;
 
             this.state_cursor_setIndex(this.state_cursor_validateIndex(
                 Math.floor(rY / this.itemHeightNumber)));
@@ -747,7 +749,7 @@ abstract class TreeViewComponent {
 
         this.measureBaseElement();
 
-        this.boundingClientRect = null;
+        this.boundingClientRect_measurementsAreValid = false;
         this.ensure_boundingClientRect();
         this.TREEVIEW_render_do_FullReset(timestamp);
     }
@@ -766,8 +768,11 @@ abstract class TreeViewComponent {
     }
 
     ensure_boundingClientRect() {
-        if (!this.boundingClientRect) {
-            this.boundingClientRect = this.rootElement.getBoundingClientRect();
+        if (!this.boundingClientRect_measurementsAreValid) {
+            let rect = this.rootElement.getBoundingClientRect();;
+            this.boundingClientRect_height = rect.height;
+            this.boundingClientRect_top = rect.top;
+            this.boundingClientRect_measurementsAreValid = true;
             this.virtualCount = Math.ceil(this.rootElement.offsetHeight / this.itemHeightNumber);
         }
     }
@@ -782,8 +787,8 @@ abstract class TreeViewComponent {
         // If no UI modifications were made prior that are still pending this might avoid a synchronous layout.
         // TODO: If you touch the transform style first... I don't know what would happen it is a GPU related style... so I'm unsure.
         //
-        if (this.cursorTranslateYNumber + (2 * this.itemHeightNumber) > this.lastReadNumber_scrollTop + this.boundingClientRect.height) {
-            let currentBottom = this.lastReadNumber_scrollTop + this.boundingClientRect.height;
+        if (this.cursorTranslateYNumber + (2 * this.itemHeightNumber) > this.lastReadNumber_scrollTop + this.boundingClientRect_height) {
+            let currentBottom = this.lastReadNumber_scrollTop + this.boundingClientRect_height;
             let changeToMakeBottomTouch = this.cursorTranslateYNumber - currentBottom;
             let entireValueToScrollBy = changeToMakeBottomTouch + (2 * this.itemHeightNumber);
             this.rootElement.scrollBy(0, entireValueToScrollBy);
@@ -889,6 +894,8 @@ abstract class TreeViewComponent {
     protected abstract ondblclick_async(divItem: HTMLElement, indexItem: number): Promise<void>;
 
     protected abstract drawItem_BATCH_PullDataDrawResult(): void;
+
+    protected abstract expandCollapseIconWasClicked_async(divItem: HTMLElement, indexItem: number): Promise<void>;
     
     /*
     TODO: The TreeView after you resize it, you can continually scroll down and it keeps replacing more and more '~' lines
@@ -943,7 +950,10 @@ class TreeViewNodeList {
      */
     getElementAt(index_abstract: number) {
         let index_literal = index_abstract * this.field_count;
-        TreeView_pooledNode_nodeKind = this.data_literal[index_literal + this.nodeKind_offset];
+
+        TreeView_pooledNode_nodeKind = this.data_literal[index_literal + this.nodeKind_offset] as TreeView_NodeKind;
+        // TODO: A Safer Alternative (Runtime Validation) 'if (rawValue in TreeView_NodeKind)'?
+
         TreeView_pooledNode_key = this.data_literal[index_literal + this.key_offset];
         TreeView_pooledNode_depth = this.data_literal[index_literal + this.depth_offset];
     }
