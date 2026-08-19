@@ -760,4 +760,22 @@ Magnesium:
 
 hold on pause... I take atomoxetine (strattera)
 
+< ...
+< - Reduces Medication Side Effects:
+<     - The same clinical study noted that CoQ10 helped minimize the adverse side effects of the ADHD medication, making the primary treatment easier to tolerate.
+<
+< - Combats "Brain Fog" and Fatigue:
+<     - Because ADHD can be mentally exhausting, CoQ10's main job—generating mitochondrial energy—can help support overall cellular stamina in the brain, reducing the mental fatigue that derails focus
+
+< ...
+< 
+< # Supplements with Stronger Evidence for Focus and ADHD
+< If your primary goal is strictly improving focus, working memory, and executive function, a few other evidence-backed supplements are more commonly recommended:
+< - Omega-3 Fatty Acids (EPA/DHA):
+<     - High-dose fish oil has the largest body of clinical evidence among natural supplements for improving attention span and reducing hyperactivity in ADHD
+< - L-Tyrosine
+<     - An amino acid that acts as a direct building block for dopamine and noradrenaline (the key neurotransmitters responsible for focus and motivation)
+< - Magnesium L-Threonate
+<     - As mentioned in our previous conversation, this specific magnesium form targets brain cell receptors directly to support working memory and cognitive clarity
+
 */
