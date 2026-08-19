@@ -522,4 +522,7 @@ as for the second part
 so long as you keep these things in mind you'll figure it out
 don't ignore them but don't sit there panic'ing to the point that
 it ends up screwing up your progress
+
+I've been eating it this entire time it takes a bit been like 12 minutes so long
+I'm listening to and watching EDM music videos while I eat
 */
