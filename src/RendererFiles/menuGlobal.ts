@@ -574,47 +574,6 @@ and then as desired ask AI for their input. That's where it shines.
 
 
 
-/*
-I've been eating:
-
-- 1 lb of 98% fat free chicken with sriracha for breakfast
-- 8 strawberry nutrigrain bars for lunch
-- 1 lb of 98% fat free chicken with sriracha for dinner
-
-I don't feel great
-my mood is completely all over and maybe it always is idk
-
-I keep sitting here in my room crying at night not playing videogames or anything
-like wtf am I doing right now
-
-I need to change it so I eat rice with the 1lb of 98% fat free chicken instead of the 8 nutrigrain bars for lunch I think
-
-then it'd be
-
-Breakfast:
-- 1 lb of 98% fat free chicken with sriracha for breakfast
-- calculate the amount of calories of rice you need
-
-Dinner:
-- 1 lb of 98% fat free chicken with sriracha for breakfast
-- calculate the amount of calories of rice you need
-
-just breakfast and dinner I think.
-
-I literally sit here watching "The Quiet - Run" on loop.
-For hours doing nothing
-just ruminating until I go to sleep
-
-"dude's been spiking his blood sugar for lunch everyday like a goober"
-
-that is probably it to be honest.
-
-I'm gonna go to the store and find rice that I can eat with the chicken instead of the nutrigrain bars that way
-I eat the breakfast and dinner and then both meals have rice with it and maybe it is blood sugar related
-
-(I'm going right now) if you want anything just text me
-
-*/
 
 
 
