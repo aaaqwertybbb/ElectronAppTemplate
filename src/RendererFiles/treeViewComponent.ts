@@ -161,18 +161,18 @@ class TreeViewComponent {
     TREEVIEW_isRenderPending: boolean;
     TREEVIEW_ArrayFrom_itemListElement_children: never[];
     TREEVIEW_ArrayFrom_itemListElement_children_length: number;
-    TREEVIEW_draw_create_request_parentElement: null;
+    TREEVIEW_draw_create_request_parentElement: HTMLElement | null;
     TREEVIEW_draw_create_request_insertBeforeThisChild: null;
     start: number;
     length: number;
     onePositiveDiff_twoNegativeDiff_orThreeFullScreen: number;
     caseThreeOrigin: number;
-    SET_ITEMS_director: null;
+    SET_ITEMS_director: TreeViewDirector | null;
     SET_ITEMS_itemHeightNumber: number;
     SET_ITEMS_itemHeightStyleAttributeValueString: string;
     WIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING: number;
     LARGEST_DEPTH_SEEN_NOT_THE_CSS_JUST_THE_DEPTH: number;
-    director: null;
+    director: TreeViewDirector | null;
     itemHeightNumber: number;
     itemHeightStyleAttributeValueString: string;
     boundingClientRect: null;
@@ -292,11 +292,18 @@ class TreeViewComponent {
      * of the second are used for the first.
      */
     TREEVIEW_render_do_SetItems() {
+
+        if (!this.SET_ITEMS_director) {
+            throw new Error();
+        }
+
+        this.director = this.SET_ITEMS_director;
+
         this.itemListElement.innerHTML = '';
         this.virtualizationElement.style.height = 1 + 'px';
         this.state_cursor_setIndex(0);
         
-        this.director = this.SET_ITEMS_director;
+        
         this.itemHeightNumber = this.SET_ITEMS_itemHeightNumber;
         this.itemHeightStyleAttributeValueString = this.SET_ITEMS_itemHeightStyleAttributeValueString;
 
@@ -311,7 +318,12 @@ class TreeViewComponent {
      * @param {*} itemHeightNumber '50'; cursorTop = currentIndex * itemHeightNumber;
      * @param {*} itemHeightStyleAttributeValueString '50px'; div.style.height = itemHeightStyleAttributeValueString;
      */
-    setItems(director, itemHeightNumber: number, itemHeightStyleAttributeValueString: string) {
+    setItems(director: TreeViewDirector, itemHeightNumber: number, itemHeightStyleAttributeValueString: string) {
+        
+        if (!director) {
+            throw new Error();
+        }
+
         this.SET_ITEMS_director = director;
         this.SET_ITEMS_itemHeightNumber = itemHeightNumber;
         this.SET_ITEMS_itemHeightStyleAttributeValueString = itemHeightStyleAttributeValueString;
@@ -1102,4 +1114,10 @@ class TreeViewNodeList {
             }
         }
     }
+}
+
+interface TreeViewDirector {
+    component: TreeViewComponent;
+
+    tvd_getTotalCount(): number;
 }
