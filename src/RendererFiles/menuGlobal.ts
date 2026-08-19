@@ -704,7 +704,10 @@ Magnesium:
 < The term "relaxation" when describing magnesium refers to its physiological effect on your cellular biology—calming hyperactive nerves and releasing muscle tension.
 < It does not act as a tranquilizer or sedate you unless you are taking a high dose of a sleep-specific compound like magnesium glycinate
 <
-< ...
+< # Strategy 1: Keep Magnesium at Night, Just Separate it from Iron (Recommended)
+< You do not have to move magnesium to the morning at all. You can safely maximize your evening window by spacing them out by just two hours:
+< - 6:30 PM (Dinner): Take your magnesium pill. Taking it with your evening meal provides enough time for it to digest, helps relax physical tension from the workday, and keeps it gentle on your stomach
+< - 9:30 PM (Bedtime): Take your iron supplement. By creating a 3-hour buffer, the magnesium will have cleared the primary absorption pathways in your gut, ensuring your iron absorbs perfectly without competition
 <
 < # Strategy 2: Use a "Focus-Friendly" Daytime Magnesium
 < If you eventually decide you prefer a morning routine, you can completely avoid daytime drowsiness by choosing the right form of magnesium.
