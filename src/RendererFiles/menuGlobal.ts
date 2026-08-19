@@ -607,6 +607,26 @@ I'm gonna take the iron closer to bed time then. I go to sleep at 9:00 PM so I'l
 I looked up what vitamin d3 as 'cholecalciferol' was.
 It "is safe and generally free of side effects...". "It is the natural form of vitamin your body makes from sunlight...".
 
+===========
 
+choline:
+
+Alpha-GPC (Choline Alfoscerate)
+- Pros:
+    - Contains about 41% elemental choline by weight and crosses the blood-brain barrier very efficiently to support acetylcholine production.
+- Cons:
+    - More expensive; long-term high-dose use is sometimes cautioned against regarding stroke risk
+
+"is sometimes cautioned against regarding stroke risk"???
+
+Citicoline (CDP-Choline):
+- Pros:
+    - Excellent bioavailability with robust clinical data for memory, focus, and long-term brain health (supplying both choline and cytidine).
+- Cons:
+    - Lower percentage of raw choline by weight compared to Alpha-GPC, making pills larger or requiring multiple doses
+
+...other forms of choline
+
+I think I like 'Citicoline (CDP-Choline)'
 
 */
