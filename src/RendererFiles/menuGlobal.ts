@@ -527,4 +527,8 @@ I've been eating it this entire time it takes a bit been like 12 minutes so long
 I'm listening to and watching EDM music videos while I eat
 
 "this guy is so cringe"
+
+from my perspective everytime I talk about this I'm thinking
+that anyone who reads it is like
+"how much of an incel do you have to be to sit here for 12 minutes eating a lb of chicken every morning"
 */
