@@ -533,4 +533,19 @@ that anyone who reads it is like
 "how much of an incel do you have to be to sit here for 12 minutes eating a lb of chicken every morning"
 
 I'm a number 1 pick I always have been I just wanna feel good is all
+
+AI Overview Paraphrased:
+- Alpha-GPC (Choline Alfoscerate)
+    - High bioavailability (~41% choline by weight) and crosses the blood-brain barrier very efficiently. Often used for acute cognitive and physical performance.
+- CDP-Choline (Citicoline)
+    -  Excellent brain bioavailability; breaks down into choline and cytidine (which supports neural membranes and long-term brain health)
+- Phosphatidylcholine (often from Lecithin)
+    - Lower percentage of pure choline by weight (~13%), but well-tolerated and well-suited for general health and liver support.
+- Choline Bitartrate
+    -  Inexpensive and high in choline per gram, but has lower brain uptake and can convert more readily to TMAO in the gut (a metabolite linked to cardiovascular risks)
+
+omg I take Choline Bitartrate every morning
+
+
+
 */
