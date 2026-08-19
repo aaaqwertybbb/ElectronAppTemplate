@@ -1,3 +1,7 @@
+import { APP_lineHeight } from './applicationRendererRoot'
+//import { EXPLORER_MenuOnClick } from './explorerGlobal'
+//import { EDITOR_MenuOnClick } from './editorGlobal'
+
 const get_CommandKind_None = () => 0;
 const get_CommandKind_Submenu = () => 1;
 const get_CommandKind_Copy = () => 2;
@@ -67,7 +71,9 @@ let MENU_restoreFocusToElement: HTMLElement | null = null;
 ////////
 ////////
 
-let MENU_recentBoundingClientRectTop: DOMRect | null = null;
+let MENU_recentBoundingClientRectTop: number = 0;
+let MENU_recentBoundingClientRectTop_EXISTS: boolean = false;
+
 
 let MENU_cursorIndex = 0;
 /** By duplicating this you guarantee the initial cursor index is what was expected. */
@@ -86,7 +92,7 @@ let MENU_renderKind_Set_countOfPendingRequests = 0;
 
 let MENU_optionList: MenuOption[] | null = null;
 /** TODO: Perhaps use 'MENU_optionList' instead? */
-let MENU_ArrayFrom_menuOptionList_children: HTMLElement[] | null = null;
+let MENU_ArrayFrom_menuOptionList_children: HTMLElement[] = [];
 
 let MENU_NOTshouldFocus = false;
 
@@ -142,10 +148,10 @@ function MENU_render_do_Hide() {
     MENU_removeEvents();
 
     menu.remove();
-    MENU_ArrayFrom_menuOptionList_children = null;
+    MENU_ArrayFrom_menuOptionList_children = [];
 
     // This changes after drawing at a different left/top thus needs be null'd out in the render function.
-    MENU_recentBoundingClientRectTop = null;
+    MENU_recentBoundingClientRectTop_EXISTS = false;
 
     if (MENU_restoreFocusToElement) {
         if (MENU_HIDE_shouldRestoreFocus) {
@@ -155,7 +161,7 @@ function MENU_render_do_Hide() {
     }
 }
 
-async function MENU_state_do_hide(shouldRestoreFocus: boolean) {
+async function MENU_state_do_hide(shouldRestoreFocus: boolean | undefined) {
 
     if (MENU_onHideAction) {
         await MENU_onHideAction();
@@ -166,7 +172,7 @@ async function MENU_state_do_hide(shouldRestoreFocus: boolean) {
 
     MENU_optionList = null;
 
-    //MENU_recentBoundingClientRectTop = null;
+    //MENU_recentBoundingClientRectTop_EXISTS = false;
 
     MENU_context = null;
     MENU_target = null;
@@ -176,12 +182,16 @@ async function MENU_state_do_hide(shouldRestoreFocus: boolean) {
     }
 }
 
-async function menuHide(shouldRestoreFocus: boolean) {
+async function menuHide(shouldRestoreFocus: boolean | undefined) {
     // TODO: Don't put this line here when you could instead just think about async code and figure out the truth of what will happen...
     // ...I'm anxious and can't think straight I swear...
     MENU_last_handled_ticketId = MENU_ticketId_drawn;
     await MENU_state_do_hide(shouldRestoreFocus);
     MENU_render_request(get_MENUrenderKind_Hide());
+}
+
+function menuHide_event() {
+    return menuHide(undefined);
 }
 
 function MENU_render_do_Set() {
@@ -291,12 +301,12 @@ function MENU_render_do_Set() {
     }
 }
 
-async function menuSet(context: string, target: any, optionList, left, top, NOTshouldFocus, index, onHideAction) {
+async function menuSet(context: string, target: any, optionList: MenuOption[], left: number, top: number, NOTshouldFocus: boolean, index: number | undefined | null, onHideAction: (() => Promise<void>) | null) {
     MENU_ticketId_pending = MENU_ticketId_counter++;
     
     // TODO: These 'if (MENU_optionList)' and 'if (MENU_ArrayFrom_menuOptionList_children)' won't work because for some reason you decided that a menu could be "empty", thus these could be null and no longer would indicate that whether only the state function ran or both the state function and the render function ran or etc...
     if (MENU_optionList) {
-        await MENU_state_do_hide();
+        await MENU_state_do_hide(undefined);
     }
 
     MENU_left = left;
@@ -317,7 +327,7 @@ async function menuSet(context: string, target: any, optionList, left, top, NOTs
 
     MENU_NOTshouldFocus = NOTshouldFocus;
 
-    MENU_recentBoundingClientRectTop = null;
+    MENU_recentBoundingClientRectTop_EXISTS = false;
 
     MENU_render_request(get_MENUrenderKind_Set());
 }
@@ -325,7 +335,7 @@ async function menuSet(context: string, target: any, optionList, left, top, NOTs
 function MENU_onMouseMove(event: MouseEvent) {
     // then cancel the throttle? That's what you were actually doing with the thing?
 
-    if (!MENU_recentBoundingClientRectTop) {
+    if (!MENU_recentBoundingClientRectTop_EXISTS) {
         MENU_ensure_boundingClientRect();
     }
 
@@ -338,7 +348,7 @@ function MENU_onMouseMove(event: MouseEvent) {
     MENU_setCursorIndex(index);
 }
 
-async function optionOnClick(indexClicked, elementClicked) {
+async function optionOnClick(indexClicked: number, elementClicked: HTMLElement) {
     if (MENU_ticketId_drawn === MENU_ticketId_pending && MENU_ticketId_drawn !== MENU_last_handled_ticketId) {
         MENU_last_handled_ticketId = MENU_ticketId_drawn;
         MENU_HIDE_shouldRestoreFocus = true;
@@ -346,9 +356,9 @@ async function optionOnClick(indexClicked, elementClicked) {
             case 'EXPLORER':
                 await EXPLORER_MenuOnClick(indexClicked, elementClicked);
                 break;
-            case 'EDITOR':
-                await EDITOR_MenuOnClick(indexClicked, elementClicked);
-                break;
+            //case 'EDITOR':
+            //    await EDITOR_MenuOnClick(indexClicked, elementClicked);
+            //    break;
             case 'EXPLORER_pickFolderOrWorkspaceButton':
                 await EXPLORER_pickFolderOrWorkspaceButton_MenuOnClick(indexClicked, elementClicked);
                 break;
@@ -358,7 +368,7 @@ async function optionOnClick(indexClicked, elementClicked) {
 }
 
 /** mouse move handler has this explicit inlined (duplicated) due to the sheer frequency of its invocation */
-function menuGetRelativeMouseEventData(event) {
+function menuGetRelativeMouseEventData(event: MouseEvent) {
     let paddingTop = 4;
     let relativeY = event.clientY - (MENU_recentBoundingClientRectTop + paddingTop);
     return Math.floor(relativeY / APP_lineHeight);
@@ -367,7 +377,7 @@ function menuGetRelativeMouseEventData(event) {
 function MENU_addEvents() {
     let menu = document.getElementById('MENU');
     if (!menu) return;
-    menu.addEventListener('blur', menuHide); // TODO: should 'once' be used here?
+    menu.addEventListener('blur', menuHide_event); // TODO: should 'once' be used here?
     menu.addEventListener('click', MENU_onclick);
     menu.addEventListener('keydown', MENU_onKeyDown);
     menu.addEventListener('mousemove', MENU_onMouseMove);
@@ -376,13 +386,13 @@ function MENU_addEvents() {
 function MENU_removeEvents() {
     let menu = document.getElementById('MENU');
     if (!menu) return;
-    menu.removeEventListener('blur', menuHide); // TODO: should 'once' be used when adding?
+    menu.removeEventListener('blur', menuHide_event); // TODO: should 'once' be used when adding?
     menu.removeEventListener('click', MENU_onclick);
     menu.removeEventListener('keydown', MENU_onKeyDown);
     menu.removeEventListener('mousemove', MENU_onMouseMove);
 }
 
-function MENU_onclick(event) {
+function MENU_onclick(event: MouseEvent) {
     MENU_ensure_boundingClientRect();
     let indexClicked = menuGetRelativeMouseEventData(event);
     return optionOnClick(indexClicked, MENU_ArrayFrom_menuOptionList_children[indexClicked]);
@@ -395,7 +405,7 @@ function MENU_render_do_Cursor() {
     cursorElement.style.top = 4 + (APP_lineHeight * MENU_cursorIndex) + 'px';
 }
 
-function MENU_state_do_Cursor(index) {
+function MENU_state_do_Cursor(index: number) {
     if (index >= MENU_ArrayFrom_menuOptionList_children.length)
         index = MENU_ArrayFrom_menuOptionList_children.length - 1;
     
@@ -405,7 +415,7 @@ function MENU_state_do_Cursor(index) {
     MENU_cursorIndex = index;
 }
 
-function MENU_setCursorIndex(index) {
+function MENU_setCursorIndex(index: number) {
     MENU_state_do_Cursor(index);
     MENU_render_request(get_MENUrenderKind_Cursor());
 }
@@ -439,7 +449,7 @@ function MENU_validateCursor() {
 // < While this works, it is an anti-pattern.
 // < It forces the function to pause, unpack the promise value, and repack it into a new promise before returning it
 
-function MENU_onKeyDown(event) {
+function MENU_onKeyDown(event: KeyboardEvent) {
     MENU_validateCursor();
     if (MENU_ArrayFrom_menuOptionList_children.length === 0) return;
 
@@ -463,7 +473,7 @@ function MENU_onKeyDown(event) {
 }
 
 function MENU_ensure_boundingClientRect() {
-    if (!MENU_recentBoundingClientRectTop) {
+    if (!MENU_recentBoundingClientRectTop_EXISTS) {
         const menuElement = document.getElementById('MENU');
         if (!menuElement) return;
         MENU_recentBoundingClientRectTop = menuElement.getBoundingClientRect().top;

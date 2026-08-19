@@ -6,7 +6,7 @@ import { DIALOG_show_async } from './dialogGlobal';
  * 
  * TODO: (speculation) I've never liked saying "line height" I believe that deals with the vertical alignment of text within some container is "line height" a good wording.
  * */
-let APP_lineHeight = 20;
+export let APP_lineHeight = 20;
 
 init();
 
