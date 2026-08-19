@@ -574,6 +574,27 @@ is that you have to take caclium carbonate with food.
 And this calcium carbonate that I got has 49% of my daily calcium in it.
 So I can eat the breakfast chicken and then take 1 of these calcium pills.
 
+============
+
+Paraphrase Google AI Overview:
+------------------------------
+- Ferrous Sulfate:
+    - The most common and affordable standard medical option. It contains high elemental iron and is very effective, but it frequently causes digestive upset, nausea, and constipation.
+- Ferrous Bisglycinate (Chelated Iron):
+    - Iron bound to amino acids. It boasts high bioavailability and is significantly gentler on the stomach with fewer gastrointestinal side effects. It is also less affected by foods that usually block iron.
+- Ferrous Gluconate & Fumarate:
+    - Gluconate has lower elemental iron making it milder, while fumarate has a high percentage of usable iron. Both serve as standard alternatives to sulfate
+- Heme Iron Polypeptide:
+    - Derived from animal sources, it is absorbed intact and bypasses many typical dietary blocks, making it very well tolerated though typically more expensive
+- Polysaccharide-Iron Complexes:
+    - Another alternative designed to reduce stomach irritation, though individual tolerance varies
+
+
+
+
+I also got iron:
+- solgar brand; "gentle iron" as iron bisglycinate 25mg 139%
+
 
 
 */
