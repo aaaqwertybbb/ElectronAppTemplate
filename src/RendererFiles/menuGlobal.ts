@@ -545,5 +545,8 @@ that my body couldn't make the proper of "something"
 and now I feel everything way more now in terms of energy levels
 I feel energy wise like completely different
 and maybe it is just an adjusting period
+
+I think that's the thing too I always am anxious but it isn't just anxiety it is
+anxiety and energy and just a lot of weird sensations that maybe are good I can't tell
 */
 
