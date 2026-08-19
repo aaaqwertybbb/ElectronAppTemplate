@@ -529,5 +529,7 @@ but there's plant iron and meat iron and they're not the same thing
 And the numbers just don't add up in my head in any way I think I'm just trippin though.
 
 I don't know if I'm eating enough
+
+analysis paralysis at the grocery store lol
 */
 
