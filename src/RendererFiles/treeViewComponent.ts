@@ -21,7 +21,45 @@ const get_TREEVIEWrenderKind_Resize = () => 8;
  * You just keep flattening it into a byte array and map back and forth.
  */
 class TreeViewComponent {
-    constructor(itemHeight) {
+    rootElement: HTMLDivElement;
+    virtualizationElement: HTMLDivElement;
+    cursorElement: HTMLDivElement;
+    itemListElement: HTMLDivElement;
+    itemHeightTotal: number;
+    cursorIndex: number;
+    _ONSCROLLvirtualIndex: number;
+    _ONSCROLLvirtualCount: number;
+    lastReadNumber_scrollLeft: number;
+    lastReadNumber_scrollTop: number;
+    scrollTimer: null;
+    hasTrailingCall: boolean;
+    beltIndexZero: number;
+    TREEVIEW_renderKindArray: number[];
+    TREEVIEW_isRenderPending: boolean;
+    TREEVIEW_ArrayFrom_itemListElement_children: never[];
+    TREEVIEW_ArrayFrom_itemListElement_children_length: number;
+    TREEVIEW_draw_create_request_parentElement: null;
+    TREEVIEW_draw_create_request_insertBeforeThisChild: null;
+    start: number;
+    length: number;
+    onePositiveDiff_twoNegativeDiff_orThreeFullScreen: number;
+    caseThreeOrigin: number;
+    SET_ITEMS_director: null;
+    SET_ITEMS_itemHeightNumber: number;
+    SET_ITEMS_itemHeightStyleAttributeValueString: string;
+    WIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING: number;
+    LARGEST_DEPTH_SEEN_NOT_THE_CSS_JUST_THE_DEPTH: number;
+    director: null;
+    itemHeightNumber: number;
+    itemHeightStyleAttributeValueString: string;
+    boundingClientRect: null;
+    virtualCount: number;
+    virtualIndex_ofScrollTop: number;
+    cursorTranslateYNumber: number;
+    lastReadNumber_offsetWidth: number;
+    lastReadNumber_offsetHeight: number;
+    
+    constructor() {
         this.rootElement = document.createElement('div');
         this.rootElement.classList.add('TREEVIEW', 'unselectable');
         this.rootElement.tabIndex = 0;
@@ -79,7 +117,7 @@ class TreeViewComponent {
         this.LARGEST_DEPTH_SEEN_NOT_THE_CSS_JUST_THE_DEPTH = 0;
     }
 
-    TREEVIEW_render_request(renderKind) {
+    TREEVIEW_render_request(renderKind: number) {
         if (this.TREEVIEW_renderKindArray[this.TREEVIEW_renderKindArray.length - 1] !== renderKind) {
             this.TREEVIEW_renderKindArray.push(renderKind);
         }
@@ -90,7 +128,7 @@ class TreeViewComponent {
         }
     }
 
-    renderDo = (timestamp) => {
+    renderDo = (timestamp: number) => {
         let renderKind;
         
         // Synchronously exhaust the item queue for this animation frame
@@ -150,14 +188,14 @@ class TreeViewComponent {
      * @param {*} itemHeightNumber '50'; cursorTop = currentIndex * itemHeightNumber;
      * @param {*} itemHeightStyleAttributeValueString '50px'; div.style.height = itemHeightStyleAttributeValueString;
      */
-    setItems(director, itemHeightNumber, itemHeightStyleAttributeValueString) {
+    setItems(director, itemHeightNumber: number, itemHeightStyleAttributeValueString: string) {
         this.SET_ITEMS_director = director;
         this.SET_ITEMS_itemHeightNumber = itemHeightNumber;
         this.SET_ITEMS_itemHeightStyleAttributeValueString = itemHeightStyleAttributeValueString;
         this.TREEVIEW_render_request(get_TREEVIEWrenderKind_SetItems());
     }
 
-    TREEVIEW_render_do_Create(timestamp) {
+    TREEVIEW_render_do_Create(timestamp: number) {
         if (this.rootElement.parentElement) {
             // It is the case that I invoke 'draw_create_request' when creating the tree view for the first time.
             // But I also do this when I re-open the os input file dialog and pick either a separate or the same folder.
@@ -196,13 +234,13 @@ class TreeViewComponent {
      * @param {HTMLElement} parentElement 
      * @param {*} insertBeforeThisChild (if falsey, the list UI is appended to the parent element)
      */
-    draw_create_request(parentElement, insertBeforeThisChild) {
+    draw_create_request(parentElement: HTMLElement, insertBeforeThisChild: HTMLElement | null | undefined) {
         this.TREEVIEW_draw_create_request_parentElement = parentElement;
         this.TREEVIEW_draw_create_request_insertBeforeThisChild = insertBeforeThisChild;
         this.TREEVIEW_render_request(get_TREEVIEWrenderKind_Create());
     }
 
-    TREEVIEW_render_do_Batch(timestamp) {
+    TREEVIEW_render_do_Batch(timestamp: number) {
         this.director.tvd_drawItem_BATCH(this.start, this.length, this.onePositiveDiff_twoNegativeDiff_orThreeFullScreen, this.caseThreeOrigin, timestamp);
     }
 
@@ -262,7 +300,7 @@ class TreeViewComponent {
         }
     }
 
-    TREEVIEW_render_do_Scroll(timestamp) {
+    TREEVIEW_render_do_Scroll(timestamp: number) {
         if (this.TREEVIEW_ArrayFrom_itemListElement_children_length !== this.virtualCount) {
             this.TREEVIEW_render_do_FullReset(timestamp);
         }
@@ -312,7 +350,7 @@ class TreeViewComponent {
         }
     }
 
-    draw_BATCH_request(start, length, onePositiveDiff_twoNegativeDiff_orThreeFullScreen, caseThreeOrigin) {
+    draw_BATCH_request(start: number, length: number, onePositiveDiff_twoNegativeDiff_orThreeFullScreen: number, caseThreeOrigin: number) {
         this.start = start;
         this.length = length;
         this.onePositiveDiff_twoNegativeDiff_orThreeFullScreen = onePositiveDiff_twoNegativeDiff_orThreeFullScreen;
@@ -320,7 +358,7 @@ class TreeViewComponent {
         this.TREEVIEW_render_request(get_TREEVIEWrenderKind_Batch());
     }
 
-    TREEVIEW_render_do_FullReset(timestamp) {
+    TREEVIEW_render_do_FullReset(timestamp: number) {
         this.ensure_boundingClientRect();
 
         this._ONSCROLLvirtualCount = this.virtualCount;
@@ -420,7 +458,7 @@ class TreeViewComponent {
         }
     }
 
-    async event_dblclick(event) {
+    async event_dblclick(event: MouseEvent) {
         this.ensure_boundingClientRect();
 
         let rY = event.clientY - this.boundingClientRect.top + this.lastReadNumber_scrollTop;
@@ -453,7 +491,7 @@ class TreeViewComponent {
         }
     }
 
-    async event_contextmenu(event) {
+    async event_contextmenu(event: MouseEvent) {
         this.ensure_boundingClientRect();
 
         if (event.button === 2) {
@@ -497,7 +535,7 @@ class TreeViewComponent {
         }
     }
 
-    async event_keydown(event) {
+    async event_keydown(event: KeyboardEvent) {
         switch (event.key) {
             case 'ArrowDown':
                 event.preventDefault();
@@ -576,7 +614,7 @@ class TreeViewComponent {
         }
     }
 
-    TREEVIEW_render_do_Resize(timestamp) {
+    TREEVIEW_render_do_Resize(timestamp: number) {
         this.rootElement.style.width = '';
         this.rootElement.style.height = '';
         this.rootElement.style.contain = '';
@@ -608,7 +646,7 @@ class TreeViewComponent {
         }
     }
 
-    TREEVIEW_render_do_Cursor(index) {
+    TREEVIEW_render_do_Cursor() {
         // Determine the number without modifying styles so you can use this variable to determine the need to scroll into view without synchronous layout.
         this.cursorTranslateYNumber = this.cursorIndex * this.itemHeightNumber;
 
@@ -637,7 +675,7 @@ class TreeViewComponent {
      * 
      * @param {*} index 
      */
-    state_cursor_setIndex(index) {
+    state_cursor_setIndex(index: number) {
         if (this.cursorIndex === index) return;
         this.cursorIndex = index;
         this.TREEVIEW_render_request(get_TREEVIEWrenderKind_Cursor());
@@ -648,7 +686,7 @@ class TreeViewComponent {
      * 
      * @param {*} indexItem 
      */
-    state_cursor_validateIndex(indexItem) {
+    state_cursor_validateIndex(indexItem: number) {
         if (indexItem >= this.director.tvd_getTotalCount()) {
             indexItem = this.director.tvd_getTotalCount() - 1;
         }
@@ -738,7 +776,7 @@ class TreeViewNodeList {
     key_offset = 1;
     depth_offset = 2;
 
-    constructor(initialCapacity_abstract) {
+    constructor(initialCapacity_abstract: number) {
         let temp_capacity_literal = initialCapacity_abstract * this.field_count;
 
         this.data_literal = new Uint32Array(temp_capacity_literal);
@@ -761,14 +799,14 @@ class TreeViewNodeList {
      * @param {TreeViewNode} trackedSyntax a place to read the data into, since it is stored as just int32 data (not the class)
      * @returns {TrackedSyntax}
      */
-    getElementAt(index_abstract) {
+    getElementAt(index_abstract: number) {
         let index_literal = index_abstract * this.field_count;
         TreeView_pooledNode_nodeKind = this.data_literal[index_literal + this.nodeKind_offset];
         TreeView_pooledNode_key = this.data_literal[index_literal + this.key_offset];
         TreeView_pooledNode_depth = this.data_literal[index_literal + this.depth_offset];
     }
 
-    getKey(index_abstract) {
+    getKey(index_abstract: number) {
         return this.data_literal[(index_abstract * this.field_count) + this.key_offset];
     }
 
@@ -779,11 +817,11 @@ class TreeViewNodeList {
      * @param {number} index_abstract 
      * @param {number} key 
      */
-    setKey(index_abstract, key) {
+    setKey(index_abstract: number, key) {
         this.data_literal[(index_abstract * this.field_count) + this.key_offset] = key;
     }
     
-    getDepth(index_abstract) {
+    getDepth(index_abstract: number) {
         return this.data_literal[(index_abstract * this.field_count) + this.depth_offset];
     }
     
@@ -794,7 +832,7 @@ class TreeViewNodeList {
      * @param {number} index_abstract 
      * @param {number} depth 
      */
-    setDepth(index_abstract, depth) {
+    setDepth(index_abstract: number, depth: number) {
         this.data_literal[(index_abstract * this.field_count) + this.depth_offset] = depth;
     }
     
@@ -805,11 +843,11 @@ class TreeViewNodeList {
      * @param {number} index_abstract 
      * @param {number} nodeKind 
      */
-    setNodeKind(index_abstract, nodeKind) {
+    setNodeKind(index_abstract: number, nodeKind) {
         this.data_literal[(index_abstract * this.field_count) + this.nodeKind_offset] = nodeKind;
     }
 
-    insert(index_abstract, nodeKind, key, depth) {
+    insert(index_abstract: number, nodeKind, key, depth: number) {
         this.ensureCapacityForInsertion(index_abstract, 1);
 
         let index_literal = index_abstract * this.field_count;
@@ -830,7 +868,7 @@ class TreeViewNodeList {
      * 
      * count === 0 immediately returns
      */
-    removeAt(index_abstract, count_abstract) {
+    removeAt(index_abstract: number, count_abstract: number) {
 
         if (index_abstract > this.count_abstract) { throw new Error('removeAt(...): index_abstract > this.count_abstract'); }
         if (index_abstract + count_abstract > this.count_abstract) { throw new Error('removeAt(...): index_abstract + count_abstract > this.count_abstract'); }
@@ -867,7 +905,7 @@ class TreeViewNodeList {
      *         Since this ought to be a negligible check for this method to perform.
      *         And failure to catch that case if it happens is an infinite loop.
      */
-    ensureCapacityForInsertion(index_abstract, count_abstract) {
+    ensureCapacityForInsertion(index_abstract: number, count_abstract: number) {
         let capacityPrevious_abstract = this.capacity_abstract;
         while (true) {
             if (this.count_abstract + count_abstract > this.capacity_abstract) {
@@ -903,7 +941,7 @@ class TreeViewNodeList {
     /**
      * inclusive/exclusive
      */
-    copyTo(dataSource_literal, sourceStart_abstract, dataDestination_literal, destinationStart_abstract, length_abstract) {
+    copyTo(dataSource_literal, sourceStart_abstract: number, dataDestination_literal, destinationStart_abstract: number, length_abstract: number) {
 
         if (dataSource_literal === dataDestination_literal) {
             if (dataSource_literal !== this.data_literal) {
