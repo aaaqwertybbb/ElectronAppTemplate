@@ -179,6 +179,10 @@ abstract class TreeViewComponent {
     cursorTranslateYNumber: number;
     lastReadNumber_offsetWidth: number;
     lastReadNumber_offsetHeight: number;
+    scrollEndDeadline: number = 0;
+    /** Starting with an empty array so I can have undefined/null signify that the "TreeViewDirector" is "opting out" of this feature, thus the component should not allocate this on the "TreeViewDirector"'s behalf. */
+    pullData_array = new Uint32Array(0);
+    pullData_array_count = 0;
     
     constructor() {
         this.rootElement = document.createElement('div');
@@ -361,7 +365,7 @@ abstract class TreeViewComponent {
     }
 
     TREEVIEW_render_do_Batch(timestamp: number) {
-        this.director.tvd_drawItem_BATCH(this.start, this.length, this.onePositiveDiff_twoNegativeDiff_orThreeFullScreen, this.caseThreeOrigin, timestamp);
+        this.drawItem_BATCH(this.start, this.length, this.onePositiveDiff_twoNegativeDiff_orThreeFullScreen, this.caseThreeOrigin, timestamp);
     }
 
     /**
@@ -444,20 +448,20 @@ abstract class TreeViewComponent {
 
                 let diff = currVli - prevVli;
 
-                let totalCount = this.director.tvd_getTotalCount();
+                let totalCount = this.getTotalCount();
 
                 if (diff > 0 && diff < this.virtualCount) {
-                    this.director.tvd_drawItem_BATCH(prevVli + this._ONSCROLLvirtualCount, diff, 1, undefined, timestamp);
+                    this.drawItem_BATCH(prevVli + this._ONSCROLLvirtualCount, diff, 1, undefined, timestamp);
                 }
                 else if (diff < 0 && (diff *= -1) < this.virtualCount) {
-                    this.director.tvd_drawItem_BATCH(currVli, diff, 2, undefined, timestamp);
+                    this.drawItem_BATCH(currVli, diff, 2, undefined, timestamp);
                 }
                 else {
                     if (diff === 0) {
-                        this.director.scrollEndDeadline = timestamp + 300;
+                        this.scrollEndDeadline = timestamp + 300;
                     }
                     else {
-                        this.director.tvd_drawItem_BATCH(this.virtualIndex_ofScrollTop, this.virtualCount, 3, undefined, timestamp);
+                        this.drawItem_BATCH(this.virtualIndex_ofScrollTop, this.virtualCount, 3, undefined, timestamp);
                     }
                 }
             }
@@ -465,9 +469,7 @@ abstract class TreeViewComponent {
     }
 
     TREEVIEW_render_do_Scroll_PullDataDrawResult() {
-        if (this.director.tvd_drawItem_BATCH_PullDataDrawResult) {
-            this.director.tvd_drawItem_BATCH_PullDataDrawResult();
-        }
+        this.drawItem_BATCH_PullDataDrawResult();
     }
 
     draw_BATCH_request(start: number, length: number, onePositiveDiff_twoNegativeDiff_orThreeFullScreen: number, caseThreeOrigin: number) {
@@ -486,7 +488,7 @@ abstract class TreeViewComponent {
         this.virtualIndex_ofScrollTop = Math.floor(this.lastReadNumber_scrollTop / this.itemHeightNumber);
         this.beltIndexZero = 0;
 
-        let totalCount = this.director.tvd_getTotalCount();
+        let totalCount = this.getTotalCount();
 
         if (this.itemListElement.children.length !== this.virtualCount) {
             this.itemListElement.innerHTML = '';
@@ -522,9 +524,13 @@ abstract class TreeViewComponent {
             }
             
             // TODO: check the resize logic, that it works
-            if (this.director.pullData_array) {
-                this.director.pullData_array = new Uint32Array(this.virtualCount);
-                this.director.pullData_array_count = 0;
+            if (this.pullData_array) {
+                //
+                // TODO: When writing this to be an abstract class the 'this.pullData_array' is believed to always be non-falsey...
+                // ...specifically: "TODO: make a final decision about this and remove the if statement depending on the final decision?"
+                //
+                this.pullData_array = new Uint32Array(this.virtualCount);
+                this.pullData_array_count = 0;
             }
 
             this.TREEVIEW_ArrayFrom_itemListElement_children = Array.from(this.itemListElement.children);
@@ -533,7 +539,7 @@ abstract class TreeViewComponent {
 
         // TODO: This if statement check is awkward because the previous if statement ought to have guaranteed this one to be true.
         if (this.itemListElement.children.length === this.virtualCount) {
-            this.director.tvd_drawItem_BATCH(this.virtualIndex_ofScrollTop, this.virtualCount, 3, undefined, timestamp);
+            this.drawItem_BATCH(this.virtualIndex_ofScrollTop, this.virtualCount, 3, undefined, timestamp);
         }
     }
 
@@ -607,7 +613,7 @@ abstract class TreeViewComponent {
             else beltIndexItem = (beltIndexItem + this.beltIndexZero) % this.virtualCount;
 
             if (beltIndexItem < 0) return;
-            return this.director.tvd_ondblclick_async(this.TREEVIEW_ArrayFrom_itemListElement_children[beltIndexItem], this.cursorIndex);
+            return this.ondblclick_async(this.TREEVIEW_ArrayFrom_itemListElement_children[beltIndexItem], this.cursorIndex);
         }
     }
 
@@ -631,9 +637,9 @@ abstract class TreeViewComponent {
             else beltIndexItem = (beltIndexItem + this.beltIndexZero) % this.virtualCount;
 
             if (beltIndexItem < 0) return;
-            return this.director.tvd_oncontextmenu_async(this.TREEVIEW_ArrayFrom_itemListElement_children[beltIndexItem], this.cursorIndex, event, beltIndexItem);
+            return this.oncontextmenu_async(this.TREEVIEW_ArrayFrom_itemListElement_children[beltIndexItem], this.cursorIndex, event, beltIndexItem);
         } else {
-            if (this.cursorIndex >= this.director.tvd_getTotalCount()) {
+            if (this.cursorIndex >= this.getTotalCount()) {
                 return;
             }
 
@@ -651,7 +657,7 @@ abstract class TreeViewComponent {
             if (beltIndexItem < 0) return;
 
             // TODO: Handle context menu with keyboard when active node is out of view
-            return this.director.tvd_oncontextmenu_async(this.TREEVIEW_ArrayFrom_itemListElement_children[beltIndexItem], this.cursorIndex, event, beltIndexItem);
+            return this.oncontextmenu_async(this.TREEVIEW_ArrayFrom_itemListElement_children[beltIndexItem], this.cursorIndex, event, beltIndexItem);
         }
     }
 
@@ -694,7 +700,7 @@ abstract class TreeViewComponent {
                     else beltIndexItem = (beltIndexItem + this.beltIndexZero) % this.virtualCount;
 
                     if (beltIndexItem < 0) return;
-                    return this.director.tvd_arrowRight_async(this.TREEVIEW_ArrayFrom_itemListElement_children[beltIndexItem], this.cursorIndex);
+                    return this.arrowRight_async(this.TREEVIEW_ArrayFrom_itemListElement_children[beltIndexItem], this.cursorIndex);
                 }
                 return;
             case 'ArrowLeft':
@@ -712,7 +718,7 @@ abstract class TreeViewComponent {
                     else beltIndexItem = (beltIndexItem + this.beltIndexZero) % this.virtualCount;
 
                     if (beltIndexItem < 0) return;
-                    return this.director.tvd_arrowLeft_async(this.TREEVIEW_ArrayFrom_itemListElement_children[beltIndexItem], this.cursorIndex);
+                    return this.arrowLeft_async(this.TREEVIEW_ArrayFrom_itemListElement_children[beltIndexItem], this.cursorIndex);
                 }
             	return;
             case ' ':
@@ -730,7 +736,7 @@ abstract class TreeViewComponent {
                 else beltIndexItem = (beltIndexItem + this.beltIndexZero) % this.virtualCount;
 
                 if (beltIndexItem < 0) return;
-                return this.director.tvd_onkeydown_async(this.TREEVIEW_ArrayFrom_itemListElement_children[beltIndexItem], this.cursorIndex, event.key);
+                return this.onkeydown_async(this.TREEVIEW_ArrayFrom_itemListElement_children[beltIndexItem], this.cursorIndex, event.key);
         }
     }
 
@@ -807,8 +813,8 @@ abstract class TreeViewComponent {
      * @param {*} indexItem 
      */
     state_cursor_validateIndex(indexItem: number) {
-        if (indexItem >= this.director.tvd_getTotalCount()) {
-            indexItem = this.director.tvd_getTotalCount() - 1;
+        if (indexItem >= this.getTotalCount()) {
+            indexItem = this.getTotalCount() - 1;
         }
         if (indexItem < 0) {
             indexItem = 0;
@@ -867,8 +873,23 @@ abstract class TreeViewComponent {
     /** 
      * @param {number} caseThreeOrigin if left undefined or (falsey but not 0), this will default to 'this.component.beltIndexZero'
      */
-    protected abstract tvd_drawItem_BATCH(start: number, length: number, onePositiveDiff_twoNegativeDiff_orThreeFullScreen: number, caseThreeOrigin: number, timestamp: number): void;
+    protected abstract drawItem_BATCH(start: number, length: number, onePositiveDiff_twoNegativeDiff_orThreeFullScreen: number, caseThreeOrigin: number | undefined, timestamp: number): void;
 
+    /**
+     * Not every key invokes this. 
+     */
+    protected abstract onkeydown_async(divItem: HTMLElement, indexItem: number, eventKey: string): Promise<void>;
+
+    protected abstract arrowLeft_async(divItem: HTMLElement, indexItem: number): Promise<void>;
+
+    protected abstract arrowRight_async(divItem: HTMLElement, indexItem: number): Promise<void>;
+
+    protected abstract oncontextmenu_async(divItem: HTMLElement, indexItem: number, event: MouseEvent, relativeIndex: number): Promise<void>;
+
+    protected abstract ondblclick_async(divItem: HTMLElement, indexItem: number): Promise<void>;
+
+    protected abstract drawItem_BATCH_PullDataDrawResult(): void;
+    
     /*
     TODO: The TreeView after you resize it, you can continually scroll down and it keeps replacing more and more '~' lines
           even if you've scrolled through everything already.
