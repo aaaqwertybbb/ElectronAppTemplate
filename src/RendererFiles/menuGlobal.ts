@@ -531,5 +531,12 @@ And the numbers just don't add up in my head in any way I think I'm just trippin
 I don't know if I'm eating enough
 
 analysis paralysis at the grocery store lol
+
+I think I just need sleep a lot of sleep.
+I've been sleeping perfectly every night.
+And I reduced my caffeine intake down to 200mg each day a while ago sometime a month or less ago
+I used to have up to 800mg of caffeine every night
+and yet on 200mg I am just losing my mind with anxiety for some reason
+that's the reason I lowered it I usually tolerate 800mg but I started being unable to
 */
 
