@@ -21,6 +21,27 @@
 //
 // "I dunno it looks like this makes a javascript object in the end? Maybe it isn't"
 // all in all I wanna lean towards being idiomatic to start than idiotic.
+//
+// > I'm gonna ask:
+// > is the generated javascript resulting in an object allocation?:
+// > ```js
+// > const Status = {
+// >     Active: 0,
+// >     Pending: 1,
+// > };
+// > ```
+//
+// < Yes, this code results in an object allocation at runtime.
+// < ...
+// < If your goal is absolute zero runtime allocation, you have two ways to achieve it:
+
+const TreeView_RenderKind = {
+  Active: "ACTIVE",
+  Pending: "PENDING",
+} as const;
+// Derive the type union from the object values
+type TreeView_RenderKind = typeof TreeView_RenderKind[keyof typeof TreeView_RenderKind];
+let userStatus: TreeView_RenderKind = TreeView_RenderKind.Active;
 
 const get_TREEVIEWrenderKind_None = () => 0;
 const get_TREEVIEWrenderKind_Cursor = () => 1;
