@@ -629,4 +629,12 @@ Citicoline (CDP-Choline):
 
 I think I like 'Citicoline (CDP-Choline)'
 
+==========
+
+Men's complete multivitamin (one a day brand) has many 'daily serving / daily value' listed. But it lacks choline from the list entirely.
+
+Thus I worry because I happen to know about choline. But I don't necessarily know about every vitamin/mineral/etc... so I was wondering:
+
+"Can you tell me what 'vitamin/mineral/etc...' are not listed on that multivitamin"
+
 */
