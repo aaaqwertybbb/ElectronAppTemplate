@@ -546,6 +546,34 @@ AI Overview Paraphrased:
 
 omg I take Choline Bitartrate every morning
 
+I take this multi vitamin... (I wanna figure out what percentages aren't 100% or above and then figure out where to get the remainder)
+Men's complete multivitamin (one a day brand):
+- calcium   16%
+- iron       0%
+- magnesium 29%
+
+Not every vitamin/mineral appears on the label though like what is choline it isn't on here at all
+
+Today I got 'calcium 600mg 20mcg vitamin d3' as calcium carbonate, as d3 cholecalciferol
+- Calcium Carbonate:
+    - Contains about 40% elemental calcium by weight.
+    - Requires food and stomach acid for optimal absorption.
+    - Can cause mild gas, bloating, or constipation.
+    - Often less expensive and requires fewer pills
+- Calcium Citrate:
+    - Contains about 21% elemental calcium by weight.
+    - Can be taken with or without food.
+    - Better for older adults or anyone taking acid-reducing medications (like PPIs).
+    - Generally causes fewer digestive side effects
+
+
+I'd looked this up prior to making the purchase.
+I went with calcium carbonate because the absorption difference
+is that you have to take caclium carbonate with food.
+
+And this calcium carbonate that I got has 49% of my daily calcium in it.
+So I can eat the breakfast chicken and then take 1 of these calcium pills.
+
 
 
 */
