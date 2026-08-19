@@ -675,7 +675,7 @@ let EXPLORER_show = true;
 /** 8 */
 let EXPLORER_firstSpanWidthValue = 8;
 /** 8px */
-let EXPLORER_firstSpanWidth = 8;
+let EXPLORER_firstSpanWidth = '8px';
 
 let menuOptionX = 0;
 let menuOptionY = 0;

@@ -143,7 +143,7 @@ let TreeView_pooledNode_depth = 0;
  * 
  * You just keep flattening it into a byte array and map back and forth.
  */
-abstract class TreeViewComponent {
+abstract class TreeViewComponent implements EventListenerObject {
     rootElement: HTMLDivElement;
     virtualizationElement: HTMLDivElement;
     cursorElement: HTMLDivElement;
@@ -162,7 +162,7 @@ abstract class TreeViewComponent {
     TREEVIEW_ArrayFrom_itemListElement_children: HTMLElement[];
     TREEVIEW_ArrayFrom_itemListElement_children_length: number;
     TREEVIEW_draw_create_request_parentElement: HTMLElement | null;
-    TREEVIEW_draw_create_request_insertBeforeThisChild: null;
+    TREEVIEW_draw_create_request_insertBeforeThisChild: HTMLElement | null;
     start: number;
     length: number;
     onePositiveDiff_twoNegativeDiff_orThreeFullScreen: number;
@@ -323,6 +323,11 @@ abstract class TreeViewComponent {
     }
 
     TREEVIEW_render_do_Create(timestamp: number) {
+
+        if (!this.TREEVIEW_draw_create_request_parentElement) {
+            throw new Error('this.TREEVIEW_draw_create_request_parentElement was null');
+        }
+
         if (this.rootElement.parentElement) {
             // It is the case that I invoke 'draw_create_request' when creating the tree view for the first time.
             // But I also do this when I re-open the os input file dialog and pick either a separate or the same folder.
@@ -360,7 +365,7 @@ abstract class TreeViewComponent {
      * @param {HTMLElement} parentElement 
      * @param {*} insertBeforeThisChild (if falsey, the list UI is appended to the parent element)
      */
-    draw_create_request(parentElement: HTMLElement, insertBeforeThisChild: HTMLElement | null | undefined) {
+    draw_create_request(parentElement: HTMLElement, insertBeforeThisChild: HTMLElement | null) {
         this.TREEVIEW_draw_create_request_parentElement = parentElement;
         this.TREEVIEW_draw_create_request_insertBeforeThisChild = insertBeforeThisChild;
         this.TREEVIEW_render_request(TreeView_RenderKind.Create);
@@ -387,7 +392,7 @@ abstract class TreeViewComponent {
     draw_addEvents() {
         this.rootElement.addEventListener('click', this);
         this.rootElement.addEventListener('keydown', this);
-        this.rootElement.addEventListener('scroll', this, { passive: true });
+        this.rootElement.addEventListener('scroll', this as EventListenerObject, { passive: true });
         this.rootElement.addEventListener('dblclick', this);
         this.rootElement.addEventListener('contextmenu', this);
         window.addEventListener('resize', this);
@@ -396,29 +401,36 @@ abstract class TreeViewComponent {
     draw_removeEvents() {
         this.rootElement.removeEventListener('click', this);
         this.rootElement.removeEventListener('keydown', this);
-        this.rootElement.removeEventListener('scroll', this, { passive: true });
+
+        // TODO: > Google AI:...
+        // ..."Because the browser strictly ignores passive when tearing down an event listener, you can drop the options parameter or pass false. TypeScript will instantly accept this signature"
+        // ...
+        // ...I don't want to do this at the moment cause it just makes me uncomfortable at this exact moment.
+        //
+        this.rootElement.removeEventListener('scroll', this as EventListenerObject, { passive: true } as any);
+
         this.rootElement.addEventListener('dblclick', this);
         this.rootElement.addEventListener('contextmenu', this);
         window.removeEventListener('resize', this);
     }
 
     // The browser automatically looks for this exact method name
-    handleEvent(event) {
+    handleEvent(event: Event): void {
         switch (event.type) {
             case 'click':
-                this.event_click(event);
+                this.event_click(event as MouseEvent);
                 break;
             case 'keydown':
-                this.event_keydown(event);
+                this.event_keydown(event as KeyboardEvent);
                 break;
             case 'scroll':
                 this.event_scroll();
                 break;
             case 'dblclick':
-                this.event_dblclick(event);
+                this.event_dblclick(event as MouseEvent);
                 break;
             case 'contextmenu':
-                this.event_contextmenu(event);
+                this.event_contextmenu(event as MouseEvent);
                 break;
             case 'resize':
                 this.event_windowResize();
@@ -522,7 +534,7 @@ abstract class TreeViewComponent {
                 iconSpan.style.display = 'inline-block';
                 // TODO: Consider what differences if any exist between the '' iconSpan having an empty height of 0 when left unset, versus if you were to set it to 1px, does this matter? It doesn't seem to impact the "horizontal" space being taken.
                 divItem.appendChild(iconSpan);
-                divItem.appendChild(document.createTextNode(i));
+                divItem.appendChild(document.createTextNode(`${i}`));
             }
             
             // TODO: check the resize logic, that it works
@@ -969,7 +981,7 @@ class TreeViewNodeList {
      * @param {number} index_abstract 
      * @param {number} key 
      */
-    setKey(index_abstract: number, key) {
+    setKey(index_abstract: number, key: number) {
         this.data_literal[(index_abstract * this.field_count) + this.key_offset] = key;
     }
     
@@ -995,11 +1007,11 @@ class TreeViewNodeList {
      * @param {number} index_abstract 
      * @param {number} nodeKind 
      */
-    setNodeKind(index_abstract: number, nodeKind) {
+    setNodeKind(index_abstract: number, nodeKind: TreeView_NodeKind) {
         this.data_literal[(index_abstract * this.field_count) + this.nodeKind_offset] = nodeKind;
     }
 
-    insert(index_abstract: number, nodeKind, key, depth: number) {
+    insert(index_abstract: number, nodeKind: TreeView_NodeKind, key: number, depth: number) {
         this.ensureCapacityForInsertion(index_abstract, 1);
 
         let index_literal = index_abstract * this.field_count;
@@ -1093,7 +1105,7 @@ class TreeViewNodeList {
     /**
      * inclusive/exclusive
      */
-    copyTo(dataSource_literal, sourceStart_abstract: number, dataDestination_literal, destinationStart_abstract: number, length_abstract: number) {
+    copyTo(dataSource_literal: Uint32Array, sourceStart_abstract: number, dataDestination_literal: Uint32Array, destinationStart_abstract: number, length_abstract: number) {
 
         if (dataSource_literal === dataDestination_literal) {
             if (dataSource_literal !== this.data_literal) {
