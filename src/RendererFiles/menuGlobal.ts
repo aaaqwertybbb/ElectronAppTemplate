@@ -505,3 +505,27 @@ function MENU_ensure_boundingClientRect() {
 //let bodyElement = document.getElementById('ROOT');
 //bodyElement.addEventListener('mousedown', listenHandlerToCloseMenu, /*useCapturing*//* true);
 */
+
+/*
+I feel like I don't wanna mention this because is gonna drive people crazy.
+
+But I'm 100% certain that I'll be ripped soon.
+
+So me documenting this is pretty good.
+
+I have like wild anxiety.
+
+I went to the store and I didn't buy anything.
+
+I just kept looking at everything trying to figure out how I'd hit 100% of my daily:
+- iron
+- and calcium
+
+and I felt I was gonna have a panic attack in the store
+
+I think about whether you could take an iron vitamin
+but there's plant iron and meat iron and they're not the same thing
+
+And the numbers just don't add up in my head in any way I think I'm just trippin though.
+*/
+
