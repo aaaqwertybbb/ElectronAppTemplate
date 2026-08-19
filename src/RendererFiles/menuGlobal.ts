@@ -578,6 +578,7 @@ So I can eat the breakfast chicken and then take 1 of these calcium pills.
 
 Paraphrase Google AI Overview:
 ------------------------------
+# Common Sources and Efficacy
 - Ferrous Sulfate:
     - The most common and affordable standard medical option. It contains high elemental iron and is very effective, but it frequently causes digestive upset, nausea, and constipation.
 - Ferrous Bisglycinate (Chelated Iron):
@@ -589,7 +590,13 @@ Paraphrase Google AI Overview:
 - Polysaccharide-Iron Complexes:
     - Another alternative designed to reduce stomach irritation, though individual tolerance varies
 
-
+# Tips for Maximizing Absorption
+- Empty Stomach:
+    - Iron absorbs best when taken on an empty stomach (about 1 hour before or 2 hours after a meal). If it causes severe nausea, taking it with a small snack is acceptable, though absorption drops.
+- Add Vitamin C:
+    - Taking your pill with a source of vitamin C (like a glass of orange juice) enhances absorption
+- Avoid Blockers:
+    - Do not take iron with coffee, tea (tannins), milk, calcium supplements, or antacids, as these severely reduce uptake. Separate them by at least 1 to 2 hours
 
 
 I also got iron:
