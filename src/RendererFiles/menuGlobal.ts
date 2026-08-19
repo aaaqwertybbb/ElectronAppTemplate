@@ -548,5 +548,8 @@ and maybe it is just an adjusting period
 
 I think that's the thing too I always am anxious but it isn't just anxiety it is
 anxiety and energy and just a lot of weird sensations that maybe are good I can't tell
+
+and I feel the panic starting to set in again
+so this is the part where I delete this comment then make another commit that is just an empty line
 */
 
