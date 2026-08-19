@@ -538,5 +538,12 @@ And I reduced my caffeine intake down to 200mg each day a while ago sometime a m
 I used to have up to 800mg of caffeine every night
 and yet on 200mg I am just losing my mind with anxiety for some reason
 that's the reason I lowered it I usually tolerate 800mg but I started being unable to
+
+My theory:
+I think when I was super unhealthy
+that my body couldn't make the proper of "something"
+and now I feel everything way more now in terms of energy levels
+I feel energy wise like completely different
+and maybe it is just an adjusting period
 */
 
