@@ -97,6 +97,46 @@ export type EditKind = typeof EditKind[keyof typeof EditKind];
 
 
 
+/** 
+ * see editorGlobal.js:
+ * > const count_of_wellknown_renderKinds = ...;
+ *
+ * get_RenderKind_Cursor_n is to say
+ * renderKind - (count_of_wellknown_renderKinds - 1) => render the cursor at cursorList[result];
+ * ...
+ * maybe I'll change this to be the id of the cursor at some point cause I'm not sure if it holds up with cursor movement possibly changing their order in the list.
+ * but for now...
+*/
+export const RenderKind = {
+    None: 0,
+    Scroll: 1,
+    Resize: 2,
+    InsertLtr: 3,
+    TabKey: 4,
+    IndentMore: 5,
+    IndentLess: 6,
+    BackspaceRtl: 7,
+    DeleteLtr: 8,
+    RemoveSelection: 9,
+    Enter: 10,
+    DuplicateOrPaste: 11,
+    Clear: 12,
+    SetText: 13,
+    CreateViewport: 14,
+    SyntaxHighlighting: 15,
+    /** non-primaryCursors won't scroll into view, */
+    Cursor_flag_scrollIntoViewExplicit: 16,
+    /** To have a cursor not scroll into view add request this render immediately after the 'get_RenderKind_Cursor_n'. */
+    Cursor_flag_doNotScrollIntoView: 17,
+    /** Add the index of the cursor */
+    Cursor_n: 18,
+} as const;
+// Derive the type union from the object values
+export type RenderKind = typeof RenderKind[keyof typeof RenderKind];
+
+
+
+
 /**
  * If you have an extension listed here, it is expected that the "function to invoke" exists.
  * As of right now any patterns to naming the function that gets invoked are tentative.
