@@ -881,4 +881,18 @@ Even on the rare occassion that I generate a code snippet with AI I've read it f
 You have a skill issue if you are black and white for or against AI.
 And if you don't "get good" you're gonna fall behind.
 
+=====
+
+Also, the more I word on the editor... like a few months ago.
+I got to the point were I was like...
+I don't think I'm ever gonna use my own editor idk it depends.
+Even if I keep working on it... I mean... it's complicated... and you're gonna wear and tear your laptop's battery using some trash that I make
+cause of all the wasted CPU usage that has been already solved by larger companies.
+
+Unless after a long enough time I manage to have it optimized.
+
+I use VSCode and the default dark theme these days lol
+
+Color themes... they're complicated. I got things to do, I can suffice with VSCode dark theme.
+
 */
