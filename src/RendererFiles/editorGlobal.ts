@@ -223,7 +223,7 @@ let longestLine_length = 0;
 
 let drawn_count_of_digits_longest_line_number = 0;
 
-let set_EDITOR_gutterWidthStyleValue;
+let gutterWidthStyleValue = 32;
 
 class EDITOR_Cursor {
 
@@ -630,8 +630,8 @@ function EDITOR_init() {
     EDITOR_gutterBackgroundColor.style.paddingLeft = gutterPaddingLeft;
     EDITOR_gutterBackgroundColor.style.paddingRight = gutterPaddingRight;
 
-    set_EDITOR_gutterWidthStyleValue(EDITOR_characterWidth);
-    let gutterWidth = get_EDITOR_gutterWidthStyleValue() + 'px';
+    gutterWidthStyleValue = EDITOR_characterWidth;
+    let gutterWidth = gutterWidthStyleValue + 'px';
 
     EDITOR_drawGutter_Width();
 
@@ -829,7 +829,7 @@ function EDITOR_render_do_CreateViewport() {
     EDITOR_beltIndexZero = 0;
     let translateY = `translateY(0px)`;
     let left = gutterWidthTotal_withPxUnits;
-    let gutterWidth = `${get_EDITOR_gutterWidthStyleValue()}px`;
+    let gutterWidth = `${gutterWidthStyleValue}px`;
 
     for (var i = 0; i < virtualCount; i++) {
 
@@ -1562,11 +1562,11 @@ function EDITOR_drawGutter_Width() {
 
     drawn_count_of_digits_longest_line_number = digitCountOfLargestLineNumber;
 
-    set_EDITOR_gutterWidthStyleValue(Math.ceil(digitCountOfLargestLineNumber * EDITOR_characterWidth));
-    set_EDITOR_gutterWidthTotal(get_EDITOR_gutterWidthStyleValue() + get_EDITOR_gutterPaddingLeft() + get_EDITOR_gutterPaddingRight());
+    gutterWidthStyleValue = (Math.ceil(digitCountOfLargestLineNumber * EDITOR_characterWidth));
+    set_EDITOR_gutterWidthTotal(gutterWidthStyleValue + get_EDITOR_gutterPaddingLeft() + get_EDITOR_gutterPaddingRight());
     gutterWidthTotal_withPxUnits = `${get_EDITOR_gutterWidthTotal()}px`;
 
-    let gutterWidth = get_EDITOR_gutterWidthStyleValue() + 'px';
+    let gutterWidth = gutterWidthStyleValue + 'px';
     cached_EDITOR_gutter.style.width = gutterWidth;
     EDITOR_gutterBackgroundColor.style.width = gutterWidth;
 
