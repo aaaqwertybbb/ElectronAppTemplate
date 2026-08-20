@@ -212,6 +212,7 @@ let ONSCROLLvirtualIndexLine = 0;
 let ONSCROLLscrollTop = 0;
 
 let offsetLine = 0;
+let offsetColumn = 0;
 
 class EDITOR_Cursor {
 
@@ -1365,7 +1366,7 @@ function EDITOR_state_clear() {
     set_EDITOR_indexCursor(0);
     offsetLine = 0;
     set_EDITOR_offsetColumn_withRespectToThisIndexLine(0);
-    set_EDITOR_offsetColumn(0);
+    offsetColumn = 0;
     set_EDITOR_totalShift(0);
     EDITOR_offsetWithinSpan_withRespectToThisSpan = null;
     set_EDITOR_offsetWithinSpan(0);
@@ -2726,7 +2727,7 @@ function walkLineUntilIndexColumn(cursor: EDITOR_Cursor) {
     }
     
     let div = ArrayFrom_textElement_children[w_beltIndexLine];
-    let indexColumn_Goal = cursor.indexColumn + get_EDITOR_offsetColumn();
+    let indexColumn_Goal = cursor.indexColumn + offsetColumn;
     let indexColumn_Sum = 0;
 
     for (var indexSpan = 0; indexSpan < div.children.length; indexSpan++) {
@@ -2902,7 +2903,7 @@ function EDITOR_draw_all_cursors() {
  */
 function EDITOR_drawCursor(cursor: EDITOR_Cursor, NOTscrollCursorIntoView?: boolean) {
     cursor.cursorTranslateYValue = (cursor.indexLine + offsetLine) * get_EDITOR_lineHeight();
-    cursor.cursorTranslateXValue = (cursor.indexColumn + get_EDITOR_offsetColumn()) * EDITOR_characterWidth;
+    cursor.cursorTranslateXValue = (cursor.indexColumn + offsetColumn) * EDITOR_characterWidth;
 
     cursor.caretRow.style.transform = `translateY(${cursor.cursorTranslateYValue}px)`;
     cursor.cursorElement.style.transform = `translateX(${cursor.cursorTranslateXValue}px)`;
@@ -4423,7 +4424,7 @@ function EDITOR_editEvent_theEditIself_InsertLtr(event) {
         EDITOR_movementBasedCacheInvalidation(cursor);
         if (get_EDITOR_offsetColumn_withRespectToThisIndexLine() !== cursor.indexLine) {
             set_EDITOR_offsetColumn_withRespectToThisIndexLine(cursor.indexLine);
-            set_EDITOR_offsetColumn(0);
+            offsetColumn = 0;
         }
         // You can do this because the function 'EDITOR_NOTcanBatch_insert' was already checked for all the cursors, if it is possible to batch, the editKind will stay InsertLtr otherwise it is finalized and set to None.
         // TODO: Use if === EditKind.None for copy and paste safety / it might just even be more readable
@@ -4433,7 +4434,7 @@ function EDITOR_editEvent_theEditIself_InsertLtr(event) {
         EDITOR_insertDo(cursor, event.key);
         cursor.STORED_indexColumn = cursor.indexColumn;
         EDITOR_render_request(RenderKind.Cursor_n + i);
-        //set_EDITOR_offsetColumn(get_EDITOR_offsetColumn() + cursor.editLength);
+        //offsetColumn = offsetColumn + cursor.editLength;
         //set_EDITOR_totalShift(get_EDITOR_totalShift() + cursor.editLength); // this isn't needed here, but it is needed elsewhere so in order to create a pattern it was included here... TODO: maybe get rid of this or...?
         EDITOR_render_request(RenderKind.InsertLtr);
     }
@@ -4446,7 +4447,7 @@ function EDITOR_editEvent_theEditIself_DeleteLtr(event) {
         EDITOR_movementBasedCacheInvalidation(cursor);
         if (get_EDITOR_offsetColumn_withRespectToThisIndexLine() !== cursor.indexLine) {
             set_EDITOR_offsetColumn_withRespectToThisIndexLine(cursor.indexLine);
-            set_EDITOR_offsetColumn(0);
+            offsetColumn = 0;
         }
         if (cursor.hasSelection()) {
             EDITOR_removeSelection(cursor);
@@ -4458,7 +4459,7 @@ function EDITOR_editEvent_theEditIself_DeleteLtr(event) {
             EDITOR_deleteDo(cursor, event);
         }
         EDITOR_render_request(RenderKind.Cursor_n + i);
-        //set_EDITOR_offsetColumn(get_EDITOR_offsetColumn() - cursor.editLength);
+        //offsetColumn = offsetColumn - cursor.editLength;
         //set_EDITOR_totalShift(get_EDITOR_totalShift() - cursor.editLength); // this isn't needed here, but it is needed elsewhere so in order to create a pattern it was included here... TODO: maybe get rid of this or...?
     }
 }
@@ -4470,7 +4471,7 @@ function EDITOR_editEvent_theEditIself_BackspaceRtl(event) {
         EDITOR_movementBasedCacheInvalidation(cursor);
         if (get_EDITOR_offsetColumn_withRespectToThisIndexLine() !== cursor.indexLine) {
             set_EDITOR_offsetColumn_withRespectToThisIndexLine(cursor.indexLine);
-            set_EDITOR_offsetColumn(0);
+            offsetColumn = 0;
         }
         if (cursor.hasSelection()) {
             EDITOR_removeSelection(cursor);
@@ -4483,7 +4484,7 @@ function EDITOR_editEvent_theEditIself_BackspaceRtl(event) {
             cursor.STORED_indexColumn = cursor.indexColumn;
         }
         EDITOR_render_request(RenderKind.Cursor_n + i);
-        //set_EDITOR_offsetColumn(get_EDITOR_offsetColumn() - cursor.editLength);
+        //offsetColumn = offsetColumn - cursor.editLength;
         //set_EDITOR_totalShift(get_EDITOR_totalShift() - cursor.editLength); // this isn't needed here, but it is needed elsewhere so in order to create a pattern it was included here... TODO: maybe get rid of this or...?
     }
 }
@@ -4801,7 +4802,7 @@ async function EDITOR_onKeyDown(event: KeyboardEvent) {
     set_EDITOR_indexCursor(0);
     offsetLine = 0;
     set_EDITOR_offsetColumn_withRespectToThisIndexLine(0);
-    set_EDITOR_offsetColumn(0);
+    offsetColumn = 0;
     set_EDITOR_totalShift(0);
     EDITOR_offsetWithinSpan_withRespectToThisSpan = null;
     set_EDITOR_offsetWithinSpan(0);
@@ -4887,7 +4888,7 @@ function EDITOR_onKeyDown_ArrowLeft(event: KeyboardEvent) {
         EDITOR_movementBasedCacheInvalidation(cursor);
         if (get_EDITOR_offsetColumn_withRespectToThisIndexLine() !== cursor.indexLine) {
             set_EDITOR_offsetColumn_withRespectToThisIndexLine(cursor.indexLine);
-            set_EDITOR_offsetColumn(0);
+            offsetColumn = 0;
         }
 
         if (cursor.hasSelection() && !event.shiftKey) {
@@ -4940,7 +4941,7 @@ function EDITOR_onKeyDown_ArrowLeft(event: KeyboardEvent) {
         if (!EDITOR_isChecking_cursorBlinkTrailingEdge) {
             EDITOR_cursorBlink_startChecking();
         }
-        //set_EDITOR_offsetColumn(get_EDITOR_offsetColumn() + cursor.editLength);
+        //offsetColumn = offsetColumn + cursor.editLength;
         //set_EDITOR_totalShift(get_EDITOR_totalShift() + cursor.editLength);
     }
 }
@@ -5027,7 +5028,7 @@ function EDITOR_onKeyDown_ArrowRight(event: KeyboardEvent) {
         EDITOR_movementBasedCacheInvalidation(cursor);
         if (get_EDITOR_offsetColumn_withRespectToThisIndexLine() !== cursor.indexLine) {
             set_EDITOR_offsetColumn_withRespectToThisIndexLine(cursor.indexLine);
-            set_EDITOR_offsetColumn(0);
+            offsetColumn = 0;
         }
 
         if (cursor.hasSelection() && !event.shiftKey) {
@@ -5081,7 +5082,7 @@ function EDITOR_onKeyDown_ArrowRight(event: KeyboardEvent) {
         if (!EDITOR_isChecking_cursorBlinkTrailingEdge) {
             EDITOR_cursorBlink_startChecking();
         }
-        //set_EDITOR_offsetColumn(get_EDITOR_offsetColumn() + cursor.editLength);
+        //offsetColumn = offsetColumn + cursor.editLength;
         //set_EDITOR_totalShift(get_EDITOR_totalShift() + cursor.editLength);
     }
 }
@@ -5296,7 +5297,7 @@ function EDITOR_onMouseDown(event) {
     
     // TODO: You might want to do this inside 'EDITOR_finalizeAllCursors_andClearNonPrimaryCursors();' at the end... I'm not sure.
     set_EDITOR_indexCursor(0);
-    set_EDITOR_offsetColumn(0);
+    offsetColumn = 0;
     offsetLine = 0;
 
     if (get_EDITOR_recentBoundingClientRect_isNull_intFalsey()) {
