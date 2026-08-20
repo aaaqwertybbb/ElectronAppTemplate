@@ -60,6 +60,18 @@ And it can introduce oddities involving tabstop or very tiny changes in horizont
 '\0' is a similar problem, it is a special character that might cause odd behavior.
 */
 
+/**
+ * TODO: Long term this likely should be removed and all enter key logic reduced into an insertion but this will help in the time being.
+ */
+export const EnterKeyEventKind = {
+    None: 0,
+    StartOfLine: 1,
+    EndOfLine: 2,
+    AmongALine: 3,
+} as const;
+// Derive the type union from the object values
+export type EnterKeyEventKind = typeof EnterKeyEventKind[keyof typeof EnterKeyEventKind];
+
 export let EDITOR_trackedSyntaxList = new TrackedSyntaxList(32, null);
 
 /**
@@ -108,7 +120,7 @@ class EDITOR_Cursor {
     cursorElement: HTMLDivElement;
     enterKey_newLinePlusIndentation_byteList: ByteList | null;
     cached_indentation_string: string | null;
-    enterKeyEventKind: any;
+    enterKeyEventKind: EnterKeyEventKind;
     editLineFeedCount: number;
     edit_flagLineChanged: number;
     EDITOR_paste_clipboardContent: string | null;
@@ -195,7 +207,7 @@ class EDITOR_Cursor {
          */
         this.enterKey_newLinePlusIndentation_byteList = null;
         this.cached_indentation_string = null;
-        this.enterKeyEventKind = get_EnterKeyEventKind_None();
+        this.enterKeyEventKind = EnterKeyEventKind.None;
 
         /**
          * TODO: probably is sensible to use this for the enter key too but I'm firstly adding it for the sake of backspace so
@@ -269,7 +281,7 @@ class EDITOR_Cursor {
 
         this.enterKey_newLinePlusIndentation_byteList = null;
         this.cached_indentation_string = null;
-        this.enterKeyEventKind = get_EnterKeyEventKind_None();
+        this.enterKeyEventKind = EnterKeyEventKind.None;
 
         this.editLineFeedCount = 0;
         this.edit_flagLineChanged = -1;
@@ -1381,7 +1393,7 @@ function update_virtualCount() {
  */
 function EDITOR_drawGutter_Width() {
     let count = EDITOR_lineEndPositionList.count;
-    if (EDITOR_primaryCursor.enterKeyEventKind !== get_EnterKeyEventKind_None()) {
+    if (EDITOR_primaryCursor.enterKeyEventKind !== EnterKeyEventKind.None) {
         count += 1;
     }
     let digitCountOfLargestLineNumber = positiveNumbersOnly_countDigitsLoop(count);
@@ -1670,8 +1682,8 @@ function EDITOR_finalizeEdit_Enter(cursor, indexLine_editOccurredOn) {
 
     EDITOR_trackedSyntaxList_inefficientUpdateStartAndLength(cursor.editPosition, cursor.editLength);
 
-    // throws an exception if 'get_EnterKeyEventKind_None' (...or falsey).
-    if (!cursor.enterKeyEventKind || cursor.enterKeyEventKind === get_EnterKeyEventKind_None()) { EDITOR_finalizeEdit_ClearEditState(cursor); throw new Error('if (!enterKeyEventKind...)'); }
+    // throws an exception if 'EnterKeyEventKind.None' (...or falsey).
+    if (!cursor.enterKeyEventKind || cursor.enterKeyEventKind === EnterKeyEventKind.None) { EDITOR_finalizeEdit_ClearEditState(cursor); throw new Error('if (!enterKeyEventKind...)'); }
 
     EDITOR_textByteList.insertBytes(cursor.editPosition, cursor.enterKey_newLinePlusIndentation_byteList.bytes, /*offset*/ 0, cursor.enterKey_newLinePlusIndentation_byteList.count);
 
@@ -6934,7 +6946,7 @@ function EDITOR_EnterKey(cursor, ctrlKey, shiftKey) {
 
     if (cursor.editLength === 0) {
 
-        cursor.enterKeyEventKind = get_EnterKeyEventKind_None();
+        cursor.enterKeyEventKind = EnterKeyEventKind.None;
 
         cursor.editPosition = EDITOR_getPositionIndex_raw(cursor);
         cursor.editIndexLine = cursor.indexLine;
@@ -6945,7 +6957,7 @@ function EDITOR_EnterKey(cursor, ctrlKey, shiftKey) {
     
     if (cursor.indexColumn === 0) { // start of line
         if (cursor.enterKeyEventKind === 0) {
-            cursor.enterKeyEventKind = get_EnterKeyEventKind_StartOfLine();
+            cursor.enterKeyEventKind = EnterKeyEventKind.StartOfLine;
         }
 
         if (!ctrlKey)
@@ -6956,8 +6968,8 @@ function EDITOR_EnterKey(cursor, ctrlKey, shiftKey) {
 
         if (cursor.enterKeyEventKind === 0) {
             cursor.enterKeyEventKind = lastValidIndexColumn === cursor.indexColumn
-                ? get_EnterKeyEventKind_EndOfLine()
-                : get_EnterKeyEventKind_AmongALine();
+                ? EnterKeyEventKind.EndOfLine
+                : EnterKeyEventKind.AmongALine;
         }
         
         cursor.indexLine++;
