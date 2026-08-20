@@ -9,20 +9,32 @@ import { EXPLORER_firstSpanWidth_SETTER, EXPLORER_firstSpanWidthValue, EXPLORER_
  * */
 export let APP_lineHeight = 20;
 
+type myAPI_languageServer_response = { method: string; value: any };
+
 init();
 
 function init() {
-    document
-        .getElementById('HEADER_buttonSettings')
-        .addEventListener('click', HEADER_buttonSettings_onClick);
+    let buttonSettings = document.getElementById('HEADER_buttonSettings');
+    if (buttonSettings) {
+        buttonSettings.addEventListener('click', HEADER_buttonSettings_onClick);
+    }
+    else {
+        throw new Error();
+    }
+        
 
-    //window.myAPI.onMessage(window_myAPI_onMessage);
-//
-    //const EDITOR_gotoF_button = document.getElementById('EDITOR_gotoF');
-    //EDITOR_gotoF_button.addEventListener('click', window.myAPI.editorDocumentSymbolsRequest);
-    //document.body.addEventListener('keydown', documentBody_onKeyDown);
-//
-    //requestAnimationFrame(APP_render_init);
+    const EDITOR_gotoF_button = document.getElementById('EDITOR_gotoF');
+    if (EDITOR_gotoF_button) {
+        //EDITOR_gotoF_button.addEventListener('click', window.myAPI.editorDocumentSymbolsRequest);
+    }
+    else {
+        throw new Error();
+    }
+    
+    document.body.addEventListener('keydown', documentBody_onKeyDown);
+
+    window.myAPI.onMessage(window_myAPI_onMessage);
+    requestAnimationFrame(APP_render_init);
 }
 
 /**
@@ -83,7 +95,7 @@ function APP_measureLineHeightAndCharacterWidth() {
     }
 }
 
-async function window_myAPI_onMessage(data) {
+async function window_myAPI_onMessage(data: myAPI_languageServer_response) {
     switch (data.method) {
         case 'textDocument/documentSymbol':
             break;
@@ -166,7 +178,7 @@ async function documentBody_onKeyDown(event: KeyboardEvent) {
                 if (!EXPLORER_Element) {
                     return;
                 }
-                if (EXPLORER_Element.children.length === 1) {
+                if (EXPLORER_Element.children.length === 1 && EXPLORER_Element.children[0] instanceof HTMLElement) {
                     EXPLORER_Element.children[0].focus();
                 }
             }

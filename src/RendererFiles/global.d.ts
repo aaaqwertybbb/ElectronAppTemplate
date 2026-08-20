@@ -9,6 +9,7 @@ export interface MyAPI {
   getFilesystemEntries_argumentIsId: (id) => Promise<any>;
   chooseDirectory: () => Promise<any>;
   chooseWorkspace: () => Promise<any>;
+  onMessage: (callback) => Promise<any>;
 }
 
 declare global {
