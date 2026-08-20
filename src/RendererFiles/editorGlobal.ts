@@ -151,6 +151,18 @@ export type ExtensionKind = typeof ExtensionKind[keyof typeof ExtensionKind];
 
 
 
+export type LspQueue_Entry = {
+    absolutePath: string,
+    version: number,
+    startLine: number,
+    startCharacter: number,
+    endLine: number,
+    endCharacter: number,
+    text: string,
+};
+
+
+
 
 export let EDITOR_trackedSyntaxList = new TrackedSyntaxList(32, null);
 
@@ -408,7 +420,7 @@ let EDITOR_lineEndPositionList_PENDING = new UInt32List(128);
  */
 let EDITOR_lineEndPositionList = new UInt32List(128);
 
-let gutterWidthTotal_withPxUnits;
+let gutterWidthTotal_withPxUnits: string;
 
 let EDITOR_primaryCursor = new EDITOR_Cursor();
 //cached_EDITOR_cursorListElement.appendChild(EDITOR_primaryCursor.caretRow);
@@ -429,7 +441,7 @@ let EDITOR_documentSymbolResult;
  */
 let EDITOR_listComponent = null;
 
-let EDITOR_onResize_timer = null;
+let EDITOR_onResize_timer: NodeJS.Timeout | null = null;
 let EDITOR_onResize_hasTrailingCall = false;
 
 let EDITOR_offsetWithinSpan_withRespectToThisSpan = null;
@@ -470,7 +482,7 @@ let currVli: number;
  * This queueing is currently a complete copy and paste of what Google AI generated.
  * I looked it over and it appears correct.
  */
-const lspQueue = [];
+const lspQueue: LspQueue_Entry[] = [];
 let isProcessingLspQueue = false;
 
 /** The value of 'EDITOR_baseElement.scrollLeft' at the most recent scroll event that occurred */
@@ -1738,7 +1750,7 @@ function EDITOR_finalizeEdit_InsertLtr(cursor, indexLine_editOccurredOn) {
         endLine: lineAndColumnIndices.indexLine,
         endCharacter: lineAndColumnIndices.indexColumn,
         text: text
-    });
+    } as LspQueue_Entry);
     // -------------------------
 
     if (indexLine_editOccurredOn === get_EDITOR_longestLine_indexLine()) {
@@ -2388,7 +2400,7 @@ function EDITOR_finalizeEdit_DeleteLtr_BackspaceRtl_RemoveTextNoBatching(cursor,
         endLine: endLineAndColumnIndices.indexLine,
         endCharacter: endLineAndColumnIndices.indexColumn,
         text: text
-    });
+    } as LspQueue_Entry);
     // -------------------------
 
     if (indexLine_editOccurredOn === get_EDITOR_longestLine_indexLine()) {
@@ -2430,7 +2442,7 @@ function EDITOR_finalizeEdit_ClearEditState(cursor) {
     EDITOR_lineEndPositionList_PENDING.clear();
 }
 
-function enqueueLSPNotification(payload) {
+function enqueueLSPNotification(payload: LspQueue_Entry) {
     lspQueue.push(payload);
     processLspQueue(); // Fire-and-forget processing loop
 }
@@ -2441,6 +2453,9 @@ async function processLspQueue() {
 
     while (lspQueue.length > 0) {
         const item = lspQueue.shift(); // Guarantees strict FIFO order
+        if (item === undefined) {
+            return;
+        }
         
         try {
             // Await the Electron IPC and LSP stdin write
@@ -4231,7 +4246,7 @@ function EDITOR_editEvent(editKind, event, clipboardContent) {
             EDITOR_finalizeAllCursors();
         }
     }
-    
+
     // If you have delete/backspace you need to ONLY remove the selection if it exists not remove selection then delete/backspace
     // but insert needs to remove selection AND insert.
     if (editKind === EditKind.InsertLtr || editKind === EditKind.Enter || editKind === EditKind.Paste) {
