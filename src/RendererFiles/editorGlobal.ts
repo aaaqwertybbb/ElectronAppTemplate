@@ -251,6 +251,7 @@ class EDITOR_Cursor {
     selectionIndexEndColumn: number = 0;
     selectionIndexAnchorLine: number = 0;
     selectionIndexAnchorColumn: number = 0;
+    selectionDivExists: boolean = false;
 
     /**
      * After invoking the constructor you likely would want to add to:
@@ -2765,15 +2766,16 @@ function walkLineUntilIndexColumn(cursor: EDITOR_Cursor) {
  * @param {HTMLElement} gutterLineElement 
  * @param {HTMLElement} divElement 
  */
-function EDITOR_drawLine(indexLine, gutterLineElement, textLineElement) {
+function EDITOR_drawLine(indexLine: number, gutterLineElement: HTMLElement, textLineElement: HTMLElement) {
     if (indexLine >= EDITOR_lineEndPositionList.count) {
         gutterLineElement.textContent = '~';
     }
     else {
-        gutterLineElement.textContent = indexLine + 1;
+        gutterLineElement.textContent = `${indexLine + 1}`;
     }
 
     let trackedSyntax_StartingIndex = EDITOR_drawViewPort_FindTrackedSyntax_StartingIndex(indexLine);
+    // TODO: This condition will always return 'false'.ts(2845)... Did you mean 'Number.isNaN(trackedSyntax_StartingIndex)'?
     if (trackedSyntax_StartingIndex === NaN || trackedSyntax_StartingIndex === -1) {
         trackedSyntax_StartingIndex = EDITOR_trackedSyntaxList.count_abstract;
     }
@@ -2786,7 +2788,7 @@ function EDITOR_drawLine(indexLine, gutterLineElement, textLineElement) {
  * @param {*} indexLineAaa 
  * @returns 
  */
-function EDITOR_drawViewPort_FindTrackedSyntax_StartingIndex(indexLineAaa) {
+function EDITOR_drawViewPort_FindTrackedSyntax_StartingIndex(indexLineAaa: number) {
 
     // TODO: 'indexLineAaa' and 'indexLineBbb'; babel compiler error when both were named indexLine.
 
@@ -2827,7 +2829,7 @@ function EDITOR_drawViewPort_FindTrackedSyntax_StartingIndex(indexLineAaa) {
  * if (trackedSyntax_StartingIndex === NaN || trackedSyntax_StartingIndex === -1) { trackedSyntax_StartingIndex = EDITOR_trackedSyntaxList.count_abstract; }
  * Probably should make 1 of these and accept a predicate.
  */
-function EDITOR_trackedSyntaxReposition_find(positionIndex) {
+function EDITOR_trackedSyntaxReposition_find(positionIndex: number) {
 
     let left = 0;
     let right = EDITOR_trackedSyntaxList.count_abstract - 1;
@@ -2860,7 +2862,7 @@ function EDITOR_trackedSyntaxReposition_find(positionIndex) {
 }
 
 /** modification of Google AI Overview "javascript count of digits" */
-function positiveNumbersOnly_countDigitsLoop(number) {
+function positiveNumbersOnly_countDigitsLoop(number: number) {
   if (number <= 0) return 1;
   let count = 0;
 
@@ -3072,6 +3074,9 @@ function EDITOR_createStyleForSelection(cursor: EDITOR_Cursor) {
                         cached_EDITOR_presentation.removeChild(textSelectionDiv);
                         cursor.selectionDivExists = false;
                     }
+                    else {
+                        throw new Error();
+                    }
                     break;
                 }
             }
@@ -3090,11 +3095,17 @@ function EDITOR_createStyleForSelection(cursor: EDITOR_Cursor) {
 
         let start = cursor.selectionAnchor;
         let startLineAndColumnIndices = EDITOR_getLineAndColumnIndices(start);
+        if (startLineAndColumnIndices === undefined) {
+            throw new Error();
+        }
         let startLine = startLineAndColumnIndices.indexLine;
         let startColumn = startLineAndColumnIndices.indexColumn;
 
         let end = cursor.selectionEnd;
         let endLineAndColumnIndices = EDITOR_getLineAndColumnIndices(end);
+        if (endLineAndColumnIndices === undefined) {
+            throw new Error();
+        }
         let INCLUSIVEendLine = endLineAndColumnIndices.indexLine;
         let INCLUSIVEendColumn = endLineAndColumnIndices.indexColumn;
 
@@ -3264,7 +3275,7 @@ function EDITOR_getLineBoundaryPositions(indexLine) {
     }
 }
 
-function EDITOR_getLineStart_pos(indexLine) {
+function EDITOR_getLineStart_pos(indexLine: number) {
     if (indexLine < EDITOR_lineEndPositionList.count) {
         if (indexLine === 0) {
             return 0;
@@ -3276,7 +3287,7 @@ function EDITOR_getLineStart_pos(indexLine) {
     return 0;
 }
 
-function EDITOR_getLineEnd_pos(indexLine) {
+function EDITOR_getLineEnd_pos(indexLine: number) {
     if (indexLine < EDITOR_lineEndPositionList.count) {
         if (indexLine === 0) {
             return EDITOR_readLineEndPositionList(indexLine) - 0;
@@ -3298,7 +3309,7 @@ function EDITOR_getLineEnd_pos(indexLine) {
  * 
  * @returns an object with properties 'start' inclusive, 'end' exclusive
  */
-function EDITOR_getLineBoundaryPositions_raw(indexLine) {
+function EDITOR_getLineBoundaryPositions_raw(indexLine: number) {
     if (indexLine < EDITOR_lineEndPositionList.count) {
         if (indexLine === 0) {
             return {
@@ -3319,7 +3330,7 @@ function EDITOR_getLineBoundaryPositions_raw(indexLine) {
     }
 }
 
-function EDITOR_getLineStart_pos_raw(indexLine) {
+function EDITOR_getLineStart_pos_raw(indexLine: number) {
     if (indexLine < EDITOR_lineEndPositionList.count) {
         if (indexLine === 0) {
             return 0;
@@ -3331,7 +3342,7 @@ function EDITOR_getLineStart_pos_raw(indexLine) {
     return 0;
 }
 
-function EDITOR_getLineEnd_pos_raw(indexLine) {
+function EDITOR_getLineEnd_pos_raw(indexLine: number) {
     if (indexLine < EDITOR_lineEndPositionList.count) {
         if (indexLine === 0) {
             return EDITOR_lineEndPositionList.data[indexLine] - 0;
@@ -3343,7 +3354,7 @@ function EDITOR_getLineEnd_pos_raw(indexLine) {
     return 0;
 }
 
-function EDITOR_onMouseMove_WRAPIT(event) {
+function EDITOR_onMouseMove_WRAPIT(event: MouseEvent) {
     if ((event.buttons & 1) && !get_EDITOR_recentBoundingClientRect_isNull_intFalsey()) {
 
         // TODO: Consider short circuiting at via event.clientX and clientY by tracking the necessary thresholds for the cursor position to pass rather than the previous and current indices. (you can possibly thereby skip the calculation of the indices entirely for the redundant events).
