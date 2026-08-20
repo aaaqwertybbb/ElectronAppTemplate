@@ -4230,7 +4230,8 @@ function EDITOR_editEvent(editKind, event, clipboardContent) {
         else {
             EDITOR_finalizeAllCursors();
         }
-
+    }
+    
     // If you have delete/backspace you need to ONLY remove the selection if it exists not remove selection then delete/backspace
     // but insert needs to remove selection AND insert.
     if (editKind === EditKind.InsertLtr || editKind === EditKind.Enter || editKind === EditKind.Paste) {
