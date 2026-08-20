@@ -1,10 +1,24 @@
-const get_WidgetKind_None = () => 0;
-const get_WidgetKind_InputText = () => 1;
-const get_WidgetKind_YesCancel = () => 2;
+export const WidgetKind = {
+    None: 0,
+    InputText: 1,
+    YesCancel: 2,
+} as const;
+// Derive the type union from the object values
+export type WidgetKind = typeof WidgetKind[keyof typeof WidgetKind];
 
-const get_WIDGETrenderKind_None = () => 0;
-const get_WIDGETrenderKind_Show = () => 1;
-const get_WIDGETrenderKind_Hide = () => 2;
+
+
+
+export const Widget_RenderKind = {
+    None: 0,
+    Show: 1,
+    Hide: 2,
+} as const;
+// Derive the type union from the object values
+export type Widget_RenderKind = typeof Widget_RenderKind[keyof typeof Widget_RenderKind];
+
+
+
 
 /**
  * @callback MENU_Callback
@@ -30,9 +44,9 @@ const get_WIDGETrenderKind_Hide = () => 2;
  */
 let WIDGET_ticketId_counter = 1;
 
-let WIDGET_WidgetKind_pending = get_WidgetKind_None();
-let WIDGET_WidgetKind_drawn = get_WidgetKind_None();
-let WIDGET_restoreFocusToElement_drawn = null;
+let WIDGET_WidgetKind_pending: WidgetKind = WidgetKind.None;
+let WIDGET_WidgetKind_drawn: WidgetKind = WidgetKind.None;
+let WIDGET_restoreFocusToElement_drawn: HTMLElement | null = null;
 
 let WIDGET_ticketId_pending = 0;
 let WIDGET_ticketId_drawn = 0;
@@ -45,7 +59,9 @@ let WIDGET_top = 0;
 let WIDGET_currentCallback = null;
 let WIDGET_placeholder = null;
 let WIDGET_value = null;
-let WIDGET_target = null;
+export let WIDGET_target: any | null = null;
+
+export let WIDGET_SHOW_value = null;
 
 // Instead of passing the data around in a way that even still is prone to timing errors
 // you should tag the UI with an id and each set increments this id you then verify that the id is matching upon
@@ -53,22 +69,22 @@ let WIDGET_target = null;
 //
 // Although you'd want to ensure that every callback has the 'cancel' passed to it when it gets overwritten
 
-let WIDGET_renderKindArray = [];
+let WIDGET_renderKindArray: Widget_RenderKind[] = [];
 let WIDGET_isRenderPending = false;
 
 let WIDGETrenderKind_Show_countOfPendingRequests = 0;
 
 let WIDGET_shouldRestoreFocus = true;
 
-let WIDGET_restoreFocusToElementOverride = null;
+let WIDGET_restoreFocusToElementOverride: HTMLElement | null = null;
 
 // You aren't focusing the widget element itself so blur likely won't work.
 //WIDGET_element.addEventListener('focusout', () => WIDGET_hide());
 
-function WIDGET_render_request(renderKind) {
+function WIDGET_render_request(renderKind: Widget_RenderKind) {
     if (WIDGET_renderKindArray[WIDGET_renderKindArray.length - 1] !== renderKind) {
         WIDGET_renderKindArray.push(renderKind);
-        if (renderKind === get_WIDGETrenderKind_Show()) WIDGETrenderKind_Show_countOfPendingRequests++;
+        if (renderKind === Widget_RenderKind.Show) WIDGETrenderKind_Show_countOfPendingRequests++;
     }
     
     if (!WIDGET_isRenderPending) {
@@ -82,11 +98,11 @@ function WIDGET_render_do() {
     
     while (renderKind = WIDGET_renderKindArray.shift()) {
         switch (renderKind) {
-            case get_WIDGETrenderKind_Show():
+            case Widget_RenderKind.Show:
                 if (WIDGETrenderKind_Show_countOfPendingRequests-- > 1) break;
                 WIDGET_render_do_Show();
                 break;
-            case get_WIDGETrenderKind_Hide():
+            case Widget_RenderKind.Hide:
                 WIDGET_render_do_Hide();
                 break;
         }
@@ -98,7 +114,7 @@ function WIDGET_render_do() {
 function WIDGET_render_do_Show() {
 
     let WIDGET_element = document.getElementById('WIDGET');
-    if (WIDGET_WidgetKind_drawn !== get_WidgetKind_None()) {
+    if (WIDGET_WidgetKind_drawn !== WidgetKind.None) {
         WIDGET_element = null;
         // You don't have to invoke 'WIDGET_state_do_Hide' because there was a 1 to 1 overwrite of all the state due to the 'WIDGET_show' invocation which triggered this function.
         WIDGET_shouldRestoreFocus = false; // going to show a different widget so don't bother with focus here
@@ -124,10 +140,10 @@ function WIDGET_render_do_Show() {
     WIDGET_ticketId_drawn = WIDGET_ticketId_pending;
 
     switch (WIDGET_WidgetKind_drawn) {
-        case get_WidgetKind_InputText():
+        case WidgetKind.InputText:
             WIDGET_CreateInputText();
             break;
-        case get_WidgetKind_YesCancel():
+        case WidgetKind.YesCancel:
             WIDGET_CreateYesCancel();
             break;
     }
@@ -174,7 +190,7 @@ function WIDGET_render_do_Show() {
  * @param {object} target this is stored in the variable 'WIDGET_target'.
  * @param {MENU_Callback} callback this is invoked when the widget is either submitted or cancelled.
  */
-async function WIDGET_show(widgetKind, left, top, placeholder, value, target, callback) {
+async function WIDGET_show(widgetKind: WidgetKind, left: number, top: number, placeholder, value, target, callback) {
 
     WIDGET_ticketId_pending = WIDGET_ticketId_counter++;
     WIDGET_WidgetKind_pending = widgetKind;
@@ -191,26 +207,26 @@ async function WIDGET_show(widgetKind, left, top, placeholder, value, target, ca
     WIDGET_value = value;
     WIDGET_target = target;
 
-    WIDGET_render_request(get_WIDGETrenderKind_Show());
+    WIDGET_render_request(Widget_RenderKind.Show);
 }
 
 function WIDGET_render_do_Hide() {
     const WIDGET_element = document.getElementById('WIDGET');
 
     switch (WIDGET_WidgetKind_drawn) {
-        case get_WidgetKind_InputText():
+        case WidgetKind.InputText:
             let input = document.getElementById('WIDGET_inputText');
             input.removeEventListener('keydown', WIDGET_inputTextOnKeyDown);
             break;
-        case get_WidgetKind_YesCancel():
+        case WidgetKind.YesCancel:
             let yesButtonElement = document.getElementById('WIDGET_YesCancel_yes');
-            yesButtonElement.removeEventListener('onclick', WIDGET_YesCancelButtonOnClick_yes);
+            yesButtonElement?.removeEventListener('onclick', WIDGET_YesCancelButtonOnClick_yes);
             let cancelButtonElement = document.getElementById('WIDGET_YesCancel_cancel');
-            cancelButtonElement.removeEventListener('onclick', WIDGET_YesCancelButtonOnClick_cancel);
+            cancelButtonElement?.removeEventListener('onclick', WIDGET_YesCancelButtonOnClick_cancel);
             break;
     }
-    WIDGET_WidgetKind_drawn = get_WidgetKind_None();
-    WIDGET_element.remove();
+    WIDGET_WidgetKind_drawn = WidgetKind.None;
+    WIDGET_element?.remove();
     if (WIDGET_shouldRestoreFocus && WIDGET_restoreFocusToElement_drawn)
         WIDGET_restoreFocusToElement_drawn.focus();
 }
@@ -225,13 +241,13 @@ async function WIDGET_state_do_Hide(shouldRestoreFocus) {
         await WIDGET_currentCallback({isCancelled:true, value:undefined});
     }
     WIDGET_currentCallback = null;
-    WIDGET_WidgetKind_pending = get_WidgetKind_None();
+    WIDGET_WidgetKind_pending = WidgetKind.None;
     WIDGET_target = null;
 }
 
 async function WIDGET_hide(shouldRestoreFocus) {
     await WIDGET_state_do_Hide(shouldRestoreFocus);
-    WIDGET_render_request(get_WIDGETrenderKind_Hide());
+    WIDGET_render_request(Widget_RenderKind.Hide);
 }
 
 /**
@@ -260,7 +276,7 @@ async function WIDGET_completeForm(resultObject) {
     }
 }
 
-async function WIDGET_inputTextOnKeyDown(event) {
+async function WIDGET_inputTextOnKeyDown(event: KeyboardEvent) {
     if (event.key === 'Enter' || event.key === 'Escape') {
         let isCancelled = event.key === 'Enter' ? false : true;
         let input = document.getElementById('WIDGET_inputText');
