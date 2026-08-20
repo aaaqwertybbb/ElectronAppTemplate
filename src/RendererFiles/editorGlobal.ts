@@ -1515,7 +1515,7 @@ function update_VirtualIndexLine() {
 }
 
 function update_virtualCount() {
-    set_EDITOR_virtualCount(Math.ceil(lastReadNumber_offsetHeight / get_EDITOR_lineHeight()));
+    virtualCount = (Math.ceil(lastReadNumber_offsetHeight / get_EDITOR_lineHeight()));
 }
 
 /**
