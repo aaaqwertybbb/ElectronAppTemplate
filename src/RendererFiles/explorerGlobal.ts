@@ -716,8 +716,10 @@ let EXPLORER_show = true;
 
 /** 8 */
 export let EXPLORER_firstSpanWidthValue = 8;
+export function EXPLORER_firstSpanWidthValue_SETTER(value: number) { EXPLORER_firstSpanWidthValue = value; }
 /** 8px */
 export let EXPLORER_firstSpanWidth = '8px';
+export function EXPLORER_firstSpanWidth_SETTER(value: string) { EXPLORER_firstSpanWidth = value; }
 
 let menuOptionX = 0;
 let menuOptionY = 0;

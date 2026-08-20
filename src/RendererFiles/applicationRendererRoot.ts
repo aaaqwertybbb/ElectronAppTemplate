@@ -1,4 +1,5 @@
 import { DIALOG_show_async } from './dialogGlobal';
+import { EXPLORER_firstSpanWidth_SETTER, EXPLORER_firstSpanWidthValue, EXPLORER_firstSpanWidthValue_SETTER } from './explorerGlobal';
 
 /**
  * This value ought to be an int (no decimal places) due to its high frequency usage in drawing UI,
@@ -67,8 +68,8 @@ function APP_measureLineHeightAndCharacterWidth() {
     measureElement.textContent = "+";
     const plusWidth = Math.ceil(measureElement.getBoundingClientRect().width);
     const largerWidth = minusWidth > plusWidth ? minusWidth : plusWidth; // 11
-    EXPLORER_firstSpanWidthValue = largerWidth;
-    EXPLORER_firstSpanWidth = EXPLORER_firstSpanWidthValue + 'px';
+    EXPLORER_firstSpanWidthValue_SETTER(largerWidth);
+    EXPLORER_firstSpanWidth_SETTER(EXPLORER_firstSpanWidthValue + 'px');
 
     wrapper.removeChild(measureElement);
     document.body.removeChild(wrapper);
@@ -92,12 +93,12 @@ async function window_myAPI_onMessage(data) {
 }
 
 function EDITOR_listComponent_getItemsCountFunc() {
-    if (EDITOR_documentSymbolResult) {
-        return EDITOR_documentSymbolResult.length;
-    }
-    else {
-        return 0;
-    }
+    //if (EDITOR_documentSymbolResult) {
+    //    return EDITOR_documentSymbolResult.length;
+    //}
+    //else {
+    //    return 0;
+    //}
 }
 
 function EDITOR_listComponent_onkeydownAction(div, index) {
@@ -196,5 +197,5 @@ async function documentBody_onKeyDown(event) {
 }
 
 async function HEADER_buttonSettings_onClick() {
-    return DIALOG_show_async("Settings");
+    return DIALOG_show_async("Settings", null);
 }
