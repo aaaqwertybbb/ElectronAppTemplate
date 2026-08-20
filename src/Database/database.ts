@@ -2,7 +2,22 @@ import { app } from 'electron';
 import path from 'node:path';
 import Database from 'better-sqlite3';
 
-class AppDatabase {
+export class AppDatabase_Entry {
+    id: number;
+    value: string;
+    displayName: string;
+
+    constructor(id: number, value: string, displayName: string) {
+        this.id = id;
+        this.value = value;
+        this.displayName = displayName;
+    }
+}
+
+export class AppDatabase {
+    id: number;
+    db: Database.Database;
+    
     constructor() {
         this.id = 1;
         // TODO: You'd have to make it so only this app's main process can write to the db otherwise remote code execution possibilities?
@@ -51,7 +66,7 @@ class AppDatabase {
      * @param {string} displayName 
      * @returns the id in the exiting row, or the one that was added if there was no already existing row; info.changes <= 0 returns '-1'.
      */
-    addAbsolutePath(absolutePath, displayName) {
+    addAbsolutePath(absolutePath: string, displayName: string) {
         let existingRow = this.getBy_absolutePath(absolutePath);
         if (existingRow) {
             return existingRow.id;
@@ -68,7 +83,7 @@ class AppDatabase {
      * @param {string} absolutePath 
      * @returns boolean of the result's falsey
      */
-    contains(absolutePath) {
+    contains(absolutePath: string) {
         const result = this.db
             .prepare('SELECT * from AbsolutePaths WHERE value = ?')
             .get(absolutePath);
@@ -84,21 +99,19 @@ class AppDatabase {
      * @param {string} absolutePath 
      * @returns the first row from the query result, or undefined.
      */
-    getBy_absolutePath(absolutePath) {
+    getBy_absolutePath(absolutePath: string) {
         return this.db
             .prepare('SELECT * from AbsolutePaths WHERE value = ?')
-            .get(absolutePath);
+            .get(absolutePath) as AppDatabase_Entry;
     }
     
     /**
      * @param {number} id 
      * @returns the first row from the query result, or undefined.
      */
-    getBy_id(id) {
+    getBy_id(id: number) {
         return this.db
             .prepare('SELECT * from AbsolutePaths WHERE id = ?')
             .get(id);
     }
 }
-
-export default AppDatabase;
