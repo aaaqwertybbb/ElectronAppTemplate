@@ -895,4 +895,12 @@ I use VSCode and the default dark theme these days lol
 
 Color themes... they're complicated. I got things to do, I can suffice with VSCode dark theme.
 
+
+"Color themes... they're complicated":
+there's many ways that the syntax highlighting can align,
+and there are edge cases that you aren't taking into account.
+
+When those edge cases align, it causes extreme eye strain.
+
+They've dedicated time to figure it out and I'm suffice with this for now.
 */
