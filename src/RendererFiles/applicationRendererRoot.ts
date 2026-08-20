@@ -36,6 +36,13 @@ export type myAPI_languageServer_SLICEresponse = {
     totalLength: number,
 };
 
+export type myAPI_chooseDirectory_result = {
+    basename: string,
+    openedDirectory: string,
+    id: number,
+    canceled: boolean
+};
+
 export type myAPI_chooseWorkspace_directory = {
     basename: string,
     absolutePath: string,

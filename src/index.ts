@@ -39,7 +39,7 @@ const createWindow = (): void => {
   //mainWindow.webContents.openDevTools();
 
   // Handle the request from the renderer process
-	//ipcMain.handle('choose-directory', chooseDirectory);
+	ipcMain.handle('choose-directory', chooseDirectory);
 	ipcMain.handle('choose-workspace', chooseWorkspace);
 };
 
@@ -70,6 +70,26 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+async function chooseDirectory (event: any) {
+	const result = await dialog.showOpenDialog({ properties: ['openDirectory'] });
+	if (result.canceled) {
+		return { basename: '', openedDirectory: '', canceled: result.canceled };
+	}
+
+	openedDirectory = result.filePaths[0];
+	openedWorkspace = null;
+	workspaceDirectories = null;
+
+	let filename = path.basename(openedDirectory);
+	let id = database.addAbsolutePath(openedDirectory, filename);
+
+	//if (!languageServer) {
+	//	MAIN_initializeLanguageServer();
+	//}
+
+	return { basename: filename, openedDirectory: openedDirectory, id: id, canceled: result.canceled };
+}
 
 async function chooseWorkspace(event: any) {
 	const result = await dialog.showOpenDialog({ properties: ['openFile'] });
