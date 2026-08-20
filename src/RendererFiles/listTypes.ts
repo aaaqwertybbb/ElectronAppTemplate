@@ -3,7 +3,7 @@ class ByteList {
     capacity;
     count;
 
-    constructor(initialCapacity) {
+    constructor(initialCapacity: number) {
         // The Uint8Array avoids serialization during IPC
         this.bytes = new Uint8Array(initialCapacity);
         this.capacity = initialCapacity;
@@ -20,7 +20,7 @@ class ByteList {
     /**
      * TODO: ensure all the parameters are encoded, especially because I'm noticing myself forgetting.
      */
-    insert(index, byte) {
+    insert(index: number, byte: number) {
         this.ensureCapacityForInsertion(index, 1);
 
         if (index !== this.count) {
@@ -32,16 +32,15 @@ class ByteList {
         this.count++;
     }
 
-    insertString(index, string, encoder) {
+    insertString(index: number, string: string, encoder: TextEncoder) {
         this.ensureCapacityForInsertion(index, string.length);
 
         if (index !== this.count) {
             this.copyTo(this.bytes, index, this.bytes, index + string.length, this.count - index);
         }
 
-        for (var i = 0; i < string.length; i++) {
-            this.bytes[index + i] = encoder.encode(string[i]);
-        }
+        const encodedBytes = encoder.encode(string);
+        this.bytes.set(encodedBytes, index);
 
         this.count += string.length;
     }
@@ -52,7 +51,7 @@ class ByteList {
      * @param {number} offset the offset to begin reading from
      * @param {number} length the amount of bytes to read
      */
-    insertBytes(index, incomingBs, offset, length) {
+    insertBytes(index: number, incomingBs: Uint8Array, offset: number, length: number) {
         this.ensureCapacityForInsertion(index, length);
 
         if (index !== this.count) {
@@ -72,7 +71,7 @@ class ByteList {
      * @param {number} destinationStart 
      * @param {number} length 
      */
-    duplicateWithin(sourceStart, destinationStart, length) {
+    duplicateWithin(sourceStart: number, destinationStart: number, length: number) {
 
         if (sourceStart + length > destinationStart) {
             // TODO: This perhaps could result in the initial 'copyTo' step that creates space within the array, having clobbered the source.
@@ -102,7 +101,7 @@ class ByteList {
      * 
      * count === 0 immediately returns
      */
-    removeAt(index, count) {
+    removeAt(index: number, count: number) {
 
         if (index > this.count) { throw new Error('removeAt(...): index > this.count'); }
         if (index + count > this.count) { throw new Error('removeAt(...): index + count > this.count'); }
@@ -139,7 +138,7 @@ class ByteList {
      *         Since this ought to be a negligible check for this method to perform.
      *         And failure to catch that case if it happens is an infinite loop.
      */
-    ensureCapacityForInsertion(index, count) {
+    ensureCapacityForInsertion(index: number, count: number) {
         let capacityPrevious = this.capacity;
         while (true) {
             if (this.count + count > this.capacity) {
@@ -174,7 +173,7 @@ class ByteList {
     /**
      * inclusive/exclusive
      */
-    copyTo(bytesSource, sourceStart, bytesDestination, destinationStart, length) {
+    copyTo(bytesSource: Uint8Array, sourceStart: number, bytesDestination: Uint8Array, destinationStart: number, length: number) {
 
         if (bytesSource === bytesDestination) {
             if (bytesSource !== this.bytes) {
@@ -197,7 +196,7 @@ class UInt32List {
     capacity;
     count;
 
-    constructor(initialCapacity) {
+    constructor(initialCapacity: number) {
         this.data = new Uint32Array(initialCapacity);
         this.capacity = initialCapacity;
         this.count = 0;
@@ -213,7 +212,7 @@ class UInt32List {
     /**
      * TODO: ensure all the parameters are encoded, especially because I'm noticing myself forgetting.
      */
-    insert(index, int32Value) {
+    insert(index: number, int32Value: number) {
         this.ensureCapacityForInsertion(index, 1);
 
         if (index !== this.count) {
@@ -230,7 +229,7 @@ class UInt32List {
      * 
      * count === 0 immediately returns
      */
-    removeAt(index, count) {
+    removeAt(index: number, count: number) {
 
         if (index > this.count) { throw new Error('removeAt(...): index > this.count'); }
         if (index + count > this.count) { throw new Error('removeAt(...): index + count > this.count'); }
@@ -267,7 +266,7 @@ class UInt32List {
      *         Since this ought to be a negligible check for this method to perform.
      *         And failure to catch that case if it happens is an infinite loop.
      */
-    ensureCapacityForInsertion(index, count) {
+    ensureCapacityForInsertion(index: number, count: number) {
         let capacityPrevious = this.capacity;
         while (true) {
             if (this.count + count > this.capacity) {
@@ -302,7 +301,7 @@ class UInt32List {
     /**
      * inclusive/exclusive
      */
-    copyTo(bytesSource, sourceStart, bytesDestination, destinationStart, length) {
+    copyTo(bytesSource: Uint32Array, sourceStart: number, bytesDestination: Uint32Array, destinationStart: number, length: number) {
 
         if (bytesSource === bytesDestination) {
             if (bytesSource !== this.data) {
