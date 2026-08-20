@@ -112,6 +112,6 @@ export class AppDatabase {
     getBy_id(id: number) {
         return this.db
             .prepare('SELECT * from AbsolutePaths WHERE id = ?')
-            .get(id);
+            .get(id) as AppDatabase_Entry;
     }
 }
