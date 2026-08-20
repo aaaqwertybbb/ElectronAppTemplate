@@ -1,4 +1,5 @@
 import { TrackedSyntaxKind, TrackedSyntaxList } from "./trackedSyntaxTypes";
+import { ByteList } from './listTypes';
 
 /*
 ###################################
@@ -93,6 +94,26 @@ class EDITOR_Cursor {
     editPosition: number;
     editIndexLine: number;
     editIndexColumn: number;
+    editRenderedDisplacement: number;
+    editRenderedDisplacement_INDEX_LINE_OFFSET: number;
+    END_editIndexLine: number;
+    END_editIndexColumn: number;
+    cursorIndex: number;
+    htmlId: string;
+    gapBuffer: Uint8Array;
+    gapBufferCount: number;
+    gapBufferWriteToSpanElement: null;
+    gapBufferWriteToSpanElement_SpanTextContentRelativeIndex: number;
+    caretRow: HTMLDivElement;
+    cursorElement: HTMLDivElement;
+    enterKey_newLinePlusIndentation_byteList: ByteList | null;
+    cached_indentation_string: string | null;
+    enterKeyEventKind: any;
+    editLineFeedCount: number;
+    edit_flagLineChanged: number;
+    EDITOR_paste_clipboardContent: string | null;
+    EDITOR_duplicate_small: number;
+    EDITOR_duplicate_length: number;
 
     /**
      * After invoking the constructor you likely would want to add to:

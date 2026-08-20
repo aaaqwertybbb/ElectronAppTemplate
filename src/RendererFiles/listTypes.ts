@@ -1,4 +1,4 @@
-class ByteList {
+export class ByteList {
     bytes;
     capacity;
     count;
