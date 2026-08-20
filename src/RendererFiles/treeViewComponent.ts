@@ -129,7 +129,7 @@ export const TreeView_NodeKind = {
     NOTisExpandable_NOTisExpanded: 4,
 } as const;
 // Derive the type union from the object values
-type TreeView_NodeKind = typeof TreeView_NodeKind[keyof typeof TreeView_NodeKind];
+export type TreeView_NodeKind = typeof TreeView_NodeKind[keyof typeof TreeView_NodeKind];
 
 
 export let TreeView_pooledNode_nodeKind: TreeView_NodeKind = TreeView_NodeKind.None;

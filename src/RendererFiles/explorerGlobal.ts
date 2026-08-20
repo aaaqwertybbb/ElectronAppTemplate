@@ -88,7 +88,7 @@ class EXPLORER_TreeViewComponent extends TreeViewComponent {
 
         if (!this.chosenDirectory) return;
 
-        let nodeKind = TreeView_NodeKind.isExpandable_NOTisExpanded;
+        let nodeKind: TreeView_NodeKind = TreeView_NodeKind.isExpandable_NOTisExpanded;
         this.nodeList.insert(this.nodeList.count_abstract, nodeKind, this.chosenDirectoryAbsolutePathId, 0);
         this.itemHeightTotal = this.tvd_getTotalCount() * this.itemHeightNumber;
         this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
@@ -166,7 +166,7 @@ class EXPLORER_TreeViewComponent extends TreeViewComponent {
         for (var indexItem = start; indexItem < upperBound; indexItem++) {
 
             let depth = 0;
-            let nodeKind = TreeView_NodeKind.NOTisExpandable_NOTisExpanded;
+            let nodeKind: TreeView_NodeKind = TreeView_NodeKind.NOTisExpandable_NOTisExpanded;
 
             let divItem: HTMLElement;
             let divIndex: number;
@@ -187,10 +187,11 @@ class EXPLORER_TreeViewComponent extends TreeViewComponent {
             divItem = this.TREEVIEW_ArrayFrom_itemListElement_children[divIndex];
 
             if (indexItem >= totalCount) {
-                if (divItem.lastElementChild) {
+                if (divItem.lastChild instanceof Text) {
                     // TODO: Will the user agent remove a text node that has an "empty" nodeValue?
-                    (divItem.lastElementChild as HTMLElement).nodeValue = '~';
-                    (divItem.lastElementChild as HTMLElement).title = '';
+                    (divItem.lastChild as Text).nodeValue = '~';
+                    // title property does not exist on Node or Text
+                    //(divItem.lastChild as Node).title = '';
                 }
             }
             else {
@@ -203,6 +204,13 @@ class EXPLORER_TreeViewComponent extends TreeViewComponent {
                                   nodeKind === TreeView_NodeKind.isExpandable_NOTisExpanded;
 
                 //let entry = arrayEntries[loopCounter];
+
+                // I have plans for this.
+                // Whether this extra code compiles to JS overhead or not
+                // I'm gonna mix javascript and typescript when I'm done getting this to build.
+                if (divItem.lastChild instanceof Text) {
+
+                }
                 let textNode = divItem.lastChild;
                 textNode.nodeValue = '...';//entry.basename;
                 textNode.title = '...';//entry.absolutePath;
