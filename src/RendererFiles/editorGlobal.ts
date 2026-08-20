@@ -59,7 +59,7 @@ And it can introduce oddities involving tabstop or very tiny changes in horizont
 '\0' is a similar problem, it is a special character that might cause odd behavior.
 */
 
-let EDITOR_trackedSyntaxList = new TrackedSyntaxList(32);
+export let EDITOR_trackedSyntaxList = new TrackedSyntaxList(32);
 
 /**
  * @type {UInt32List}

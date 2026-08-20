@@ -1,4 +1,4 @@
-import { EDITOR_textByteList, EDITOR_decoder } from "./editorGlobal";
+import { EDITOR_textByteList, EDITOR_decoder, EDITOR_pooledTrackedSyntax_trackedSyntaxKind, EDITOR_trackedSyntaxList, EDITOR_pooledTrackedSyntax_start, EDITOR_pooledTrackedSyntax_length } from "./editorGlobal";
 import { TrackedSyntaxKind } from "./trackedSyntaxTypes";
 
 function JS_line_lex(div: HTMLElement, substart: number, lineEnd: number, childIndex: number) {
@@ -2187,7 +2187,7 @@ I did some exercises then about an hour long walk then showered...
                 div.appendChild(span);
             }
 
-            let trackedSyntaxEnd = get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length();
+            let trackedSyntaxEnd = EDITOR_pooledTrackedSyntax_start + EDITOR_pooledTrackedSyntax_length;
             subend = trackedSyntaxEnd > divSpanTextContentLength ? divSpanTextContentLength : trackedSyntaxEnd;
             
             let length = subend - substart;
@@ -2224,22 +2224,22 @@ I did some exercises then about an hour long walk then showered...
                 continue;
             }
 
-            if (get_EDITOR_pooledTrackedSyntax_start() >= lineStart + divSpanTextContentLength) {
+            if (EDITOR_pooledTrackedSyntax_start >= lineStart + divSpanTextContentLength) {
                 createDoLexFlag = true;
                 trackedSyntaxExhausted = true;
                 subend = divSpanTextContentLength;
                 continue;
             }
 
-            if (get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length() < lineStart) {
+            if (EDITOR_pooledTrackedSyntax_start + EDITOR_pooledTrackedSyntax_length < lineStart) {
                 trackedSyntax_I++;
                 continue;
             }
 
-            if (get_EDITOR_pooledTrackedSyntax_start() > lineStart + substart) {
+            if (EDITOR_pooledTrackedSyntax_start > lineStart + substart) {
                 createDoLexFlag = true;
                 trackedSyntaxExhausted = false;
-                subend = get_EDITOR_pooledTrackedSyntax_start() > lineStart + divSpanTextContentLength ? lineStart + divSpanTextContentLength : get_EDITOR_pooledTrackedSyntax_start(); // probably a nonsense line of code given the previous if statements
+                subend = EDITOR_pooledTrackedSyntax_start > lineStart + divSpanTextContentLength ? lineStart + divSpanTextContentLength : EDITOR_pooledTrackedSyntax_start; // probably a nonsense line of code given the previous if statements
                 continue;
                 //childIndex = EDITOR_language_line_lex(div, substart, subend, childIndex);
                 //substart += (subend - substart);
@@ -2251,7 +2251,7 @@ I did some exercises then about an hour long walk then showered...
                 
             }
 
-            if (get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length() <= divSpanTextContentLength) {
+            if (EDITOR_pooledTrackedSyntax_start + EDITOR_pooledTrackedSyntax_length <= divSpanTextContentLength) {
                 trackedSyntax_I++;
                 continue;
             }
