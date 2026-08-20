@@ -488,7 +488,7 @@ export abstract class TreeViewComponent implements EventListenerObject {
         this.drawItem_BATCH_PullDataDrawResult();
     }
 
-    draw_BATCH_request(start: number, length: number, onePositiveDiff_twoNegativeDiff_orThreeFullScreen: number, caseThreeOrigin: number) {
+    draw_BATCH_request(start: number, length: number, onePositiveDiff_twoNegativeDiff_orThreeFullScreen: number, caseThreeOrigin: number | undefined) {
         this.start = start;
         this.length = length;
         this.onePositiveDiff_twoNegativeDiff_orThreeFullScreen = onePositiveDiff_twoNegativeDiff_orThreeFullScreen;

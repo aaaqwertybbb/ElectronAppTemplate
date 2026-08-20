@@ -1,7 +1,7 @@
 import { APP_lineHeight } from './applicationRendererRoot';
 import { TreeViewComponent, TreeViewNodeList, TreeView_NodeKind, TreeView_pooledNode_key, TreeView_pooledNode_depth, TreeView_pooledNode_nodeKind, TreeView_RenderKind } from './treeViewComponent';
 import { MenuOption, Menu_CommandKind, menuSet, MENU_target, MENU_HIDE_shouldRestoreFocus_SETTER, MENU_restoreFocusToElement } from './menuGlobal';
-import { WIDGET_restoreFocusToElementOverride_SETTER, WIDGET_show, WIDGET_SHOW_value, WIDGET_target, WIDGET_target_SETTER, WidgetKind } from './widgetGlobal';
+import { WIDGET_restoreFocusToElementOverride_SETTER, WIDGET_show, WIDGET_SHOW_value, WIDGET_target, WIDGET_target_SETTER, WidgetCallbackArgs, WidgetKind } from './widgetGlobal';
 //import { WIDGET_SHOW_value, WIDGET_target } from './widgetGlobal';
 
 /**
@@ -1079,7 +1079,7 @@ export async function EXPLORER_MenuOnClick(indexClicked: number, elementClicked:
                                 // TODO: fine grained redrawing of only the nodes that are:
                                 // - part of the virtualization result
                                 // - and have changed in some way that necessitates their UI be redrawn
-                                EXPLORER_director.draw_BATCH_request(EXPLORER_director.virtualIndex_ofScrollTop, EXPLORER_director.virtualCount, 3);
+                                EXPLORER_director.draw_BATCH_request(EXPLORER_director.virtualIndex_ofScrollTop, EXPLORER_director.virtualCount, 3, undefined);
                             }
                         }
                     }
@@ -1165,7 +1165,7 @@ export async function EXPLORER_MenuOnClick(indexClicked: number, elementClicked:
     }
 }
 
-async function get_CommandKind_NewFile_Directory_WIDGET_InputText_callback(result) {
+async function get_CommandKind_NewFile_Directory_WIDGET_InputText_callback(result: WidgetCallbackArgs) {
     if (result.isCancelled) return;
 
     let entry = WIDGET_SHOW_value;
@@ -1251,13 +1251,13 @@ async function get_CommandKind_NewFile_Directory_WIDGET_InputText_callback(resul
                 // TODO: fine grained redrawing of only the nodes that are:
                 // - part of the virtualization result
                 // - and have changed in some way that necessitates their UI be redrawn
-                EXPLORER_director.draw_BATCH_request(EXPLORER_director.virtualIndex_ofScrollTop, EXPLORER_director.virtualCount, 3);
+                EXPLORER_director.draw_BATCH_request(EXPLORER_director.virtualIndex_ofScrollTop, EXPLORER_director.virtualCount, 3, undefined);
             }
         }
     }
 }
 
-async function get_CommandKind_NewFile_File_WIDGET_InputText_callback(result) {
+async function get_CommandKind_NewFile_File_WIDGET_InputText_callback(result: WidgetCallbackArgs) {
     if (result.isCancelled) return;
 
     let entry = WIDGET_SHOW_value;
@@ -1333,13 +1333,13 @@ async function get_CommandKind_NewFile_File_WIDGET_InputText_callback(result) {
                 // TODO: fine grained redrawing of only the nodes that are:
                 // - part of the virtualization result
                 // - and have changed in some way that necessitates their UI be redrawn
-                EXPLORER_director.draw_BATCH_request(EXPLORER_director.virtualIndex_ofScrollTop, EXPLORER_director.virtualCount, 3);
+                EXPLORER_director.draw_BATCH_request(EXPLORER_director.virtualIndex_ofScrollTop, EXPLORER_director.virtualCount, 3, undefined);
             }
         }
     }
 }
 
-async function get_CommandKind_DeleteFile_Directory_YesCancel_callback(result) {
+async function get_CommandKind_DeleteFile_Directory_YesCancel_callback(result: WidgetCallbackArgs) {
     if (result.isCancelled) return;
     let entry = WIDGET_SHOW_value;
     let deleteFileResult = await window.myAPI.deleteFile(entry.absolutePath, /*isDirectory*/ true);
@@ -1375,11 +1375,11 @@ async function get_CommandKind_DeleteFile_Directory_YesCancel_callback(result) {
         // TODO: fine grained redrawing of only the nodes that are:
         // - part of the virtualization result
         // - and have changed in some way that necessitates their UI be redrawn
-        EXPLORER_director.draw_BATCH_request(EXPLORER_director.virtualIndex_ofScrollTop, EXPLORER_director.virtualCount, 3);
+        EXPLORER_director.draw_BATCH_request(EXPLORER_director.virtualIndex_ofScrollTop, EXPLORER_director.virtualCount, 3, undefined);
     }
 }
 
-async function get_CommandKind_DeleteFile_File_YesCancel_callback(result) {
+async function get_CommandKind_DeleteFile_File_YesCancel_callback(result: WidgetCallbackArgs) {
     if (result.isCancelled) return;
     // TODO: Biggest concern is that 'WIDGET_SHOW_value' is never set to a GC collectable state after widget finishes.
     // ...better wording of the TODO: the object that 'WIDGET_SHOW_value' references can never be garbage collected even after the widget finishes (unless a later show of a widget overrites the variable to reference a different object). This is because the variable is never set to null. Due to the variable being global, it exists for the entire app duration and a null set is required in this case for garbage collection of what it points to to take place.
@@ -1408,11 +1408,11 @@ async function get_CommandKind_DeleteFile_File_YesCancel_callback(result) {
         // TODO: fine grained redrawing of only the nodes that are:
         // - part of the virtualization result
         // - and have changed in some way that necessitates their UI be redrawn
-        EXPLORER_director.draw_BATCH_request(EXPLORER_director.virtualIndex_ofScrollTop, EXPLORER_director.virtualCount, 3);
+        EXPLORER_director.draw_BATCH_request(EXPLORER_director.virtualIndex_ofScrollTop, EXPLORER_director.virtualCount, 3, undefined);
     }
 }
 
-async function get_CommandKind_RenameFile_Directory_InputText_callback(result) {
+async function get_CommandKind_RenameFile_Directory_InputText_callback(result: WidgetCallbackArgs) {
     if (result.isCancelled) return;
     // TODO: Confusing, hacky, upsetting: 'WIDGET_target.entry / WIDGET_target.MENU_target'
     let entry = WIDGET_target.entry;
@@ -1421,11 +1421,14 @@ async function get_CommandKind_RenameFile_Directory_InputText_callback(result) {
     if (renameFileResult.success) {
         await EXPLORER_director.setNodeListEntryId_async(WIDGET_target.indexItem, renameFileResult.pathId);
         let divItem = EXPLORER_director.itemListElement.children[WIDGET_target.divRelativeIndex];
-        divItem.lastChild.nodeValue = result.value;
+        if (divItem.lastChild instanceof Text) {
+            // TODO: It doesn't like 'undefined' but it would take 'null'.
+            divItem.lastChild.nodeValue = result.value ?? null;
+        }
     }
 }
 
-async function get_CommandKind_RenameFile_File_InputText_callback(result) {
+async function get_CommandKind_RenameFile_File_InputText_callback(result: WidgetCallbackArgs) {
     if (result.isCancelled) return;
     // TODO: Confusing, hacky, upsetting: 'WIDGET_target.entry / WIDGET_target.MENU_target'
     let entry = WIDGET_target.entry;
@@ -1434,6 +1437,9 @@ async function get_CommandKind_RenameFile_File_InputText_callback(result) {
     if (renameFileResult.success) {
         await EXPLORER_director.setNodeListEntryId_async(WIDGET_target.indexItem, renameFileResult.pathId);
         let divItem = EXPLORER_director.itemListElement.children[WIDGET_target.divRelativeIndex];
-        divItem.lastChild.nodeValue = result.value;
+        if (divItem.lastChild instanceof Text) {
+            // TODO: It doesn't like 'undefined' but it would take 'null'.
+            divItem.lastChild.nodeValue = result.value ?? null;
+        }
     }
 }

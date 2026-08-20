@@ -45,7 +45,7 @@ let WIDGET_left = 0;
 let WIDGET_top = 0;
 
 // Define the shape of the object argument
-type WidgetCallbackArgs = { isCancelled: boolean; value: string | undefined };
+export type WidgetCallbackArgs = { isCancelled: boolean; value: string | undefined };
 
 //let WIDGET_currentCallback = null;
 let WIDGET_currentCallback: ((arg: WidgetCallbackArgs) => Promise<void>) | null;
