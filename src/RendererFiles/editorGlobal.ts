@@ -235,7 +235,7 @@ class EDITOR_Cursor {
     htmlId: string;
     gapBuffer: Uint8Array;
     gapBufferCount: number;
-    gapBufferWriteToSpanElement: null;
+    gapBufferWriteToSpanElement: HTMLElement | null;
     gapBufferWriteToSpanElement_SpanTextContentRelativeIndex: number;
     caretRow: HTMLDivElement;
     cursorElement: HTMLDivElement;
@@ -247,6 +247,10 @@ class EDITOR_Cursor {
     EDITOR_paste_clipboardContent: string | null;
     EDITOR_duplicate_small: number;
     EDITOR_duplicate_length: number;
+    selectionIndexEndLine: number = 0;
+    selectionIndexEndColumn: number = 0;
+    selectionIndexAnchorLine: number = 0;
+    selectionIndexAnchorColumn: number = 0;
 
     /**
      * After invoking the constructor you likely would want to add to:
@@ -433,7 +437,8 @@ const EDITOR_debug = document.getElementById('EDITOR_debug')!;
 const EDITOR_findOverlay: HTMLElement = document.getElementById('EDITOR_findOverlay')!;
 EDITOR_findOverlay.style.visibility = 'hidden';
 
-const EDITOR_gutterBackgroundColor = document.getElementById('EDITOR_gutter_background_color');
+/** TODO: I null forgave this because it should always be there but... */
+const EDITOR_gutterBackgroundColor = document.getElementById('EDITOR_gutter_background_color')!;
 
 const EDITOR_tab_tabsbytes = new Uint8Array(4);
 EDITOR_tab_tabsbytes[0] = 9 /* TAB '\t' */;
@@ -548,7 +553,7 @@ let ArrayFrom_textElement_children_length = 0;
 const count_of_wellknown_renderKinds = 19;
 
 /** 'EDITOR_init' and 'EDITOR_drawHorizontalScrollbar' related */
-let DRAWN_NUMBER_cached_EDITOR_horizontal_scrollbar_style_left;
+let DRAWN_NUMBER_cached_EDITOR_horizontal_scrollbar_style_left = -1;
 
 let EDITOR_sum_diffNegative = 0;
 let EDITOR_sum_diffPositive = 0;
@@ -564,9 +569,9 @@ let EDITOR_RemoveSelection_largeLineAndColumnIndices: LineAndColumnIndices | nul
 // Temporary hack for state access TODO: this
 let EDITOR_indentLess_startingLinePos_end = 0;
 
-let EDITOR_hoverTimeout = null;
+let EDITOR_hoverTimeout: NodeJS.Timeout | null = null;
 
-let EDITOR_mouseOver_event = null;
+let EDITOR_mouseOver_event: MouseEvent | null = null;
 
 let EDITOR_isChecking_cursorBlinkTrailingEdge = false;
 let EDITOR_cursorBlinkLastTimestamp = 0;
@@ -2884,7 +2889,7 @@ function EDITOR_draw_all_cursors() {
  * @param {EDITOR_Cursor} cursor 
  * @param {boolean} NOTscrollCursorIntoView 
  */
-function EDITOR_drawCursor(cursor: EDITOR_Cursor, NOTscrollCursorIntoView: boolean) {
+function EDITOR_drawCursor(cursor: EDITOR_Cursor, NOTscrollCursorIntoView?: boolean) {
     cursor.cursorTranslateYValue = (cursor.indexLine + get_EDITOR_offsetLine()) * get_EDITOR_lineHeight();
     cursor.cursorTranslateXValue = (cursor.indexColumn + get_EDITOR_offsetColumn()) * EDITOR_characterWidth;
 
@@ -4103,6 +4108,9 @@ function EDITOR_createCursorAtNextMatchSelection(event) {
     let upcomingPositionIndex = EDITOR_findOverlay_searchResultPositionList.data[upcomingNumber - 1];
     if (upcomingPositionIndex) {
         let upcomingLineAndColumnIndices = EDITOR_getLineAndColumnIndices(upcomingPositionIndex);
+        if (upcomingLineAndColumnIndices === undefined) {
+            throw new Error();
+        }
         let indexOfPrimaryCursor = -1;
         for (let i = 0; i < EDITOR_cursorList.length; i++) {
             if (EDITOR_cursorList[i] === EDITOR_primaryCursor) {
@@ -4176,7 +4184,7 @@ function EDITOR_createCursorAtNextMatchSelection(event) {
     }
 }
 
-function EDITOR_cursorIndex_find_closestLessThanOrEqualToExistingCursorIndex(positionIndex) {
+function EDITOR_cursorIndex_find_closestLessThanOrEqualToExistingCursorIndex(positionIndex: number) {
     let left = 0;
     let right = EDITOR_cursorList.length - 1;
 
@@ -4261,7 +4269,7 @@ function EDITOR_movementBasedCacheInvalidation(cursor: EDITOR_Cursor) {
 /**
  * @param {*} clipboardContent This is a temporary hack to help in transitioning paste to an edit.
  */
-function EDITOR_editEvent(editKind, event, clipboardContent) {
+function EDITOR_editEvent(editKind: EditKind, event: KeyboardEvent, clipboardContent: string) {
     // check for pending => selection
     // if so then finalize all current pending
     // ...this actually is checking for selection, then presuming at least 1 cursor has a pending...
@@ -4325,16 +4333,16 @@ function EDITOR_editEvent(editKind, event, clipboardContent) {
             shouldFinalizeAllCursors = EDITOR_editEvent_checkFor_NOTcanBatch_BackspaceRtl();
             break;
         case EditKind.Tab:
-            shouldFinalizeAllCursors = EDITOR_editEvent_checkFor_NOTcanBatch_Tab(event);
+            shouldFinalizeAllCursors = EDITOR_editEvent_checkFor_NOTcanBatch_Tab(event as KeyboardEvent) ?? EDITOR_required('shouldFinalizeAllCursors');
             break;
         case EditKind.IndentMore:
             shouldFinalizeAllCursors = EDITOR_editEvent_checkFor_NOTcanBatch_IndentMore();
             break;
         case EditKind.IndentLess:
-            shouldFinalizeAllCursors = EDITOR_editEvent_checkFor_NOTcanBatch_IndentLess();
+            shouldFinalizeAllCursors = EDITOR_editEvent_checkFor_NOTcanBatch_IndentLess() ?? EDITOR_required('shouldFinalizeAllCursors');
             break;
         case EditKind.Enter:
-          shouldFinalizeAllCursors = EDITOR_editEvent_checkFor_NOTcanBatch_Enter();
+          shouldFinalizeAllCursors = EDITOR_editEvent_checkFor_NOTcanBatch_Enter(event as KeyboardEvent);
             break;
         case EditKind.Paste:
             shouldFinalizeAllCursors = true;
@@ -4383,6 +4391,10 @@ function EDITOR_editEvent(editKind, event, clipboardContent) {
         EDITOR_cursorBlink_startChecking();
     }
 }
+
+const EDITOR_required = (name = 'Value') => {
+  throw new Error(`${name} is required`);
+};
 
 function EDITOR_editEvent_theEditIself_InsertLtr(event) {
     for (var i = 0; i < EDITOR_cursorList.length; i++) {
@@ -4568,7 +4580,7 @@ function EDITOR_editEvent_checkFor_NOTcanBatch_BackspaceRtl() {
 }
 
 /** @returns {boolean} 'shouldFinalizeAllCursors' */
-function EDITOR_editEvent_checkFor_NOTcanBatch_Tab(event) {
+function EDITOR_editEvent_checkFor_NOTcanBatch_Tab(event: KeyboardEvent) {
     if (EDITOR_cursorList.length !== 1) {
         return true;
     }
@@ -4624,7 +4636,13 @@ function EDITOR_editEvent_checkFor_NOTcanBatch_IndentMore() {
         LARGE_pos = cursor.selectionAnchor;
     }
     let SMALL_lineAndColumnIndices = EDITOR_getLineAndColumnIndices(SMALL_pos);
+    if (SMALL_lineAndColumnIndices === undefined) {
+        throw new Error();
+    }
     let LARGE_lineAndColumnIndices = EDITOR_getLineAndColumnIndices(LARGE_pos);
+    if (LARGE_lineAndColumnIndices === undefined) {
+        throw new Error();
+    }
 
     // # Determine the starting indexLine (the start is the large position, this confused me for a moment)
     let startingIndex = LARGE_lineAndColumnIndices.indexLine;
@@ -4680,7 +4698,13 @@ function EDITOR_editEvent_checkFor_NOTcanBatch_IndentLess() {
         LARGE_pos = cursor.selectionAnchor;
     }
     let SMALL_lineAndColumnIndices = EDITOR_getLineAndColumnIndices_raw(SMALL_pos);
+    if (SMALL_lineAndColumnIndices === undefined) {
+        throw new Error();
+    }
     let LARGE_lineAndColumnIndices = EDITOR_getLineAndColumnIndices_raw(LARGE_pos);
+    if (LARGE_lineAndColumnIndices === undefined) {
+        throw new Error();
+    }
 
     // starting index
     let startingIndex = LARGE_lineAndColumnIndices.indexLine;
@@ -4707,7 +4731,7 @@ function EDITOR_editEvent_checkFor_NOTcanBatch_IndentLess() {
 }
 
 /** @returns {boolean} 'shouldFinalizeAllCursors' */
-function EDITOR_editEvent_checkFor_NOTcanBatch_Enter() {
+function EDITOR_editEvent_checkFor_NOTcanBatch_Enter(event: KeyboardEvent) {
     if (event.shiftKey || event.ctrlKey) {
         return true;
     }
@@ -4732,7 +4756,7 @@ function EDITOR_editEvent_checkFor_NOTcanBatch_Enter() {
  * 
  * NOTE: the draw cursor rAF needs to be enqueued prior to the 'EDITOR_cursorBlink_startChecking' invocation.
  */
-function EDITOR_cursorBlink_trailingEdge(timestamp) {
+function EDITOR_cursorBlink_trailingEdge(timestamp: number) {
     const time = timestamp - EDITOR_cursorBlinkLastTimestamp;
     if (time >= 500) {
         EDITOR_isChecking_cursorBlinkTrailingEdge = false;
@@ -4751,7 +4775,7 @@ function EDITOR_cursorBlink_startChecking() {
     requestAnimationFrame(EDITOR_cursorBlink_trailingEdge);
 }
 
-async function EDITOR_onKeyDown(event) {
+async function EDITOR_onKeyDown(event: KeyboardEvent) {
     // Explicitly inlining 'clearMulticursorState()' because it currently is and I just don't want to make a decision about this right now.
     // So what I can do is mark the code paragraph for later decision making.
     set_EDITOR_indexCursor(0);
@@ -4833,7 +4857,7 @@ async function EDITOR_onKeyDown(event) {
     }
 }
 
-function EDITOR_onKeyDown_ArrowLeft(event) {
+function EDITOR_onKeyDown_ArrowLeft(event: KeyboardEvent) {
     event.preventDefault();
     event.stopPropagation();
             
@@ -4902,7 +4926,7 @@ function EDITOR_onKeyDown_ArrowLeft(event) {
 }
 
 /** @returns {boolean} whether invoking function ought to return */
-function EDITOR_onKeyDown_ArrowDown(event) {
+function EDITOR_onKeyDown_ArrowDown(event: KeyboardEvent) {
     event.preventDefault();
     event.stopPropagation();
     if (event.ctrlKey) {
@@ -4934,7 +4958,7 @@ function EDITOR_onKeyDown_ArrowDown(event) {
 }
 
 /** @returns {boolean} whether invoking function ought to return */
-function EDITOR_onKeyDown_ArrowUp(event) {
+function EDITOR_onKeyDown_ArrowUp(event: KeyboardEvent) {
     event.preventDefault();
     event.stopPropagation();
     if (event.ctrlKey) {
@@ -4973,7 +4997,7 @@ function EDITOR_onKeyDown_ArrowUp(event) {
     return false;
 }
 
-function EDITOR_onKeyDown_ArrowRight(event) {
+function EDITOR_onKeyDown_ArrowRight(event: KeyboardEvent) {
     event.preventDefault();
     event.stopPropagation();
 
@@ -5043,7 +5067,7 @@ function EDITOR_onKeyDown_ArrowRight(event) {
 }
 
 /** @returns {boolean} whether invoking function ought to return */
-function EDITOR_onKeyDown_Home(event) {
+function EDITOR_onKeyDown_Home(event: KeyboardEvent) {
     event.preventDefault();
     event.stopPropagation();
     if (event.ctrlKey && EDITOR_cursorList.length > 1) {
@@ -5078,7 +5102,7 @@ function EDITOR_onKeyDown_Home(event) {
 }
 
 /** @returns {boolean} whether invoking function ought to return */
-function EDITOR_onKeyDown_End(event) {
+function EDITOR_onKeyDown_End(event: KeyboardEvent) {
     event.preventDefault();
     event.stopPropagation();
     if (event.ctrlKey && EDITOR_cursorList.length > 1) {
@@ -5103,7 +5127,7 @@ function EDITOR_onKeyDown_End(event) {
     return false;
 }
 
-function EDITOR_onKeyDown_PageDown(event) {
+function EDITOR_onKeyDown_PageDown(event: KeyboardEvent) {
     event.stopPropagation();
 
     if (event.ctrlKey) {
@@ -8847,7 +8871,7 @@ function EDITOR_registerHandlers() {
  * 
  * Oh wow I can clearly see why this is better than mouseMove with heavy throttling/debouncing
  */
-function EDITOR_mouseOver(e) {
+function EDITOR_mouseOver(e: MouseEvent) {
 
     EDITOR_mouseOver_event = e;
     
