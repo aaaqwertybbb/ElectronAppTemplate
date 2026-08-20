@@ -101,7 +101,7 @@ function EDITOR_listComponent_getItemsCountFunc() {
     //}
 }
 
-function EDITOR_listComponent_onkeydownAction(div, index) {
+/*function EDITOR_listComponent_onkeydownAction(div, index) {
     if (index === -1) {
         // TODO: if (index === -1)
     }
@@ -131,34 +131,34 @@ function dialog_documentSymbol_onResizeAction() {
         EDITOR_listComponent.boundingClientRect = null;
         EDITOR_listComponent.event_scroll();
     }
-}
+}*/
 
 /** TODO: Use the correct event listener, use proper command based keypress mapping so you can configure the keybinds freely. */
-async function documentBody_onKeyDown(event) {
+async function documentBody_onKeyDown(event: KeyboardEvent) {
     switch (event.key) {
-        case 's':
-        case 'S':
-            if (!event.ctrlKey) return;
-            const unvalidatedAbsolutePath = EDITOR_textSourceIdentifier;
-            const rawData = EDITOR_getFinalizedEditsAndRawSaveFileData();
-            if (rawData.uint8arrayTextBytes) {
-                event.preventDefault();
-                event.stopPropagation();
-                return window.myAPI.editorSaveFile(unvalidatedAbsolutePath, rawData.uint8arrayTextBytes, rawData.countOfBytesInUse, rawData.lineEndString, rawData.fileStartsWithBom);
-            }
-            return;
-        case 'F':
-            if (!event.ctrlKey) return;
-            return DIALOG_show_async(get_DialogKind_FindAll());
-        case 'Escape':
-            // TODO: Provide a way to disable the next (body, and useCapture) 'Escape' keypress...
-            // ...so a widget can restore focus to the relevant UI rather than
-            // the 'EDITOR' when the user presses 'Escape' to "cancel".
-            const editor = document.getElementById('EDITOR');
-            if (editor) {
-                editor.focus();
-            }
-            return;
+        //case 's':
+        //case 'S':
+        //    if (!event.ctrlKey) return;
+        //    const unvalidatedAbsolutePath = EDITOR_textSourceIdentifier;
+        //    const rawData = EDITOR_getFinalizedEditsAndRawSaveFileData();
+        //    if (rawData.uint8arrayTextBytes) {
+        //        event.preventDefault();
+        //        event.stopPropagation();
+        //        return window.myAPI.editorSaveFile(unvalidatedAbsolutePath, rawData.uint8arrayTextBytes, rawData.countOfBytesInUse, rawData.lineEndString, rawData.fileStartsWithBom);
+        //    }
+        //    return;
+        //case 'F':
+        //    if (!event.ctrlKey) return;
+        //    return DIALOG_show_async(get_DialogKind_FindAll());
+        //case 'Escape':
+        //    // TODO: Provide a way to disable the next (body, and useCapture) 'Escape' keypress...
+        //    // ...so a widget can restore focus to the relevant UI rather than
+        //    // the 'EDITOR' when the user presses 'Escape' to "cancel".
+        //    const editor = document.getElementById('EDITOR');
+        //    if (editor) {
+        //        editor.focus();
+        //    }
+        //    return;
         case 'e':
             if (event.altKey) {
                 EXPLORER_setShow(true);

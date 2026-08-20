@@ -1,7 +1,7 @@
 import { APP_lineHeight } from './applicationRendererRoot';
 import { TreeViewComponent, TreeViewNodeList, TreeView_NodeKind, TreeView_pooledNode_key, TreeView_pooledNode_depth, TreeView_pooledNode_nodeKind, TreeView_RenderKind } from './treeViewComponent';
 import { MenuOption, Menu_CommandKind, menuSet, MENU_target, MENU_HIDE_shouldRestoreFocus_SETTER, MENU_restoreFocusToElement } from './menuGlobal';
-import { WIDGET_SHOW_value, WIDGET_target, WidgetKind } from './widgetGlobal';
+import { WIDGET_restoreFocusToElementOverride_SETTER, WIDGET_show, WIDGET_SHOW_value, WIDGET_target, WIDGET_target_SETTER, WidgetKind } from './widgetGlobal';
 //import { WIDGET_SHOW_value, WIDGET_target } from './widgetGlobal';
 
 /**
@@ -1092,7 +1092,7 @@ export async function EXPLORER_MenuOnClick(indexClicked: number, elementClicked:
                 const entry = await window.myAPI.getFilesystemEntryById(MENU_target.id);
                 if (!entry) return;
                 MENU_HIDE_shouldRestoreFocus_SETTER(false);
-                WIDGET_restoreFocusToElementOverride = MENU_restoreFocusToElement;
+                WIDGET_restoreFocusToElementOverride_SETTER(MENU_restoreFocusToElement);
                 await WIDGET_show(WidgetKind.InputText, menuOptionX, menuOptionY, 'filename', entry, MENU_target, get_CommandKind_NewFile_Directory_WIDGET_InputText_callback);
                 break;
             }
@@ -1103,7 +1103,7 @@ export async function EXPLORER_MenuOnClick(indexClicked: number, elementClicked:
                 const entry = await window.myAPI.getFilesystemEntryById(MENU_target.id);
                 if (!entry) return;
                 MENU_HIDE_shouldRestoreFocus_SETTER(false);
-                WIDGET_restoreFocusToElementOverride = MENU_restoreFocusToElement;
+                WIDGET_restoreFocusToElementOverride_SETTER(MENU_restoreFocusToElement);
                 await WIDGET_show(WidgetKind.InputText, menuOptionX, menuOptionY, 'filename', entry, MENU_target, get_CommandKind_NewFile_File_WIDGET_InputText_callback);
                 break;
             }
@@ -1115,7 +1115,7 @@ export async function EXPLORER_MenuOnClick(indexClicked: number, elementClicked:
                 if (!entry) return;
                 let filename = entry.basename;
                 MENU_HIDE_shouldRestoreFocus_SETTER(false);
-                WIDGET_restoreFocusToElementOverride = MENU_restoreFocusToElement;
+                WIDGET_restoreFocusToElementOverride_SETTER(MENU_restoreFocusToElement);
                 await WIDGET_show(WidgetKind.YesCancel, menuOptionX, menuOptionY, 'delete ' + filename, entry, MENU_target, get_CommandKind_DeleteFile_Directory_YesCancel_callback);
                 break;
             }
@@ -1127,7 +1127,7 @@ export async function EXPLORER_MenuOnClick(indexClicked: number, elementClicked:
                 if (!entry) return;
                 let filename = entry.basename;
                 MENU_HIDE_shouldRestoreFocus_SETTER(false);
-                WIDGET_restoreFocusToElementOverride = MENU_restoreFocusToElement;
+                WIDGET_restoreFocusToElementOverride_SETTER(MENU_restoreFocusToElement);
                 await WIDGET_show(WidgetKind.YesCancel, menuOptionX, menuOptionY, 'delete ' + filename, entry, MENU_target, get_CommandKind_DeleteFile_File_YesCancel_callback);
                 break;
             }
@@ -1139,7 +1139,7 @@ export async function EXPLORER_MenuOnClick(indexClicked: number, elementClicked:
                 if (!entry) return;
                 let filename = entry.basename;
                 MENU_HIDE_shouldRestoreFocus_SETTER(false);
-                WIDGET_restoreFocusToElementOverride = MENU_restoreFocusToElement;
+                WIDGET_restoreFocusToElementOverride_SETTER(MENU_restoreFocusToElement);
                 await WIDGET_show(WidgetKind.InputText, menuOptionX, menuOptionY, 'rename', filename, {MENU_target:MENU_target, entry:entry}, get_CommandKind_RenameFile_Directory_InputText_callback);
                 break;
             }
@@ -1158,7 +1158,7 @@ export async function EXPLORER_MenuOnClick(indexClicked: number, elementClicked:
                 if (!entry) return;
                 let filename = entry.basename;
                 MENU_HIDE_shouldRestoreFocus_SETTER(false);
-                WIDGET_restoreFocusToElementOverride = MENU_restoreFocusToElement;
+                WIDGET_restoreFocusToElementOverride_SETTER(MENU_restoreFocusToElement);
                 await WIDGET_show(WidgetKind.InputText, menuOptionX, menuOptionY, 'rename', filename, {MENU_target: MENU_target, entry: entry}, get_CommandKind_RenameFile_File_InputText_callback);
                 break;
             }
@@ -1416,7 +1416,7 @@ async function get_CommandKind_RenameFile_Directory_InputText_callback(result) {
     if (result.isCancelled) return;
     // TODO: Confusing, hacky, upsetting: 'WIDGET_target.entry / WIDGET_target.MENU_target'
     let entry = WIDGET_target.entry;
-    WIDGET_target = WIDGET_target.MENU_target;
+    WIDGET_target_SETTER(WIDGET_target.MENU_target);
     let renameFileResult = await window.myAPI.renameFile(entry.absolutePath, result.value, /*isDirectory*/ true);
     if (renameFileResult.success) {
         await EXPLORER_director.setNodeListEntryId_async(WIDGET_target.indexItem, renameFileResult.pathId);
@@ -1429,7 +1429,7 @@ async function get_CommandKind_RenameFile_File_InputText_callback(result) {
     if (result.isCancelled) return;
     // TODO: Confusing, hacky, upsetting: 'WIDGET_target.entry / WIDGET_target.MENU_target'
     let entry = WIDGET_target.entry;
-    WIDGET_target = WIDGET_target.MENU_target;
+    WIDGET_target_SETTER(WIDGET_target.MENU_target);
     let renameFileResult = await window.myAPI.renameFile(entry.absolutePath, result.value, /*isDirectory*/ false);
     if (renameFileResult.success) {
         await EXPLORER_director.setNodeListEntryId_async(WIDGET_target.indexItem, renameFileResult.pathId);

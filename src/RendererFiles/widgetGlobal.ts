@@ -18,16 +18,6 @@ export const Widget_RenderKind = {
 export type Widget_RenderKind = typeof Widget_RenderKind[keyof typeof Widget_RenderKind];
 
 
-
-
-/**
- * @callback MENU_Callback
- * @param {Object} options - The response object.
- * @param {boolean} [options.isCancelled=false] - Indicates if the action was cancelled.
- * @param {string} [options.value=''] - The data string returned.
- * @returns {Promise}
- */
-
 /**
  * start it at 1 because you thought about starting it at 0 then using a prefix incrementation to ensure the 0 state is never used as a means of detecting an empty state
  * but if someone changes the code and moves it to postfix incrementation then everything breaks so why even take that risk when you can just start at 1
@@ -53,13 +43,21 @@ let WIDGET_ticketId_drawn = 0;
 
 let WIDGET_left = 0;
 let WIDGET_top = 0;
-/**
- * @type {MENU_Callback}
- */
-let WIDGET_currentCallback = null;
+
+// Define the shape of the object argument
+type WidgetCallbackArgs = { isCancelled: boolean; value: string | undefined };
+
+//let WIDGET_currentCallback = null;
+let WIDGET_currentCallback: ((arg: WidgetCallbackArgs) => Promise<void>) | null;
+
+
+
+
 let WIDGET_placeholder = null;
 let WIDGET_value = null;
+
 export let WIDGET_target: any | null = null;
+export function WIDGET_target_SETTER(value: any | null) { WIDGET_target = value; }
 
 export let WIDGET_SHOW_value = null;
 
@@ -76,7 +74,8 @@ let WIDGETrenderKind_Show_countOfPendingRequests = 0;
 
 let WIDGET_shouldRestoreFocus = true;
 
-let WIDGET_restoreFocusToElementOverride: HTMLElement | null = null;
+export let WIDGET_restoreFocusToElementOverride: HTMLElement | null = null;
+export function WIDGET_restoreFocusToElementOverride_SETTER(value: HTMLElement | null) { WIDGET_restoreFocusToElementOverride = value; }
 
 // You aren't focusing the widget element itself so blur likely won't work.
 //WIDGET_element.addEventListener('focusout', () => WIDGET_hide());
@@ -134,7 +133,12 @@ function WIDGET_render_do_Show() {
         WIDGET_restoreFocusToElementOverride = null;
     }
     else {
-        WIDGET_restoreFocusToElement_drawn = document.activeElement;
+        if (document.activeElement instanceof HTMLElement) {
+            WIDGET_restoreFocusToElement_drawn = document.activeElement;
+        }
+        else {
+            WIDGET_restoreFocusToElement_drawn = null;
+        }
     }
     
     WIDGET_ticketId_drawn = WIDGET_ticketId_pending;
@@ -190,7 +194,7 @@ function WIDGET_render_do_Show() {
  * @param {object} target this is stored in the variable 'WIDGET_target'.
  * @param {MENU_Callback} callback this is invoked when the widget is either submitted or cancelled.
  */
-async function WIDGET_show(widgetKind: WidgetKind, left: number, top: number, placeholder, value, target, callback) {
+export async function WIDGET_show(widgetKind: WidgetKind, left: number, top: number, placeholder, value, target, callback) {
 
     WIDGET_ticketId_pending = WIDGET_ticketId_counter++;
     WIDGET_WidgetKind_pending = widgetKind;
@@ -205,7 +209,7 @@ async function WIDGET_show(widgetKind: WidgetKind, left: number, top: number, pl
     WIDGET_top = top;
     WIDGET_placeholder = placeholder;
     WIDGET_value = value;
-    WIDGET_target = target;
+    WIDGET_target_SETTER(target);
 
     WIDGET_render_request(Widget_RenderKind.Show);
 }
@@ -242,7 +246,7 @@ async function WIDGET_state_do_Hide(shouldRestoreFocus) {
     }
     WIDGET_currentCallback = null;
     WIDGET_WidgetKind_pending = WidgetKind.None;
-    WIDGET_target = null;
+    WIDGET_target_SETTER(null);
 }
 
 async function WIDGET_hide(shouldRestoreFocus) {
