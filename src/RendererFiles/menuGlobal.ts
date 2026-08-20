@@ -903,4 +903,8 @@ and there are edge cases that you aren't taking into account.
 When those edge cases align, it causes extreme eye strain.
 
 They've dedicated time to figure it out and I'm suffice with this for now.
+
+I started playing dead cells yesterday
+
+"dead cells ain't gonna play itself I don't got time to change the colors"
 */
