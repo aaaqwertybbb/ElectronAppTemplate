@@ -162,6 +162,12 @@ export type LspQueue_Entry = {
 };
 
 
+export type LineAndColumnIndices = {
+    indexLine: number,
+    indexColumn: number,
+};
+
+
 
 
 export let EDITOR_trackedSyntaxList = new TrackedSyntaxList(32, null);
@@ -174,6 +180,16 @@ let EDITOR_findOverlay_searchResultPositionList: UInt32List | null = null;
 export let EDITOR_textByteList = new ByteList(1024);
 const EDITOR_encoder = new TextEncoder();
 export const EDITOR_decoder = new TextDecoder();
+
+let cached_EDITOR_virtualization_horizontal: HTMLElement;
+let cached_EDITOR_virtualization_vertical: HTMLElement;
+let cached_EDITOR_gutter: HTMLElement;
+let cached_EDITOR_horizontal_scrollbar: HTMLElement;
+let cached_EDITOR_horizontal_scrollbar_virtualization_boundary: HTMLElement;
+let cached_EDITOR_body: HTMLElement;
+let cached_EDITOR_presentation: HTMLElement;
+let cached_EDITOR_cursorListElement: HTMLElement;
+let cached_EDITOR_textElement: HTMLElement;
 
 class EDITOR_Cursor {
 
@@ -516,8 +532,8 @@ let EDITOR_sum_diffPositive = 0;
 //
 let EDITOR_RemoveSelection_smallPosition = 0;
 let EDITOR_RemoveSelection_largePosition = 0;
-let EDITOR_RemoveSelection_smallLineAndColumnIndices = null;
-let EDITOR_RemoveSelection_largeLineAndColumnIndices = null;
+let EDITOR_RemoveSelection_smallLineAndColumnIndices: LineAndColumnIndices | null = null;
+let EDITOR_RemoveSelection_largeLineAndColumnIndices: LineAndColumnIndices | null = null;
 
 // Temporary hack for state access TODO: this
 let EDITOR_indentLess_startingLinePos_end = 0;
@@ -1366,7 +1382,7 @@ function EDITOR_state_setText(text, fileStartsWithBom, textSourceIdentifier, FOR
                 }
                 lineLength = 0;
                 EDITOR_lineEndPositionList.insert(EDITOR_lineEndPositionList.count, EDITOR_textByteList.count);
-                EDITOR_textByteList.insert(EDITOR_textByteList.count, get_EDITOR_ASCII_LINE_FEED());
+                EDITOR_textByteList.insert(EDITOR_textByteList.count, 10 /* LINE_FEED '\n' */);
                 break;
             case '\n':
                 if (!EDITOR_lineEndString) {
@@ -1378,7 +1394,7 @@ function EDITOR_state_setText(text, fileStartsWithBom, textSourceIdentifier, FOR
                 }
                 lineLength = 0;
                 EDITOR_lineEndPositionList.insert(EDITOR_lineEndPositionList.count, EDITOR_textByteList.count);
-                EDITOR_textByteList.insert(EDITOR_textByteList.count, get_EDITOR_ASCII_LINE_FEED());
+                EDITOR_textByteList.insert(EDITOR_textByteList.count, 10 /* LINE_FEED '\n' */);
                 break;
             case '\t':
                 lineLength += 4;
@@ -1736,6 +1752,9 @@ function EDITOR_finalizeEdit_InsertLtr(cursor, indexLine_editOccurredOn) {
 
     let textSourceIdentifier = EDITOR_FORMATTED_textSourceIdentifier;
     let lineAndColumnIndices = EDITOR_getLineAndColumnIndices(cursor.editPosition);
+    if (lineAndColumnIndices === undefined) {
+        throw new Error('if (lineAndColumnIndices === undefined)');
+    }
     // TODO: Account for any '\t\0\0\0' that exist on the line
     let text = EDITOR_decoder.decode(cursor.gapBuffer.subarray(0, cursor.gapBufferCount));
     set_didChangeTextDocument_version(get_didChangeTextDocument_version() + 1);
@@ -2225,7 +2244,7 @@ function EDITOR_finalizeEdit_Paste(cursor, indexLine_editOccurredOn) {
                 insertionLength += 4;
                 break;
             case '\n':
-                EDITOR_textByteList.insert(cursor.editPosition + insertionLength, get_EDITOR_ASCII_LINE_FEED());
+                EDITOR_textByteList.insert(cursor.editPosition + insertionLength, 10 /* LINE_FEED '\n' */);
                 EDITOR_lineEndPositionList.insert(cursor.editIndexLine + linesInsertedCount, cursor.editPosition + insertionLength);
                 insertionLength++;
                 linesInsertedCount++;
@@ -2234,7 +2253,7 @@ function EDITOR_finalizeEdit_Paste(cursor, indexLine_editOccurredOn) {
                 if (sourceI < content.length - 1 && content[sourceI + 1] === '\n') {
                     sourceI++;
                 }
-                EDITOR_textByteList.insert(cursor.editPosition + insertionLength, get_EDITOR_ASCII_LINE_FEED());
+                EDITOR_textByteList.insert(cursor.editPosition + insertionLength, 10 /* LINE_FEED '\n' */);
                 EDITOR_lineEndPositionList.insert(cursor.editIndexLine + linesInsertedCount, cursor.editPosition + insertionLength);
                 insertionLength++;
                 linesInsertedCount++;
@@ -2280,10 +2299,10 @@ function EDITOR_finalizeEdit_Duplicate(cursor, indexLine_editOccurredOn) {
 
     for (let offset = 0; offset < length; offset++) {
         switch (EDITOR_textByteList.bytes[small + offset]) {
-            case get_EDITOR_ASCII_TAB():
+            case 9 /* TAB '\t' */:
                 insertionLength += 4; // ??? I think this is copy pasted from 'paste' logic where the tab would change to 4 characters total, in the case of duplication you get what you select.
                 break;
-            case get_EDITOR_ASCII_LINE_FEED():
+            case 10 /* LINE_FEED '\n' */:
                 EDITOR_lineEndPositionList.insert(cursor.editIndexLine + linesInsertedCount, cursor.editPosition + insertionLength);
                 insertionLength++;
                 linesInsertedCount++;
@@ -2306,7 +2325,7 @@ function EDITOR_finalizeEdit_Duplicate(cursor, indexLine_editOccurredOn) {
 /**
  * @param {EDITOR_Cursor} cursor 
  */
-function EDITOR_finalizeEdit_DeleteLtr_BackspaceRtl_RemoveTextNoBatching(cursor, indexLine_editOccurredOn) {
+function EDITOR_finalizeEdit_DeleteLtr_BackspaceRtl_RemoveTextNoBatching(cursor: EDITOR_Cursor, indexLine_editOccurredOn: number) {
     // TODO: surely u'd get this before doing the edit?
     let startLineAndColumnIndices;
     if (cursor.editKind === EditKind.RemoveTextNoBatching) {
@@ -2922,7 +2941,7 @@ function EDITOR_getLineAndColumnIndices_raw(positionIndex) {
     };
 }
 
-function EDITOR_getLineAndColumnIndices(positionIndex) {
+function EDITOR_getLineAndColumnIndices(positionIndex: number): LineAndColumnIndices | undefined {
     let left = 0;
     let right = EDITOR_lineEndPositionList.count - 1;
 
@@ -6720,7 +6739,7 @@ function EDITOR_findEndExclusiveIndentationIndexColumn(cursor) {
  */
 function EDITOR_cacheIndentation(cursor) {
     cursor.enterKey_newLinePlusIndentation_byteList = new ByteList(32);
-    cursor.enterKey_newLinePlusIndentation_byteList.insert(cursor.enterKey_newLinePlusIndentation_byteList.count, get_EDITOR_ASCII_LINE_FEED());
+    cursor.enterKey_newLinePlusIndentation_byteList.insert(cursor.enterKey_newLinePlusIndentation_byteList.count, 10 /* LINE_FEED '\n' */);
     let indentationBuilder = [];
     let lastValidIndexColumn = EDITOR_getLastValidIndexColumn(cursor.indexLine);
     let line = EDITOR_getLineBoundaryPositions(cursor.indexLine);
@@ -6742,7 +6761,7 @@ function EDITOR_cacheIndentation(cursor) {
                 indentationBuilder.push(c);
                 break;
             case '\t':
-                cursor.enterKey_newLinePlusIndentation_byteList.insert(cursor.enterKey_newLinePlusIndentation_byteList.count, get_EDITOR_ASCII_TAB());
+                cursor.enterKey_newLinePlusIndentation_byteList.insert(cursor.enterKey_newLinePlusIndentation_byteList.count, 9 /* TAB '\t' */);
                 indentationBuilder.push(c);
                 break;
             case '\0': // tabs are stored as: '\t\0\0\0'
