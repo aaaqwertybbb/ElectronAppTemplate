@@ -568,7 +568,7 @@ function EDITOR_init() {
  * 
  * You need to have each switch statement invoke a corresponding function in order to keep the stack frame as small as possible.
  */
-function EDITOR_render_do(timestamp) {
+function EDITOR_render_do(timestamp: number) {
     let renderKind;
     // Note the functions being invoked might internally invoke a shift() if they see that the next renderKind is a 'flag'.
 
@@ -623,10 +623,10 @@ function EDITOR_render_do(timestamp) {
             // You could perhaps "debug mode" check for these
             //case RenderKind.None: // this is a duplicate case ???
             //case RenderKind.Cursor_flag_doNotScrollIntoView: // TODO: This is a silent error
-            //case get_RenderKind_Cursor_flag_scrollIntoViewExplicit(): // TODO: This is a silent error
+            //case RenderKind.Cursor_flag_scrollIntoViewExplicit: // TODO: This is a silent error
             //    break;
             default:
-                // the 'default case' is get_RenderKind_Cursor_n():
+                // the 'default case' is RenderKind.Cursor_n:
                 EDITOR_render_do_cursor(timestamp, renderKind);
                 break;
         }
@@ -635,7 +635,7 @@ function EDITOR_render_do(timestamp) {
     EDITOR_isRenderPending = false; // Reset the lock
 }
 
-function EDITOR_render_do_cursor(timestamp, renderKind) {
+function EDITOR_render_do_cursor(timestamp: number, renderKind: RenderKind) {
     EDITOR_cursorBlinkLastTimestamp = timestamp;
     let indexCursor = renderKind - (count_of_wellknown_renderKinds - 1);
     if (indexCursor >= EDITOR_cursorList.length) {
@@ -651,7 +651,7 @@ function EDITOR_render_do_cursor(timestamp, renderKind) {
         EDITOR_renderKindArray.shift();
         notShouldScrollIntoView = true;
     }
-    else if (entryZero === get_RenderKind_Cursor_flag_scrollIntoViewExplicit()) {
+    else if (entryZero === RenderKind.Cursor_flag_scrollIntoViewExplicit) {
         EDITOR_renderKindArray.shift();
         flag_scrollIntoViewExplicit = true;
     }
@@ -2809,7 +2809,7 @@ function positiveNumbersOnly_countDigitsLoop(number) {
 
 function EDITOR_draw_all_cursors() {
     for (let i = EDITOR_cursorList.length - 1; i >= 0; i--) {
-        EDITOR_render_request(get_RenderKind_Cursor_n() + i);
+        EDITOR_render_request(RenderKind.Cursor_n + i);
     }
 }
 
@@ -3344,7 +3344,7 @@ function EDITOR_onMouseMoveDetailRankOne(event, indexLineClicked, indexColumnCli
     cursor.selectionEnd = EDITOR_getPositionIndex(cursor);
 
     let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
-    EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+    EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
 }
 
 function getCharacter_raw(positionIndex) {
@@ -3506,7 +3506,7 @@ function EDITOR_onMouseMoveDetailRankTwo(event, indexLineClicked, indexColumnCli
         }
 
         let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
-        EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+        EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
     }
     else {
         if (cursor.selectionAnchor > cursor.selectionEnd) {
@@ -3552,7 +3552,7 @@ function EDITOR_onMouseMoveDetailRankTwo(event, indexLineClicked, indexColumnCli
         }
 
         let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
-        EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+        EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
     }
 }
 
@@ -3575,7 +3575,7 @@ function EDITOR_onMouseMoveDetailRankThree(event, indexLineClicked, indexColumnC
         }
 
         let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
-        EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+        EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
     }
     else if (indexLineClicked < get_EDITOR_detailRank3OriginLine()) {
         if (cursor.selectionAnchor < cursor.selectionEnd) {
@@ -3587,7 +3587,7 @@ function EDITOR_onMouseMoveDetailRankThree(event, indexLineClicked, indexColumnC
             cursor.selectionEnd = get_EDITOR_detail_smallPosition();
 
             let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
-            EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+            EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
         }
 
         cursor.indexLine = indexLineClicked;
@@ -3596,7 +3596,7 @@ function EDITOR_onMouseMoveDetailRankThree(event, indexLineClicked, indexColumnC
         cursor.selectionEnd = EDITOR_getPositionIndex_Overload(indexLineClicked, 0);
 
         let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
-        EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+        EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
     }
     else if (indexLineClicked > get_EDITOR_detailRank3OriginLine()) {
 
@@ -3627,7 +3627,7 @@ function EDITOR_onMouseMoveDetailRankThree(event, indexLineClicked, indexColumnC
         }
 
         let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
-        EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+        EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
     }
 }
 
@@ -3675,7 +3675,7 @@ function EDITOR_onMouseDownDetailRankOne(event, indexLineClicked, indexColumnCli
     }
 
     let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
-    EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+    EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
 }
 
 function EDITOR_onMouseDownDetailRankTwo(event, indexLineClicked, indexColumnClicked) {
@@ -3733,7 +3733,7 @@ function EDITOR_onMouseDownDetailRankTwo(event, indexLineClicked, indexColumnCli
         }
 
         let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
-        EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+        EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
     }
     else if (leftCharacterKind > rightCharacterKind) {
         let goalCharacterKind = leftCharacterKind;
@@ -3755,7 +3755,7 @@ function EDITOR_onMouseDownDetailRankTwo(event, indexLineClicked, indexColumnCli
         cursor.selectionEnd = originalPositionIndex;
 
         let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
-        EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+        EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
     }
     else {
         let goalCharacterKind = rightCharacterKind;
@@ -3783,7 +3783,7 @@ function EDITOR_onMouseDownDetailRankTwo(event, indexLineClicked, indexColumnCli
         }
 
         let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
-        EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+        EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
     }
 
     if (cursor.selectionAnchor < cursor.selectionEnd) {
@@ -3815,7 +3815,7 @@ function EDITOR_onMouseDownDetailRankThree(event, indexLineClicked, indexColumnC
         let line = EDITOR_getLineBoundaryPositions(cursor.indexLine);
         cursor.selectionEnd = line.end;
         let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
-        EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+        EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
     }
     else {
         cursor.indexLine++;
@@ -3823,7 +3823,7 @@ function EDITOR_onMouseDownDetailRankThree(event, indexLineClicked, indexColumnC
         let line = EDITOR_getLineBoundaryPositions(cursor.indexLine);
         cursor.selectionEnd = line.start;
         let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
-        EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+        EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
     }
 
     if (cursor.selectionAnchor < cursor.selectionEnd) {
@@ -3980,9 +3980,9 @@ function EDITOR_createCursorLineBelow(event) {
     EDITOR_arrowDown(lastCursor, /*shiftKey*/ false);
     EDITOR_cursorList.splice(indexLastCursor, 0, clone);
     cached_EDITOR_cursorListElement.appendChild(clone.caretRow);
-    EDITOR_render_request(get_RenderKind_Cursor_n() + indexLastCursor);
-    EDITOR_render_request(get_RenderKind_Cursor_n() + indexLastCursor + 1);
-    EDITOR_render_request(get_RenderKind_Cursor_flag_scrollIntoViewExplicit());
+    EDITOR_render_request(RenderKind.Cursor_n + indexLastCursor);
+    EDITOR_render_request(RenderKind.Cursor_n + indexLastCursor + 1);
+    EDITOR_render_request(RenderKind.Cursor_flag_scrollIntoViewExplicit);
 }
 
 function EDITOR_createCursorAtNextMatchSelection(event) {
@@ -4094,12 +4094,12 @@ function EDITOR_createCursorAtNextMatchSelection(event) {
 
         EDITOR_cursorList.splice(indexOfPrimaryCursor, 0, clone);
         cached_EDITOR_cursorListElement.appendChild(clone.caretRow);
-        EDITOR_render_request(get_RenderKind_Cursor_n() + indexOfPrimaryCursor); // no longer is indexOfPrimaryCursor because of the splice.
+        EDITOR_render_request(RenderKind.Cursor_n + indexOfPrimaryCursor); // no longer is indexOfPrimaryCursor because of the splice.
 
         EDITOR_primaryCursor.selectionAnchor = postPosition;
         EDITOR_primaryCursor.selectionEnd = postPosition + input.value.length;
         EDITOR_primaryCursor.indexColumn += input.value.length;
-        EDITOR_render_request(get_RenderKind_Cursor_n() + indexOfPrimaryCursor + 1); // no longer is indexOfPrimaryCursor because of the splice.
+        EDITOR_render_request(RenderKind.Cursor_n + indexOfPrimaryCursor + 1); // no longer is indexOfPrimaryCursor because of the splice.
 
         // Move primary cursor to index 0 of cursor list.
         if (postPosition < prePosition) {
@@ -4339,7 +4339,7 @@ function EDITOR_editEvent_theEditIself_InsertLtr(event) {
         }
         EDITOR_insertDo(cursor, event.key);
         cursor.STORED_indexColumn = cursor.indexColumn;
-        EDITOR_render_request(get_RenderKind_Cursor_n() + i);
+        EDITOR_render_request(RenderKind.Cursor_n + i);
         //set_EDITOR_offsetColumn(get_EDITOR_offsetColumn() + cursor.editLength);
         //set_EDITOR_totalShift(get_EDITOR_totalShift() + cursor.editLength); // this isn't needed here, but it is needed elsewhere so in order to create a pattern it was included here... TODO: maybe get rid of this or...?
         EDITOR_render_request(RenderKind.InsertLtr);
@@ -4364,7 +4364,7 @@ function EDITOR_editEvent_theEditIself_DeleteLtr(event) {
             }
             EDITOR_deleteDo(cursor, event);
         }
-        EDITOR_render_request(get_RenderKind_Cursor_n() + i);
+        EDITOR_render_request(RenderKind.Cursor_n + i);
         //set_EDITOR_offsetColumn(get_EDITOR_offsetColumn() - cursor.editLength);
         //set_EDITOR_totalShift(get_EDITOR_totalShift() - cursor.editLength); // this isn't needed here, but it is needed elsewhere so in order to create a pattern it was included here... TODO: maybe get rid of this or...?
     }
@@ -4389,7 +4389,7 @@ function EDITOR_editEvent_theEditIself_BackspaceRtl(event) {
             EDITOR_backspaceDo(cursor, event);
             cursor.STORED_indexColumn = cursor.indexColumn;
         }
-        EDITOR_render_request(get_RenderKind_Cursor_n() + i);
+        EDITOR_render_request(RenderKind.Cursor_n + i);
         //set_EDITOR_offsetColumn(get_EDITOR_offsetColumn() - cursor.editLength);
         //set_EDITOR_totalShift(get_EDITOR_totalShift() - cursor.editLength); // this isn't needed here, but it is needed elsewhere so in order to create a pattern it was included here... TODO: maybe get rid of this or...?
     }
@@ -4432,7 +4432,7 @@ function EDITOR_editEvent_theEditIself_Tab(event) {
                 EDITOR_tabKey(cursor);
             }
         }
-        EDITOR_render_request(get_RenderKind_Cursor_n() + i);
+        EDITOR_render_request(RenderKind.Cursor_n + i);
     }
 }
 
@@ -4444,7 +4444,7 @@ function EDITOR_editEvent_theEditIself_Enter(event) {
         }
         EDITOR_EnterKey(cursor, event.ctrlKey, event.shiftKey);
         cursor.STORED_indexColumn = cursor.indexColumn;
-        EDITOR_render_request(get_RenderKind_Cursor_n() + i);
+        EDITOR_render_request(RenderKind.Cursor_n + i);
         //set_EDITOR_offsetLine(get_EDITOR_offsetLine() + 1);
     }
 }
@@ -4457,7 +4457,7 @@ function EDITOR_editEvent_theEditIself_Paste(clipboardContent) {
         }
         EDITOR_paste(cursor, clipboardContent);
         cursor.STORED_indexColumn = cursor.indexColumn;
-        EDITOR_render_request(get_RenderKind_Cursor_n() + i);
+        EDITOR_render_request(RenderKind.Cursor_n + i);
     }
 }
 
@@ -4469,7 +4469,7 @@ function EDITOR_editEvent_theEditIself_Duplicate() {
         }
         EDITOR_duplicateSelection(cursor);
         cursor.STORED_indexColumn = cursor.indexColumn;
-        EDITOR_render_request(get_RenderKind_Cursor_n() + i);
+        EDITOR_render_request(RenderKind.Cursor_n + i);
     }
 }
 
@@ -4831,7 +4831,7 @@ function EDITOR_onKeyDown_ArrowLeft(event) {
             EDITOR_postKeyboardMovementSelectionLogic(cursor, event.shiftKey);
         }
         cursor.STORED_indexColumn = cursor.indexColumn;
-        EDITOR_render_request(get_RenderKind_Cursor_n() + i);
+        EDITOR_render_request(RenderKind.Cursor_n + i);
         if (!EDITOR_isChecking_cursorBlinkTrailingEdge) {
             EDITOR_cursorBlink_startChecking();
         }
@@ -4863,7 +4863,7 @@ function EDITOR_onKeyDown_ArrowDown(event) {
         }
         for (var i = EDITOR_cursorList.length - 1; i >= 0; i--) {
             EDITOR_arrowDown(EDITOR_cursorList[i], /*shiftKey*/ event.shiftKey);
-            EDITOR_render_request(get_RenderKind_Cursor_n() + i);
+            EDITOR_render_request(RenderKind.Cursor_n + i);
             if (!EDITOR_isChecking_cursorBlinkTrailingEdge) {
                 EDITOR_cursorBlink_startChecking();
             }
@@ -4903,7 +4903,7 @@ function EDITOR_onKeyDown_ArrowUp(event) {
                 }
             }
             EDITOR_postKeyboardMovementSelectionLogic(cursor, event.shiftKey);
-            EDITOR_render_request(get_RenderKind_Cursor_n() + i);
+            EDITOR_render_request(RenderKind.Cursor_n + i);
             if (!EDITOR_isChecking_cursorBlinkTrailingEdge) {
                 EDITOR_cursorBlink_startChecking();
             }
@@ -4972,7 +4972,7 @@ function EDITOR_onKeyDown_ArrowRight(event) {
             EDITOR_postKeyboardMovementSelectionLogic(cursor, event.shiftKey);
         }
         cursor.STORED_indexColumn = cursor.indexColumn;
-        EDITOR_render_request(get_RenderKind_Cursor_n() + i);
+        EDITOR_render_request(RenderKind.Cursor_n + i);
         if (!EDITOR_isChecking_cursorBlinkTrailingEdge) {
             EDITOR_cursorBlink_startChecking();
         }
@@ -5008,7 +5008,7 @@ function EDITOR_onKeyDown_Home(event) {
         }
         EDITOR_postKeyboardMovementSelectionLogic(cursor, event.shiftKey);
         cursor.STORED_indexColumn = cursor.indexColumn;
-        EDITOR_render_request(get_RenderKind_Cursor_n() + i);
+        EDITOR_render_request(RenderKind.Cursor_n + i);
         if (!EDITOR_isChecking_cursorBlinkTrailingEdge) {
             EDITOR_cursorBlink_startChecking();
         }
@@ -5034,7 +5034,7 @@ function EDITOR_onKeyDown_End(event) {
         cursor.indexColumn = EDITOR_getLastValidIndexColumn(cursor.indexLine);
         EDITOR_postKeyboardMovementSelectionLogic(cursor, event.shiftKey);
         cursor.STORED_indexColumn = cursor.indexColumn;
-        EDITOR_render_request(get_RenderKind_Cursor_n() + i);
+        EDITOR_render_request(RenderKind.Cursor_n + i);
         if (!EDITOR_isChecking_cursorBlinkTrailingEdge) {
             EDITOR_cursorBlink_startChecking();
         }
@@ -5059,7 +5059,7 @@ function EDITOR_onKeyDown_PageDown(event) {
         // TODO: allow someone to select via this keybind, but for now it causes a bad selection if you { 'Ctrl' + 'a' } then use it so I'm clearing any active selection here for now.
         EDITOR_primaryCursor.selectionAnchor = EDITOR_primaryCursor.selectionEnd;
         let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
-        EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+        EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
         if (!EDITOR_isChecking_cursorBlinkTrailingEdge) {
             EDITOR_cursorBlink_startChecking();
         }
@@ -5083,7 +5083,7 @@ function EDITOR_onKeyDown_PageUp(event) {
         // TODO: allow someone to select via this keybind, but for now it causes a bad selection if you { 'Ctrl' + 'a' } then use it so I'm clearing any active selection here for now.
         EDITOR_primaryCursor.selectionAnchor = EDITOR_primaryCursor.selectionEnd;
         let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
-        EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+        EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
         if (!EDITOR_isChecking_cursorBlinkTrailingEdge) {
             EDITOR_cursorBlink_startChecking();
         }
@@ -5110,7 +5110,7 @@ async function EDITOR_onKeyDown_keyLengthEqualsOne_ctrlKey(event) {
             EDITOR_finalizeAllCursors();
             await EDITOR_copySelection(EDITOR_primaryCursor);
             EDITOR_removeSelection(EDITOR_primaryCursor); // TODO: Multicursor bad
-            EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+            EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
             if (!EDITOR_isChecking_cursorBlinkTrailingEdge) {
                 EDITOR_cursorBlink_startChecking(); // TODO: this one is especially questionable since it invoked 'EDITOR_removeSelection' prior to the draw cursor?
             }
@@ -5141,7 +5141,7 @@ async function EDITOR_onKeyDown_keyLengthEqualsOne_ctrlKey(event) {
             let selectionEndLineAndColumnIndices = EDITOR_getLineAndColumnIndices(EDITOR_primaryCursor.selectionEnd);
             EDITOR_primaryCursor.indexLine = selectionEndLineAndColumnIndices.indexLine;
             EDITOR_primaryCursor.indexColumn = selectionEndLineAndColumnIndices.indexColumn;
-            EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+            EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
             EDITOR_render_request(RenderKind.Cursor_flag_doNotScrollIntoView);
             break;
         case 'f':
@@ -8239,7 +8239,7 @@ async function EDITOR_MenuOnClick(indexClicked, elementClicked) {
             EDITOR_finalizeAllCursors();
             await EDITOR_copySelection(EDITOR_primaryCursor);
             EDITOR_removeSelection(EDITOR_primaryCursor);
-            EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+            EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
             return;
         case get_CommandKind_Copy():
             EDITOR_finalizeAllCursors();
@@ -8248,7 +8248,7 @@ async function EDITOR_MenuOnClick(indexClicked, elementClicked) {
             EDITOR_finalizeAllCursors();
             let clipboard = await window.myAPI.readClipboard();
             EDITOR_paste(EDITOR_primaryCursor, clipboard);
-            EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+            EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
             return;
         case get_CommandKind_Find():
             EDITOR_findOverlay_showSetter(!get_EDITOR_findOverlay_show());
@@ -8282,7 +8282,7 @@ function EDITOR_moveCursor_indexLine_indexColumn(indexLine, indexColumn) {
     // TODO: selectionAnchor = selectionEnd; EDITOR_drawCursor(cursor); # being the way to clear a selection should be documented / wrapped by a method for ease of use / readability?
     EDITOR_primaryCursor.selectionAnchor = EDITOR_primaryCursor.selectionEnd;
     let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
-    EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
+    EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
 }
 
 /**
