@@ -97,6 +97,19 @@ export type EditKind = typeof EditKind[keyof typeof EditKind];
 
 
 
+/**
+ * If you have an extension listed here, it is expected that the "function to invoke" exists.
+ * As of right now any patterns to naming the function that gets invoked are tentative.
+ * But I am not checking whether JS_full_lex or JS_line_lex exist, I'm just switching on ExtensionKind and presuming that function exists.
+ */
+export const ExtensionKind = {
+    None: 0,
+    JavaScript: 1,
+} as const;
+// Derive the type union from the object values
+export type ExtensionKind = typeof ExtensionKind[keyof typeof ExtensionKind];
+
+
 
 
 export let EDITOR_trackedSyntaxList = new TrackedSyntaxList(32, null);
@@ -366,9 +379,9 @@ let EDITOR_cursorList = [EDITOR_primaryCursor];
 
 let EDITOR_textSourceIdentifier = '';
 let EDITOR_FORMATTED_textSourceIdentifier = '';
-let EDITOR_extensionKind = get_ExtensionKind_None();
+let EDITOR_extensionKind = ExtensionKind.None;
 
-let EDITOR_lineEndString = null;
+let EDITOR_lineEndString: string | null = null;
 
 let EDITOR_documentSymbolResult;
 /**
@@ -399,8 +412,8 @@ let w_indexColumn_Goal = -1;
 let w_indexColumn_Sum = -1;
 let w_indexColumn_SpanTextContentRelative = -1;
 let w_indexSpan = -1;
-let w_span = null;
-let w_div = null;
+let w_span: HTMLElement | null = null;
+let w_div: HTMLElement | null = null;
 let w_beltIndexLine = -1;
 
 /** Also is used from 'EDITOR_render_do_SetText()', and 'EDITOR_render_do_Resize()', not just 'EDITOR_render_do_Scroll()' */
@@ -410,8 +423,8 @@ let EDITOR_scrollEndDeadline = 0;
 /** Also is used from 'EDITOR_render_do_SetText()', and 'EDITOR_render_do_Resize()', not just 'EDITOR_render_do_Scroll()' */
 let isCheckingTrailingEdge = false;
 
-let prevVli;
-let currVli;
+let prevVli: number;
+let currVli: number;
 
 /**
  * This queueing is currently a complete copy and paste of what Google AI generated.
@@ -1230,7 +1243,7 @@ function EDITOR_state_clear() {
     set_EDITOR_recentBoundingClientRect_isNull_intFalsey(1);
     EDITOR_textSourceIdentifier = '';
     EDITOR_FORMATTED_textSourceIdentifier = '';
-    EDITOR_extensionKind = get_ExtensionKind_None();
+    EDITOR_extensionKind = ExtensionKind.None;
     set_EDITOR_fileStartsWithBom(false);
     EDITOR_lineEndString = null;
     EDITOR_lineEndPositionList.clear();
@@ -1339,7 +1352,7 @@ function EDITOR_state_setText(text, fileStartsWithBom, textSourceIdentifier, FOR
     update_verticalVirtualizationBoundary();
 
     //switch (EDITOR_extensionKind) {
-    //    case get_ExtensionKind_JavaScript():
+    //    case ExtensionKind.JavaScript:
     //        // This 'JS_full_lex' only runs when you open a file for the first time.
     //        // The logic likely has some JIT overhead that is long term persistent in the GC. I have no proof of this but I need to look into it.
     //        // If so, moving this to be an LSP request to get the initial list of tracked syntax could be a massive improvement.
@@ -8564,15 +8577,15 @@ function EDITOR_toExtensionKind(extensionWithPeriod) {
     switch (extensionWithPeriod) {
         case '.js':
         case '.cjs':
-            return get_ExtensionKind_JavaScript();
+            return ExtensionKind.JavaScript;
         default:
-            return get_ExtensionKind_None();
+            return ExtensionKind.None;
     }
 }
 
 function EDITOR_language_line_lex_SET(extensionKind) {
     switch (extensionKind) {
-        case get_ExtensionKind_JavaScript():
+        case ExtensionKind.JavaScript:
             EDITOR_language_line_lex = JS_line_lex;
             break;
         default:
