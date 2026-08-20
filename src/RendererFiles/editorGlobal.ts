@@ -182,16 +182,26 @@ export let EDITOR_textByteList = new ByteList(1024);
 const EDITOR_encoder = new TextEncoder();
 export const EDITOR_decoder = new TextDecoder();
 
-const EDITOR_baseElement = document.getElementById('EDITOR');
+/** TODO: I null forgave this because it should always be there but... */
+const EDITOR_baseElement = document.getElementById('EDITOR')!;
 
+/** TODO: All of these are set via an "unchecked" ' as HTMLElement' */
 let cached_EDITOR_virtualization_horizontal: HTMLElement;
+/** TODO: All of these are set via an "unchecked" ' as HTMLElement' */
 let cached_EDITOR_virtualization_vertical: HTMLElement;
+/** TODO: All of these are set via an "unchecked" ' as HTMLElement' */
 let cached_EDITOR_gutter: HTMLElement;
+/** TODO: All of these are set via an "unchecked" ' as HTMLElement' */
 let cached_EDITOR_horizontal_scrollbar: HTMLElement;
+/** TODO: All of these are set via an "unchecked" ' as HTMLElement' */
 let cached_EDITOR_horizontal_scrollbar_virtualization_boundary: HTMLElement;
+/** TODO: All of these are set via an "unchecked" ' as HTMLElement' */
 let cached_EDITOR_body: HTMLElement;
+/** TODO: All of these are set via an "unchecked" ' as HTMLElement' */
 let cached_EDITOR_presentation: HTMLElement;
+/** TODO: All of these are set via an "unchecked" ' as HTMLElement' */
 let cached_EDITOR_cursorListElement: HTMLElement;
+/** TODO: All of these are set via an "unchecked" ' as HTMLElement' */
 let cached_EDITOR_textElement: HTMLElement;
 
 class EDITOR_Cursor {
@@ -528,11 +538,11 @@ let lastReadNumber_offsetWidth = 0;
 
 let EDITOR_isRenderPending = false;
 
-let EDITOR_renderKindArray = [];
+let EDITOR_renderKindArray: RenderKind[] = [];
 
 // Persistent, flat JS arrays that stay alive forever in memory
-let ArrayFrom_gutter_children = [];
-let ArrayFrom_textElement_children = [];
+let ArrayFrom_gutter_children: HTMLElement[] = [];
+let ArrayFrom_textElement_children: HTMLElement[] = [];
 let ArrayFrom_textElement_children_length = 0;
 
 const count_of_wellknown_renderKinds = 19;
@@ -565,19 +575,19 @@ let EDITOR_mousemove_eventListener_isActive = false;
 
 function EDITOR_init() {
 
-    cached_EDITOR_virtualization_horizontal = EDITOR_baseElement.children[0];
-    cached_EDITOR_virtualization_vertical = EDITOR_baseElement.children[1];
-    cached_EDITOR_gutter = EDITOR_baseElement.children[4];
+    cached_EDITOR_virtualization_horizontal = EDITOR_baseElement.children[0] as HTMLElement;
+    cached_EDITOR_virtualization_vertical = EDITOR_baseElement.children[1] as HTMLElement;
+    cached_EDITOR_gutter = EDITOR_baseElement.children[4] as HTMLElement;
 
-    cached_EDITOR_horizontal_scrollbar = EDITOR_baseElement.children[2].children[0];
+    cached_EDITOR_horizontal_scrollbar = EDITOR_baseElement.children[2].children[0] as HTMLElement;
     cached_EDITOR_horizontal_scrollbar.style.left = '0px';
     DRAWN_NUMBER_cached_EDITOR_horizontal_scrollbar_style_left = 0;
 
-    cached_EDITOR_horizontal_scrollbar_virtualization_boundary = EDITOR_baseElement.children[2].children[0].children[0];
-    cached_EDITOR_body = EDITOR_baseElement.children[5];
-    cached_EDITOR_presentation = EDITOR_baseElement.children[5].children[0];
-    cached_EDITOR_cursorListElement = EDITOR_baseElement.children[5].children[1];
-    cached_EDITOR_textElement = EDITOR_baseElement.children[5].children[2];
+    cached_EDITOR_horizontal_scrollbar_virtualization_boundary = EDITOR_baseElement.children[2].children[0].children[0] as HTMLElement;
+    cached_EDITOR_body = EDITOR_baseElement.children[5] as HTMLElement;
+    cached_EDITOR_presentation = EDITOR_baseElement.children[5].children[0] as HTMLElement;
+    cached_EDITOR_cursorListElement = EDITOR_baseElement.children[5].children[1] as HTMLElement;
+    cached_EDITOR_textElement = EDITOR_baseElement.children[5].children[2] as HTMLElement;
 
     cached_EDITOR_cursorListElement.appendChild(EDITOR_primaryCursor.caretRow);
 
@@ -821,8 +831,8 @@ function EDITOR_render_do_CreateViewport() {
         div.appendChild(document.createElement('span'));
     }
 
-    ArrayFrom_gutter_children = Array.from(cached_EDITOR_gutter.children);
-    ArrayFrom_textElement_children = Array.from(cached_EDITOR_textElement.children);
+    ArrayFrom_gutter_children = Array.from(cached_EDITOR_gutter.children) as HTMLElement[];
+    ArrayFrom_textElement_children = Array.from(cached_EDITOR_textElement.children) as HTMLElement[];
     ArrayFrom_textElement_children_length = ArrayFrom_textElement_children.length;
 
     EDITOR_drawHorizontalScrollbar();
@@ -1477,7 +1487,7 @@ function EDITOR_setText(text, fileStartsWithBom, textSourceIdentifier, FORMATTED
  * Thus this function takes a 'lineCount' which defaults to EDITOR_lineEndPositionList.count if falsey.
  * @param {number | null | undefined} lineCount In order to permit arbitrarily updating the vertical virtualization boundary, this takes a lineCount. If falsey, then EDITOR_lineEndPositionList.count is used.
  */
-function update_verticalVirtualizationBoundary(lineCount) {
+function update_verticalVirtualizationBoundary(lineCount: number) {
     if (!lineCount) lineCount = EDITOR_lineEndPositionList.count;
     cached_EDITOR_virtualization_vertical.style.height = ((lineCount + get_EDITOR_virtualCount() - 1) * get_EDITOR_lineHeight()) + 'px';
 }
