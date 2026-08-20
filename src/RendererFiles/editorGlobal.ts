@@ -1774,16 +1774,16 @@ function EDITOR_finalizeEdit_InsertLtr(cursor: EDITOR_Cursor, indexLine_editOccu
     }
     for (var i = 0; i < EDITOR_trackedSyntaxList.count_abstract; i++) {
         EDITOR_trackedSyntaxList.getElementAt(i);
-        if (cursor.editPosition <= get_EDITOR_pooledTrackedSyntax_start()) {
-            EDITOR_trackedSyntaxList.setStart(i, get_EDITOR_pooledTrackedSyntax_start() + cursor.editLength);
+        if (cursor.editPosition <= EDITOR_pooledTrackedSyntax_start) {
+            EDITOR_trackedSyntaxList.setStart(i, EDITOR_pooledTrackedSyntax_start + cursor.editLength);
         }
         else if (EDITOR_pooledTrackedSyntax_trackedSyntaxKind === TrackedSyntaxKind.Comment &&
-                cursor.editPosition === get_EDITOR_pooledTrackedSyntax_start() + 1) {
+                cursor.editPosition === EDITOR_pooledTrackedSyntax_start + 1) {
 
             // TODO: Insertion of '*' probably shouldn't remove.
             EDITOR_trackedSyntaxList.removeAt(i, 1);
         }
-        else if (cursor.editPosition > get_EDITOR_pooledTrackedSyntax_start() && cursor.editPosition < get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length()) {
+        else if (cursor.editPosition > EDITOR_pooledTrackedSyntax_start && cursor.editPosition < EDITOR_pooledTrackedSyntax_start + get_EDITOR_pooledTrackedSyntax_length()) {
             EDITOR_trackedSyntaxList.setLength(i, get_EDITOR_pooledTrackedSyntax_length() + cursor.editLength);
         }
     }
@@ -1966,7 +1966,7 @@ function EDITOR_finalizeEdit_IndentMore(cursor: EDITOR_Cursor, indexLine_editOcc
             }
         }
         EDITOR_trackedSyntaxList.getElementAt(trackedSyntaxReposition_i);
-        if (linePos.start > get_EDITOR_pooledTrackedSyntax_start() && linePos.start < get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length()) {
+        if (linePos.start > EDITOR_pooledTrackedSyntax_start && linePos.start < EDITOR_pooledTrackedSyntax_start + get_EDITOR_pooledTrackedSyntax_length()) {
             // # Then, you immediately know the trackedSyntax that encompasses the insertion (if it exists), so you increment its length by the text inserted on that respective line.
             EDITOR_trackedSyntaxList.setLength(trackedSyntaxReposition_i, get_EDITOR_pooledTrackedSyntax_length() + 4);
         }
@@ -2244,7 +2244,7 @@ function EDITOR_finalizeEdit_IndentLess(cursor: EDITOR_Cursor, indexLine_editOcc
             }
         }
         EDITOR_trackedSyntaxList.getElementAt(trackedSyntaxReposition_i);
-        if (linePos.start > get_EDITOR_pooledTrackedSyntax_start() && linePos.start < get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length()) {
+        if (linePos.start > EDITOR_pooledTrackedSyntax_start && linePos.start < EDITOR_pooledTrackedSyntax_start + get_EDITOR_pooledTrackedSyntax_length()) {
             EDITOR_trackedSyntaxList.setLength(trackedSyntaxReposition_i, get_EDITOR_pooledTrackedSyntax_length() - innerRemoveCount);
         }
 
@@ -2421,22 +2421,22 @@ function EDITOR_finalizeEdit_DeleteLtr_BackspaceRtl_RemoveTextNoBatching(cursor:
     }
     for (var i = EDITOR_trackedSyntaxList.count_abstract - 1; i >= 0; i--) {
         EDITOR_trackedSyntaxList.getElementAt(i);
-        if (cursor.editPosition < get_EDITOR_pooledTrackedSyntax_start()) {
-            EDITOR_trackedSyntaxList.setStart(i, get_EDITOR_pooledTrackedSyntax_start() - cursor.editLength);
+        if (cursor.editPosition < EDITOR_pooledTrackedSyntax_start) {
+            EDITOR_trackedSyntaxList.setStart(i, EDITOR_pooledTrackedSyntax_start - cursor.editLength);
         }
-        else if (get_EDITOR_pooledTrackedSyntax_start() >= cursor.editPosition && get_EDITOR_pooledTrackedSyntax_start() < cursor.editPosition + cursor.editLength) {
+        else if (EDITOR_pooledTrackedSyntax_start >= cursor.editPosition && EDITOR_pooledTrackedSyntax_start < cursor.editPosition + cursor.editLength) {
             // TODO: This needs to remove more than 1 at a time
             EDITOR_trackedSyntaxList.removeAt(i, 1);
         }
         else if (EDITOR_pooledTrackedSyntax_trackedSyntaxKind === TrackedSyntaxKind.Comment &&
-                (get_EDITOR_pooledTrackedSyntax_start() + 1) >= cursor.editPosition && (get_EDITOR_pooledTrackedSyntax_start() + 1) < cursor.editPosition + cursor.editLength) {
+                (EDITOR_pooledTrackedSyntax_start + 1) >= cursor.editPosition && (EDITOR_pooledTrackedSyntax_start + 1) < cursor.editPosition + cursor.editLength) {
             // TODO: You can invalidate a >1 char long by removing beyond just the first unless a character afterwards falls into place that is valid by chance
             //
             // only multi-line-comments that span multiple lines are stored in EDITOR_trackedSyntaxList with the 'TrackedSyntaxKind.Comment'
             //
             EDITOR_trackedSyntaxList.removeAt(i, 1);
         }
-        else if (cursor.editPosition > get_EDITOR_pooledTrackedSyntax_start() && cursor.editPosition < get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length()) {
+        else if (cursor.editPosition > EDITOR_pooledTrackedSyntax_start && cursor.editPosition < EDITOR_pooledTrackedSyntax_start + get_EDITOR_pooledTrackedSyntax_length()) {
             EDITOR_trackedSyntaxList.setLength(i, get_EDITOR_pooledTrackedSyntax_length() - cursor.editLength);
         }
     }
@@ -2622,17 +2622,17 @@ function EDITOR_createSpansForLineOfText(div, lineStart, lineEnd, trackedSyntax_
                 break;
             }
     
-            if (get_EDITOR_pooledTrackedSyntax_start() >= lineEnd) {
+            if (EDITOR_pooledTrackedSyntax_start >= lineEnd) {
                 break;
             }
     
-            if (get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length() < lineStart) {
+            if (EDITOR_pooledTrackedSyntax_start + get_EDITOR_pooledTrackedSyntax_length() < lineStart) {
                 trackedSyntax_I++;
                 continue;
             }
     
-            if (get_EDITOR_pooledTrackedSyntax_start() > substart) {
-                let subend = get_EDITOR_pooledTrackedSyntax_start() > lineEnd ? lineEnd : get_EDITOR_pooledTrackedSyntax_start(); // probably a nonsense line of code given the previous if statements
+            if (EDITOR_pooledTrackedSyntax_start > substart) {
+                let subend = EDITOR_pooledTrackedSyntax_start > lineEnd ? lineEnd : EDITOR_pooledTrackedSyntax_start; // probably a nonsense line of code given the previous if statements
                 childIndex = EDITOR_language_line_lex(div, substart, subend, childIndex);
                 substart += (subend - substart);
             }
@@ -2648,7 +2648,7 @@ function EDITOR_createSpansForLineOfText(div, lineStart, lineEnd, trackedSyntax_
                     div.appendChild(span);
                     childIndex++;
 				}
-                let trackedSyntaxEnd = get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length();
+                let trackedSyntaxEnd = EDITOR_pooledTrackedSyntax_start + get_EDITOR_pooledTrackedSyntax_length();
                 let subend = trackedSyntaxEnd > lineEnd ? lineEnd : trackedSyntaxEnd;
                 span.textContent = EDITOR_decoder.decode(EDITOR_textByteList.bytes.subarray(substart, subend));
                 substart += (subend - substart);
@@ -2665,7 +2665,7 @@ function EDITOR_createSpansForLineOfText(div, lineStart, lineEnd, trackedSyntax_
                 }
             }
     
-            if (get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length() <= lineEnd) {
+            if (EDITOR_pooledTrackedSyntax_start + get_EDITOR_pooledTrackedSyntax_length() <= lineEnd) {
                 trackedSyntax_I++;
                 continue;
             }
@@ -2812,16 +2812,16 @@ function EDITOR_drawViewPort_FindTrackedSyntax_StartingIndex(indexLineAaa: numbe
 
         EDITOR_trackedSyntaxList.getElementAt(mid);
         
-        if (get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length() > positionIndex) {
+        if (EDITOR_pooledTrackedSyntax_start + get_EDITOR_pooledTrackedSyntax_length() > positionIndex) {
             indexLineBbb = mid;
 
-            if (get_EDITOR_pooledTrackedSyntax_start() === positionIndex) {
+            if (EDITOR_pooledTrackedSyntax_start === positionIndex) {
                 break;
             }
             
             right = mid - 1;
         }
-        else if (get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length() <= positionIndex) {
+        else if (EDITOR_pooledTrackedSyntax_start + get_EDITOR_pooledTrackedSyntax_length() <= positionIndex) {
             left = mid + 1;
         }
         else {
@@ -6896,10 +6896,10 @@ function EDITOR_lineWasInsertedValidateGutter() {
 function EDITOR_trackedSyntaxList_inefficientUpdateStartAndLength(indexPosition, insertionCount) {
     for (var i = 0; i < EDITOR_trackedSyntaxList.count_abstract; i++) {
         EDITOR_trackedSyntaxList.getElementAt(i);
-        if (indexPosition <= get_EDITOR_pooledTrackedSyntax_start()) {
-            EDITOR_trackedSyntaxList.setStart(i, get_EDITOR_pooledTrackedSyntax_start() + insertionCount);
+        if (indexPosition <= EDITOR_pooledTrackedSyntax_start) {
+            EDITOR_trackedSyntaxList.setStart(i, EDITOR_pooledTrackedSyntax_start + insertionCount);
         }
-        else if (indexPosition > get_EDITOR_pooledTrackedSyntax_start() && indexPosition < get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length()) {
+        else if (indexPosition > EDITOR_pooledTrackedSyntax_start && indexPosition < EDITOR_pooledTrackedSyntax_start + get_EDITOR_pooledTrackedSyntax_length()) {
             EDITOR_trackedSyntaxList.setLength(i, get_EDITOR_pooledTrackedSyntax_length() + insertionCount);
         }
     }
@@ -7473,14 +7473,14 @@ function EDITOR_render_do_RemoveSelection() {
             let possibleTrackedSyntaxToSpanSingleLine = false;
             if (indexTrackedSyntax < EDITOR_trackedSyntaxList.count_abstract) {
                 EDITOR_trackedSyntaxList.getElementAt(indexTrackedSyntax);
-                if (get_EDITOR_pooledTrackedSyntax_start() < EDITOR_lineEndPositionList.data[cursor.indexLine]) {
+                if (EDITOR_pooledTrackedSyntax_start < EDITOR_lineEndPositionList.data[cursor.indexLine]) {
                     possibleTrackedSyntaxToSpanSingleLine = true;
                 }
                 // TODO: This has no reason to be a for loop
                 for (let i = cursor.indexLine - 1; i >= 0; i--) {
                     let lineEndPosition = EDITOR_lineEndPositionList.data[i];
-                    if (get_EDITOR_pooledTrackedSyntax_start() < lineEndPosition &&
-                        get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length() > lineEndPosition) {
+                    if (EDITOR_pooledTrackedSyntax_start < lineEndPosition &&
+                        EDITOR_pooledTrackedSyntax_start + get_EDITOR_pooledTrackedSyntax_length() > lineEndPosition) {
                             possibleTrackedSyntaxToSpanSingleLine = false;
                             break;
                     }
@@ -7504,7 +7504,7 @@ function EDITOR_render_do_RemoveSelection() {
                         let NOTlineEndBelongsToSyntax;
                         if (iVarDependent >= EDITOR_lineEndPositionList.count)
                             NOTlineEndBelongsToSyntax = true;
-                        else if (get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length() <= EDITOR_lineEndPositionList.data[iVarDependent])
+                        else if (EDITOR_pooledTrackedSyntax_start + get_EDITOR_pooledTrackedSyntax_length() <= EDITOR_lineEndPositionList.data[iVarDependent])
                             NOTlineEndBelongsToSyntax = true;
                         
                         if (NOTlineEndBelongsToSyntax) {
@@ -7514,8 +7514,8 @@ function EDITOR_render_do_RemoveSelection() {
                             possibleTrackedSyntaxToSpanSingleLine = false;
                             if (indexTrackedSyntax < EDITOR_trackedSyntaxList.count_abstract) {
                                 EDITOR_trackedSyntaxList.getElementAt(indexTrackedSyntax);
-                                if (get_EDITOR_pooledTrackedSyntax_start() < lineEnding &&
-                                    get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length() > lineEnding) {
+                                if (EDITOR_pooledTrackedSyntax_start < lineEnding &&
+                                    EDITOR_pooledTrackedSyntax_start + get_EDITOR_pooledTrackedSyntax_length() > lineEnding) {
                                         possibleTrackedSyntaxToSpanSingleLine = true;
                                 }
                             }
@@ -7535,7 +7535,7 @@ function EDITOR_render_do_RemoveSelection() {
                 let NOTlineEndBelongsToSyntax;
                 if (iVarDependent >= EDITOR_lineEndPositionList.count)
                     NOTlineEndBelongsToSyntax = true;
-                else if (get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length() <= EDITOR_lineEndPositionList.data[iVarDependent])
+                else if (EDITOR_pooledTrackedSyntax_start + get_EDITOR_pooledTrackedSyntax_length() <= EDITOR_lineEndPositionList.data[iVarDependent])
                     NOTlineEndBelongsToSyntax = true;
                 
                 if (NOTlineEndBelongsToSyntax)
@@ -8168,21 +8168,21 @@ function EDITOR_insertDo(cursor: EDITOR_Cursor, character) {
 }
 
 function EDITOR_stopTrackingIfTrackedSyntaxMadeToSpanSingleLine(cursor: EDITOR_Cursor) {
-    // binary search for 'if (get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length() > positionIndex)'
+    // binary search for 'if (EDITOR_pooledTrackedSyntax_start + get_EDITOR_pooledTrackedSyntax_length() > positionIndex)'
     let indexTrackedSyntax = EDITOR_drawViewPort_FindTrackedSyntax_StartingIndex(cursor.indexLine);
     if (indexTrackedSyntax === NaN || indexTrackedSyntax === -1) {
         indexTrackedSyntax = EDITOR_trackedSyntaxList.count_abstract;
     }
     if (indexTrackedSyntax < EDITOR_trackedSyntaxList.count_abstract) {
         EDITOR_trackedSyntaxList.getElementAt(indexTrackedSyntax);
-        if (get_EDITOR_pooledTrackedSyntax_start() < cursor.editPosition) {
+        if (EDITOR_pooledTrackedSyntax_start < cursor.editPosition) {
             let moreThanOneLineEndPositionIsEncompassed = false;
 
             // TODO: This has no reason to be a for loop
             for (let i = cursor.indexLine - 1; i >= 0; i--) {
                 let lineEndPosition = EDITOR_lineEndPositionList.data[i];
-                if (get_EDITOR_pooledTrackedSyntax_start() < lineEndPosition &&
-                    get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length() > lineEndPosition) {
+                if (EDITOR_pooledTrackedSyntax_start < lineEndPosition &&
+                    EDITOR_pooledTrackedSyntax_start + get_EDITOR_pooledTrackedSyntax_length() > lineEndPosition) {
                         moreThanOneLineEndPositionIsEncompassed = true;
                         break;
                 }
@@ -8195,8 +8195,8 @@ function EDITOR_stopTrackingIfTrackedSyntaxMadeToSpanSingleLine(cursor: EDITOR_C
                 // TODO: This has no reason to be a for loop
                 for (let i = cursor.indexLine + 1; i < EDITOR_lineEndPositionList.count; i++) {
                     let lineEndPosition = EDITOR_lineEndPositionList.data[i];
-                    if (get_EDITOR_pooledTrackedSyntax_start() < lineEndPosition &&
-                        get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length() > lineEndPosition) {
+                    if (EDITOR_pooledTrackedSyntax_start < lineEndPosition &&
+                        EDITOR_pooledTrackedSyntax_start + get_EDITOR_pooledTrackedSyntax_length() > lineEndPosition) {
                             moreThanOneLineEndPositionIsEncompassed = true;
                             break;
                     }
