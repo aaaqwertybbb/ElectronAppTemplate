@@ -1,5 +1,10 @@
 export interface MyAPI {
   setClipboard: (text: string) => Promise<void>;
+  getFilesystemEntryById: (id: number) => Promise<any>;
+  copyClipboardAbsolutePathToDirectory: (directory, menuOptionCut_id) => Promise<any>;
+  newFile: (parentDirectoryAbsolutePath, filename, isDirectory) => Promise<any>;
+  deleteFile: (absolutePath, isDirectory) => Promise<any>;
+  renameFile: (absolutePath, filename, isDirectory) => Promise<any>;
 }
 
 declare global {

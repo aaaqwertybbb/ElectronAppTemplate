@@ -1169,6 +1169,9 @@ async function get_CommandKind_NewFile_Directory_WIDGET_InputText_callback(resul
     if (result.isCancelled) return;
 
     let entry = WIDGET_SHOW_value;
+    if (!entry) {
+        throw new Error();
+    }
 
     if (!WIDGET_target) {
         throw new Error();
