@@ -50,11 +50,8 @@ export type WidgetCallbackArgs = { isCancelled: boolean; value: string | undefin
 //let WIDGET_currentCallback = null;
 let WIDGET_currentCallback: ((arg: WidgetCallbackArgs) => Promise<void>) | null;
 
-
-
-
-let WIDGET_placeholder = null;
-let WIDGET_value = null;
+let WIDGET_placeholder: string | null = null;
+let WIDGET_value: string | any = null;
 
 export let WIDGET_target: any | null = null;
 export function WIDGET_target_SETTER(value: any | null) { WIDGET_target = value; }
@@ -194,7 +191,7 @@ function WIDGET_render_do_Show() {
  * @param {object} target this is stored in the variable 'WIDGET_target'.
  * @param {MENU_Callback} callback this is invoked when the widget is either submitted or cancelled.
  */
-export async function WIDGET_show(widgetKind: WidgetKind, left: number, top: number, placeholder, value, target, callback) {
+export async function WIDGET_show(widgetKind: WidgetKind, left: number, top: number, placeholder: string | null, value: string | any, target: any, callback: ((arg: WidgetCallbackArgs) => Promise<void>) | null) {
 
     WIDGET_ticketId_pending = WIDGET_ticketId_counter++;
     WIDGET_WidgetKind_pending = widgetKind;
@@ -220,13 +217,16 @@ function WIDGET_render_do_Hide() {
     switch (WIDGET_WidgetKind_drawn) {
         case WidgetKind.InputText:
             let input = document.getElementById('WIDGET_inputText');
+            if (!input) {
+                throw new Error();
+            }
             input.removeEventListener('keydown', WIDGET_inputTextOnKeyDown);
             break;
         case WidgetKind.YesCancel:
             let yesButtonElement = document.getElementById('WIDGET_YesCancel_yes');
-            yesButtonElement?.removeEventListener('onclick', WIDGET_YesCancelButtonOnClick_yes);
+            yesButtonElement?.removeEventListener('click', WIDGET_YesCancelButtonOnClick_yes);
             let cancelButtonElement = document.getElementById('WIDGET_YesCancel_cancel');
-            cancelButtonElement?.removeEventListener('onclick', WIDGET_YesCancelButtonOnClick_cancel);
+            cancelButtonElement?.removeEventListener('click', WIDGET_YesCancelButtonOnClick_cancel);
             break;
     }
     WIDGET_WidgetKind_drawn = WidgetKind.None;
@@ -235,7 +235,7 @@ function WIDGET_render_do_Hide() {
         WIDGET_restoreFocusToElement_drawn.focus();
 }
 
-async function WIDGET_state_do_Hide(shouldRestoreFocus) {
+async function WIDGET_state_do_Hide(shouldRestoreFocus: boolean) {
 
     // TODO: This is believed to prevent any funny business where a UI is being shown, asked to be hidden, submitted before the hide rAF. Once this is confirmed to be true (or other...) remove or update this comment accordingly.
     WIDGET_ticketId_pending = WIDGET_ticketId_counter++;
@@ -249,7 +249,7 @@ async function WIDGET_state_do_Hide(shouldRestoreFocus) {
     WIDGET_target_SETTER(null);
 }
 
-async function WIDGET_hide(shouldRestoreFocus) {
+async function WIDGET_hide(shouldRestoreFocus: boolean) {
     await WIDGET_state_do_Hide(shouldRestoreFocus);
     WIDGET_render_request(Widget_RenderKind.Hide);
 }
@@ -265,7 +265,7 @@ async function WIDGET_hide(shouldRestoreFocus) {
  * If anyone desires to in the future change this such that the internal "completion" uses this function, take care because 'WIDGET_ticketId_pending === WIDGET_ticketId_drawn'
  * isn't quite as sensible when dealing with internal "completion" that needs to cancel the previous UI.
  */
-async function WIDGET_completeForm(resultObject) {
+async function WIDGET_completeForm(resultObject: WidgetCallbackArgs) {
     if (WIDGET_currentCallback) {
         if (WIDGET_ticketId_pending !== WIDGET_ticketId_drawn) {
             resultObject.isCancelled = true;
@@ -283,18 +283,25 @@ async function WIDGET_completeForm(resultObject) {
 async function WIDGET_inputTextOnKeyDown(event: KeyboardEvent) {
     if (event.key === 'Enter' || event.key === 'Escape') {
         let isCancelled = event.key === 'Enter' ? false : true;
-        let input = document.getElementById('WIDGET_inputText');
-        await WIDGET_completeForm({isCancelled:isCancelled, value:input.value});
+        let value = undefined;
+        let input = document.getElementById('WIDGET_inputText') as HTMLInputElement;
+        if (!input) {
+            isCancelled = true;
+        }
+        else {
+            value = input.value;
+        }
+        await WIDGET_completeForm({isCancelled:isCancelled, value:value});
         await WIDGET_hide(true);
     }
 }
 
-async function WIDGET_YesCancelButtonOnClick_yes(event) {
+async function WIDGET_YesCancelButtonOnClick_yes(event: MouseEvent) {
     await WIDGET_completeForm({isCancelled: false, value:'Yes'});
     await WIDGET_hide(true);
 }
 
-async function WIDGET_YesCancelButtonOnClick_cancel(event) {
+async function WIDGET_YesCancelButtonOnClick_cancel(event: MouseEvent) {
     await WIDGET_completeForm({isCancelled:true, value:'Cancel'});
     await WIDGET_hide(true);
 }
@@ -302,6 +309,9 @@ async function WIDGET_YesCancelButtonOnClick_cancel(event) {
 function WIDGET_CreateInputText() {
 
     const WIDGET_element = document.getElementById('WIDGET');
+    if (!WIDGET_element) {
+        throw new Error();
+    }
 
     let input = document.createElement('input');
     input.type = "text";
@@ -325,6 +335,9 @@ function WIDGET_CreateInputText() {
 function WIDGET_CreateYesCancel() {
 
     const WIDGET_element = document.getElementById('WIDGET');
+    if (!WIDGET_element) {
+        throw new Error();
+    }
 
     let topDivElement = document.createElement('div');
     if (WIDGET_placeholder || WIDGET_placeholder === '') {
