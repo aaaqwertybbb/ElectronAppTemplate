@@ -9,7 +9,7 @@ export const TrackedSyntaxKind = {
 // Derive the type union from the object values
 export type TrackedSyntaxKind = typeof TrackedSyntaxKind[keyof typeof TrackedSyntaxKind];
 
-class TrackedSyntaxList {
+export class TrackedSyntaxList {
     data_literal;
     capacity_literal;
 
@@ -33,7 +33,7 @@ class TrackedSyntaxList {
      * 
      * If 'sourceUint32Array' is falsey, then a new Uint32Array is made determined by the 'initialCapacity_abstract'.
      */
-    constructor(initialCapacity_abstract: number, sourceUint32Array: Uint32Array) {
+    constructor(initialCapacity_abstract: number, sourceUint32Array: Uint32Array | null) {
         if (sourceUint32Array) {
 
             if (sourceUint32Array.length % this.field_count !== 0) {

@@ -1,4 +1,4 @@
-import { TrackedSyntaxKind } from "./trackedSyntaxTypes";
+import { TrackedSyntaxKind, TrackedSyntaxList } from "./trackedSyntaxTypes";
 
 /*
 ###################################
@@ -59,12 +59,12 @@ And it can introduce oddities involving tabstop or very tiny changes in horizont
 '\0' is a similar problem, it is a special character that might cause odd behavior.
 */
 
-export let EDITOR_trackedSyntaxList = new TrackedSyntaxList(32);
+export let EDITOR_trackedSyntaxList = new TrackedSyntaxList(32, null);
 
 /**
  * @type {UInt32List}
  */
-let EDITOR_findOverlay_searchResultPositionList;
+let EDITOR_findOverlay_searchResultPositionList: UInt32List | null = null;
 
 export let EDITOR_textByteList = new ByteList(1024);
 const EDITOR_encoder = new TextEncoder();
@@ -77,6 +77,22 @@ class EDITOR_Cursor {
      * I'm not sure how large I want this, what matters is that I just have a size of anything for the time being, then can change this constant later.
      */
     static GAP_BUFFER_CAPACITY = 32;
+    indexLine: number;
+    indexColumn: number;
+    STORED_indexColumn: number;
+    cursorTranslateYValue: number;
+    cursorTranslateXValue: number;
+    selectionAnchor: number;
+    selectionEnd: number;
+    DRAWN_selectionAnchor: number;
+    DRAWN_selectionEnd: number;
+    DRAWN_selection_virtualIndexLine: number;
+    DRAWN_selection_virtualCount: number;
+    editKind: any;
+    editLength: number;
+    editPosition: number;
+    editIndexLine: number;
+    editIndexColumn: number;
 
     /**
      * After invoking the constructor you likely would want to add to:
