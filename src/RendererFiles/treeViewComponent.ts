@@ -167,7 +167,7 @@ export abstract class TreeViewComponent implements EventListenerObject {
     start: number;
     length: number;
     onePositiveDiff_twoNegativeDiff_orThreeFullScreen: number;
-    caseThreeOrigin: number;
+    caseThreeOrigin: number | undefined;
     SET_ITEMS_itemHeightNumber: number;
     SET_ITEMS_itemHeightStyleAttributeValueString: string;
     WIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING: number;
