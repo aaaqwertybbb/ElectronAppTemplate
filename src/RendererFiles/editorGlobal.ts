@@ -101,7 +101,7 @@ export type EditKind = typeof EditKind[keyof typeof EditKind];
  * see editorGlobal.js:
  * > const count_of_wellknown_renderKinds = ...;
  *
- * get_RenderKind_Cursor_n is to say
+ * RenderKind.Cursor_n is to say
  * renderKind - (count_of_wellknown_renderKinds - 1) => render the cursor at cursorList[result];
  * ...
  * maybe I'll change this to be the id of the cursor at some point cause I'm not sure if it holds up with cursor movement possibly changing their order in the list.
@@ -126,7 +126,7 @@ export const RenderKind = {
     SyntaxHighlighting: 15,
     /** non-primaryCursors won't scroll into view, */
     Cursor_flag_scrollIntoViewExplicit: 16,
-    /** To have a cursor not scroll into view add request this render immediately after the 'get_RenderKind_Cursor_n'. */
+    /** To have a cursor not scroll into view add request this render immediately after the 'RenderKind.Cursor_n'. */
     Cursor_flag_doNotScrollIntoView: 17,
     /** Add the index of the cursor */
     Cursor_n: 18,
@@ -574,22 +574,22 @@ function EDITOR_render_do(timestamp) {
 
     while (renderKind = EDITOR_renderKindArray.shift()) {
         switch (renderKind) {
-            case get_RenderKind_Scroll():
+            case RenderKind.Scroll:
                 EDITOR_render_do_Scroll(timestamp);
                 break;
-            case get_RenderKind_Resize():
+            case RenderKind.Resize:
                 EDITOR_render_do_Resize(timestamp);
                 break;
-            case get_RenderKind_InsertLtr():
+            case RenderKind.InsertLtr:
                 EDITOR_render_do_InsertLtr();
                 break;
-            case get_RenderKind_TabKey():
+            case RenderKind.TabKey:
                 EDITOR_render_do_TabKey();
                 break;
-            case get_RenderKind_IndentMore():
+            case RenderKind.IndentMore:
                 EDITOR_render_do_IndentMore();
                 break;
-            case get_RenderKind_IndentLess():
+            case RenderKind.IndentLess:
                 EDITOR_render_do_IndentLess();
                 break;
             case get_RenderKind_BackspaceRtl():
@@ -845,7 +845,7 @@ function EDITOR_onScroll_WRAPIT() {
     lastReadNumber_scrollLeft = EDITOR_baseElement.scrollLeft;
     lastReadNumber_scrollTop = EDITOR_baseElement.scrollTop;
 
-    EDITOR_render_request(get_RenderKind_Scroll());
+    EDITOR_render_request(RenderKind.Scroll);
 }
 
 function EDITOR_render_do_Scroll(timestamp) {
@@ -4342,7 +4342,7 @@ function EDITOR_editEvent_theEditIself_InsertLtr(event) {
         EDITOR_render_request(get_RenderKind_Cursor_n() + i);
         //set_EDITOR_offsetColumn(get_EDITOR_offsetColumn() + cursor.editLength);
         //set_EDITOR_totalShift(get_EDITOR_totalShift() + cursor.editLength); // this isn't needed here, but it is needed elsewhere so in order to create a pattern it was included here... TODO: maybe get rid of this or...?
-        EDITOR_render_request(get_RenderKind_InsertLtr());
+        EDITOR_render_request(RenderKind.InsertLtr);
     }
 }
 
@@ -5793,7 +5793,7 @@ function EDITOR_indentMore(cursor) {
     //}
 
     cursor.editLength++;
-    EDITOR_render_request(get_RenderKind_IndentMore());
+    EDITOR_render_request(RenderKind.IndentMore);
 }
 
 function EDITOR_render_do_IndentLess() {
@@ -5969,7 +5969,7 @@ function EDITOR_indentLess(cursor) {
     //}
 
     cursor.editLength++;
-    EDITOR_render_request(get_RenderKind_IndentLess());
+    EDITOR_render_request(RenderKind.IndentLess);
 }
 
 /**
@@ -6668,7 +6668,7 @@ function EDITOR_tabKey(cursor) {
 
     cursor.indexColumn += 4; // this has to come after the 'walkLineUntilIndexColumn' invocation.
 
-    EDITOR_render_request(get_RenderKind_TabKey());
+    EDITOR_render_request(RenderKind.TabKey);
 }
 
 /**
@@ -7163,7 +7163,7 @@ function EDITOR_render_do_Resize(timestamp) {
 }
 
 function EDITOR_onResize() {
-    EDITOR_render_request(get_RenderKind_Resize());
+    EDITOR_render_request(RenderKind.Resize);
 }
 
 // 1. The Entry Point (Replaces WRAPIT)
