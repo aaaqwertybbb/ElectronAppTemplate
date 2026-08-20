@@ -11,9 +11,9 @@ declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 let database: AppDatabase;
 
 /** openedDirectory | openedWorkspace; TODO: consider making single object with bool 'isWorkspace' */
-let openedDirectory = null;
+let openedDirectory: string | null = null;
 /** openedDirectory | openedWorkspace; TODO: consider making single object with bool 'isWorkspace'  */
-let openedWorkspace = null;
+let openedWorkspace: string | null = null;
 let workspaceDirectories = null;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -41,6 +41,7 @@ const createWindow = (): void => {
   // Handle the request from the renderer process
 	ipcMain.handle('choose-directory', chooseDirectory);
 	ipcMain.handle('choose-workspace', chooseWorkspace);
+	ipcMain.handle('get-filesystem-entries', getFilesystemEntries);
 	ipcMain.handle('get-filesystem-entry-by-id-array', getFilesystemEntryById_ARRAY);
 };
 
@@ -71,6 +72,18 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+/**
+ * @param {*} absolutePath 
+ * @returns {boolean} to indicate whether the invoker is permitted to continue execution with the given absolutePath
+ */
+function isValidAbsolutePath(absolutePath: string) {
+    // The provided absolute file path is validated.
+    // If the absolute file path is NOT recognized, then an empty enumeration is returned.
+    if (absolutePath !== openedDirectory && !database.contains(absolutePath)) return false;
+
+	return true;
+}
 
 async function chooseDirectory (event: any) {
 	const result = await dialog.showOpenDialog({ properties: ['openDirectory'] });
@@ -144,6 +157,66 @@ async function chooseWorkspace(event: any) {
 		directories: directories,
 		canceled: result.canceled
 	};
+}
+
+/**
+ * Extracts more data per entry { basename, absolutePath, isDirectory, id }
+ * and applies a common sorting prior to returning results.
+ * */
+function wrap_readdirSync_getChildList(parentAbsolutePath: string) {
+	// TODO: You solved this when you first made the repo look at the git history... using any I think is wrong.
+	let childList: (fs.Dirent<string> | any)[];
+	childList = fs.readdirSync(parentAbsolutePath, { withFileTypes: true });
+	for (var i = 0; i < childList.length; i++) {
+		let filename = childList[i].name;
+		let isDirectory = childList[i].isDirectory();
+		let childAbsolutePath = path.join(parentAbsolutePath, filename);
+		let id = database.addAbsolutePath(childAbsolutePath, filename);
+		childList[i] = {
+			basename: filename,
+			absolutePath: childAbsolutePath,
+			isDirectory: isDirectory,
+			id: id
+		};
+	}
+
+	childList.sort((a, b) => {
+		if (a.isDirectory && !b.isDirectory) {
+			return -1;
+		}
+
+		if (!a.isDirectory && b.isDirectory) {
+			return 1;
+		}
+
+		return a.basename.localeCompare(b.basename);
+	});
+
+	return childList;
+}
+
+async function getFilesystemEntries(event: any, argument: number | string, argumentIsId: boolean) {
+
+	let parentAbsolutePath;
+
+	if (argumentIsId) {
+		let entry = database.getBy_id(argument as number);
+		if (!entry) return;
+
+		parentAbsolutePath = entry.value;
+	}
+	else {
+		parentAbsolutePath = argument as string;
+		if (!isValidAbsolutePath(parentAbsolutePath)) return;
+	}
+
+	try {
+		return wrap_readdirSync_getChildList(parentAbsolutePath);
+	}
+	catch (err) {
+		console.error("Error reading directory:", err);
+		return [];
+	}
 }
 
 async function getFilesystemEntryById_ARRAY(event: any, arrayKeys: number[]) {

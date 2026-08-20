@@ -56,6 +56,14 @@ export type myAPI_chooseWorkspace_result = {
     canceled: boolean
 };
 
+/** TODO: getFilesystemEntries seemingly was completely replace by 'getFilesystemEntries_argumentIsId' but the API still is in preload.ts?  */
+export type myAPI_getFilesystemEntries_entry = {
+    basename: string,
+    absolutePath: string,
+    isDirectory: boolean,
+    id: number,
+};
+
 export type myAPI_getFilesystemEntryById_ARRAY_entry = {
     basename: string,
     absolutePath: string,
