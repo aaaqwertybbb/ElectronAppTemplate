@@ -1,3 +1,6 @@
+import { APP_lineHeight } from "./applicationRendererRoot";
+import { EXPLORER_firstSpanWidthValue } from "./explorerGlobal";
+
 let AUTOCOMPLETE_exists = false;
 
 let AUTOCOMPLETE_pending_lspResult = null;
@@ -7,14 +10,18 @@ let AUTOCOMPLETE_items_slice_start = 0;
 let AUTOCOMPLETE_items_slice_end = 0;
 let AUTOCOMPLETE_items_totalLength = 0;
 
-const get_AUTOCOMPLETErenderKind_None = () => 0;
-const get_AUTOCOMPLETErenderKind_Show = () => 1;
-const get_AUTOCOMPLETErenderKind_Hide = () => 2;
-const get_AUTOCOMPLETErenderKind_CursorSet = () => 3;
-const get_AUTOCOMPLETErenderKind_CreateLines = () => 4;
-const get_AUTOCOMPLETErenderKind_Scroll = () => 5;
+export const Autocomplete_RenderKind = {
+    None: 0,
+    Show: 1,
+    Hide: 2,
+    CursorSet: 3,
+    CreateLines: 4,
+    Scroll: 5,
+} as const;
+// Derive the type union from the object values
+export type Autocomplete_RenderKind = typeof Autocomplete_RenderKind[keyof typeof Autocomplete_RenderKind];
 
-let AUTOCOMPLETE_renderKindArray = [];
+let AUTOCOMPLETE_renderKindArray: Autocomplete_RenderKind[] = [];
 let AUTOCOMPLETE_isRenderPending = false;
 
 let AUTOCOMPLETE_cursorIndex = 0;
@@ -32,7 +39,7 @@ let AUTOCOMPLETE_beltIndexZero = 0;
 
 let AUTOCOMPLETEElement = null;
 let AUTOCOMPLETE_scrollTop = 0;
-let AUTOCOMPLETE_arrayFromItemListElement = null;
+let AUTOCOMPLETE_arrayFromItemListElement: HTMLElement[] | null = null;
 
 let AUTOCOMPLETE_scrollEndDeadline = 0;
 let AUTOCOMPLETE_isCheckingTrailingEdge = false;
@@ -61,19 +68,19 @@ function AUTOCOMPLETE_renderDo(timestamp) {
 
     while (renderKind = AUTOCOMPLETE_renderKindArray.shift()) {
         switch (renderKind) {
-            case get_AUTOCOMPLETErenderKind_Show():
+            case Autocomplete_RenderKind.Show:
                 AUTOCOMPLETE_render_do_show(timestamp);
                 break;
-            case get_AUTOCOMPLETErenderKind_Hide():
+            case Autocomplete_RenderKind.Hide:
                 AUTOCOMPLETE_render_do_hide();
                 break;
-            case get_AUTOCOMPLETErenderKind_CursorSet():
+            case Autocomplete_RenderKind.CursorSet:
                 AUTOCOMPLETE_cursor_render_set();
                 break;
-            case get_AUTOCOMPLETErenderKind_CreateLines():
+            case Autocomplete_RenderKind.CreateLines:
                 AUTOCOMPLETE_render_create_lines();
                 break;
-            case get_AUTOCOMPLETErenderKind_Scroll():
+            case Autocomplete_RenderKind.Scroll:
                 AUTOCOMPLETE_events_scroll_render(timestamp);
                 break;
         }
@@ -267,7 +274,7 @@ function AUTOCOMPLETE_render_do_show(timestamp) {
 
 function AUTOCOMPLETE_show(lspResult) {
     AUTOCOMPLETE_pending_lspResult = lspResult;
-    AUTOCOMPLETE_render_request(get_AUTOCOMPLETErenderKind_Show());
+    AUTOCOMPLETE_render_request(Autocomplete_RenderKind.Show);
 }
 
 function AUTOCOMPLETE_slice(lspResult) {
@@ -335,7 +342,7 @@ function AUTOCOMPLETE_render_do_hide() {
 
 function AUTOCOMPLETE_hide() {
     AUTOCOMPLETE_pending_lspResult = null;
-    AUTOCOMPLETE_render_request(get_AUTOCOMPLETErenderKind_Hide());
+    AUTOCOMPLETE_render_request(Autocomplete_RenderKind.Hide);
 }
 
 function AUTOCOMPLETE_cursor_render_set() {
@@ -369,7 +376,7 @@ function AUTOCOMPLETE_cursor_render_set() {
 
 function AUTOCOMPLETE_cursor_do_set(cursorIndex) {
     AUTOCOMPLETE_cursorIndex = cursorIndex;
-    AUTOCOMPLETE_render_request(get_AUTOCOMPLETErenderKind_CursorSet());
+    AUTOCOMPLETE_render_request(Autocomplete_RenderKind.CursorSet);
 }
 
 function AUTOCOMPLETE_cursor_validate(cursorIndex) {
@@ -420,7 +427,7 @@ function AUTOCOMPLETE_events_scroll_receive(event) {
     // Something is still breaking
     // 
     AUTOCOMPLETE_scrollTop = AUTOCOMPLETEElement.scrollTop;
-    AUTOCOMPLETE_render_request(get_AUTOCOMPLETErenderKind_Scroll());
+    AUTOCOMPLETE_render_request(Autocomplete_RenderKind.Scroll);
 }
 
 function AUTOCOMPLETE_events_scroll_render(timestamp) {
