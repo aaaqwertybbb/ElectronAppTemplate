@@ -218,7 +218,7 @@ let lineHeight = 20;
 
 let didChangeTextDocument_version = 0;
 
-let get_EDITOR_longestLine_indexLine = 0;
+let longestLine_indexLine = 0;
 
 class EDITOR_Cursor {
 
@@ -1364,7 +1364,7 @@ function EDITOR_state_clear() {
     EDITOR_lineEndString = null;
     EDITOR_lineEndPositionList.clear();
     EDITOR_textByteList.clear();
-    set_EDITOR_longestLine_indexLine(0);
+    longestLine_indexLine = 0;
     set_EDITOR_longestLine_length(0);
     
     // Explicitly inlining 'clearMulticursorState()' because it currently is and I just don't want to make a decision about this right now.
@@ -1426,7 +1426,7 @@ function EDITOR_state_setText(text, fileStartsWithBom, textSourceIdentifier, FOR
                 }
                 if (lineLength > get_EDITOR_longestLine_length()) {
                     set_EDITOR_longestLine_length(lineLength);
-                    set_EDITOR_longestLine_indexLine(EDITOR_lineEndPositionList.count);
+                    longestLine_indexLine = EDITOR_lineEndPositionList.count;
                 }
                 lineLength = 0;
                 EDITOR_lineEndPositionList.insert(EDITOR_lineEndPositionList.count, EDITOR_textByteList.count);
@@ -1438,7 +1438,7 @@ function EDITOR_state_setText(text, fileStartsWithBom, textSourceIdentifier, FOR
                 }
                 if (lineLength > get_EDITOR_longestLine_length()) {
                     set_EDITOR_longestLine_length(lineLength);
-                    set_EDITOR_longestLine_indexLine(EDITOR_lineEndPositionList.count);
+                    longestLine_indexLine = EDITOR_lineEndPositionList.count;
                 }
                 lineLength = 0;
                 EDITOR_lineEndPositionList.insert(EDITOR_lineEndPositionList.count, EDITOR_textByteList.count);
@@ -1820,7 +1820,7 @@ function EDITOR_finalizeEdit_InsertLtr(cursor: EDITOR_Cursor, indexLine_editOccu
     } as LspQueue_Entry);
     // -------------------------
 
-    if (indexLine_editOccurredOn === get_EDITOR_longestLine_indexLine()) {
+    if (indexLine_editOccurredOn === longestLine_indexLine) {
         set_EDITOR_longestLine_length(get_EDITOR_longestLine_length() + cursor.editLength);
     }
 
@@ -1851,8 +1851,8 @@ function EDITOR_finalizeEdit_Enter(cursor: EDITOR_Cursor, indexLine_editOccurred
     }
 
     // You need to consider if the longest line gets split
-    if (cursor.editIndexLine <= get_EDITOR_longestLine_indexLine())
-        set_EDITOR_longestLine_indexLine(get_EDITOR_longestLine_indexLine() + 1);
+    if (cursor.editIndexLine <= longestLine_indexLine)
+        longestLine_indexLine = longestLine_indexLine + 1;
 
     EDITOR_lineEndPositionList.insert(cursor.editIndexLine, cursor.editPosition);
 
@@ -2476,7 +2476,7 @@ function EDITOR_finalizeEdit_DeleteLtr_BackspaceRtl_RemoveTextNoBatching(cursor:
     } as LspQueue_Entry);
     // -------------------------
 
-    if (indexLine_editOccurredOn === get_EDITOR_longestLine_indexLine()) {
+    if (indexLine_editOccurredOn === longestLine_indexLine) {
         set_EDITOR_longestLine_length(get_EDITOR_longestLine_length() - cursor.editLength);
     }
 
@@ -2939,7 +2939,7 @@ function EDITOR_drawCursor(cursor: EDITOR_Cursor, NOTscrollCursorIntoView?: bool
         
         text += ' | (' + cursor.editLength + ')';
 
-        text += ' | (' + get_EDITOR_longestLine_indexLine() + ', ' + get_EDITOR_longestLine_length() + ')';
+        text += ' | (' + longestLine_indexLine + ', ' + get_EDITOR_longestLine_length() + ')';
 
         EDITOR_debug.replaceChildren(text);
 
