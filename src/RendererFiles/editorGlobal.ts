@@ -209,6 +209,7 @@ let virtualIndexLine = 0;
 
 let ONSCROLLvirtualCount = 0;
 let ONSCROLLvirtualIndexLine = 0;
+let ONSCROLLscrollTop = 0;
 
 class EDITOR_Cursor {
 
@@ -761,7 +762,7 @@ function EDITOR_render_do_Clear() {
     prevVli = 0;
     currVli = virtualCount;
     // TODO: Duplicated setting of scrolltop; this case and just baseline everytime vertical scrolls it is done in this method elsewhere
-    set_EDITOR_ONSCROLLscrollTop(lastReadNumber_scrollTop);
+    ONSCROLLscrollTop = lastReadNumber_scrollTop;
     EDITOR_render_do_CreateViewport();
 }
 
@@ -786,7 +787,7 @@ function EDITOR_render_do_SetText(timestamp: number) {
 }
 
 /** All DOM manipulation needs to be done through this function. */
-function EDITOR_render_request(renderKind) {
+function EDITOR_render_request(renderKind: RenderKind) {
     if (EDITOR_renderKindArray[EDITOR_renderKindArray.length - 1] !== renderKind) {
         EDITOR_renderKindArray.push(renderKind);
     }
@@ -914,7 +915,7 @@ function EDITOR_onScroll_WRAPIT() {
     EDITOR_render_request(RenderKind.Scroll);
 }
 
-function EDITOR_render_do_Scroll(timestamp) {
+function EDITOR_render_do_Scroll(timestamp: number) {
     // TODO: This floor logic seems very odd. Because given the previous and the current you can determine it without dividing maybe I think?
     virtualIndexLine = (Math.floor(lastReadNumber_scrollTop / get_EDITOR_lineHeight()));
     // ====
@@ -929,7 +930,7 @@ function EDITOR_render_do_Scroll(timestamp) {
         if (EDITOR_onScroll_LeadingEdge(timestamp)) return; // This if statement reads poorly. You return for a reason that isn't gleaned by reading the function name alone.
     }
 
-    set_EDITOR_ONSCROLLscrollTop(lastReadNumber_scrollTop);
+    ONSCROLLscrollTop = lastReadNumber_scrollTop;
 
     if (EDITOR_primaryCursor.editKind !== EditKind.None) {
         EDITOR_finalizeEdit(EDITOR_primaryCursor);
@@ -1058,7 +1059,7 @@ function EDITOR_onScroll_LeadingEdge(timestamp) {
 
     EDITOR_finalizeAllCursors();
 
-    if (get_EDITOR_ONSCROLLscrollTop() === lastReadNumber_scrollTop &&
+    if (ONSCROLLscrollTop === lastReadNumber_scrollTop &&
         prevVli === virtualIndexLine &&
         ONSCROLLvirtualCount === virtualCount) {
             // TODO: this is directly tied to a scroll event on EDITOR_baseElement so handle it from there perhaps?
@@ -1075,7 +1076,7 @@ function EDITOR_onScroll_LeadingEdge(timestamp) {
             currVli = virtualCount;
 
             // TODO: Duplicated setting of scrolltop; this case and just baseline everytime vertical scrolls it is done in this method elsewhere
-            set_EDITOR_ONSCROLLscrollTop(lastReadNumber_scrollTop);
+            ONSCROLLscrollTop = lastReadNumber_scrollTop;
             EDITOR_render_do_CreateViewport();
             return false;
     }
