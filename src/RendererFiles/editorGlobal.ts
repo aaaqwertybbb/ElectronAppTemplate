@@ -1,5 +1,6 @@
 import { TrackedSyntaxKind, TrackedSyntaxList } from "./trackedSyntaxTypes";
 import { ByteList, UInt32List } from './listTypes';
+import { DIALOG_Settings_editorDebugShowAdjacentCharacters } from './dialogGlobal';
 
 /*
 ###################################
@@ -416,8 +417,10 @@ class EDITOR_Cursor {
     }
 }
 
-const EDITOR_debug = document.getElementById('EDITOR_debug');
-const EDITOR_findOverlay = document.getElementById('EDITOR_findOverlay');
+/** TODO: I null forgave this because it should always be there but... */
+const EDITOR_debug = document.getElementById('EDITOR_debug')!;
+/** TODO: I null forgave this because it should always be there but... */
+const EDITOR_findOverlay: HTMLElement = document.getElementById('EDITOR_findOverlay')!;
 EDITOR_findOverlay.style.visibility = 'hidden';
 
 const EDITOR_gutterBackgroundColor = document.getElementById('EDITOR_gutter_background_color');
@@ -2458,7 +2461,7 @@ function EDITOR_finalizeEdit_DeleteLtr_BackspaceRtl_RemoveTextNoBatching(cursor:
     */
 }
 
-function EDITOR_finalizeEdit_ClearEditState(cursor) {
+function EDITOR_finalizeEdit_ClearEditState(cursor: EDITOR_Cursor) {
     cursor.editKind = EditKind.None;
     cursor.editLength = 0;
     cursor.editPosition = 0;
@@ -2674,7 +2677,7 @@ function EDITOR_createSpansForLineOfText(div, lineStart, lineEnd, trackedSyntax_
  * @param {EDITOR_Cursor} cursor
  * @returns
  */
-function walkLineUntilIndexColumn(cursor) {
+function walkLineUntilIndexColumn(cursor: EDITOR_Cursor) {
 
     // TODO: delete key until you delete a linefeed and join the next line onto your own then press backspace everything breaks.
 
@@ -2871,7 +2874,7 @@ function EDITOR_draw_all_cursors() {
  * @param {EDITOR_Cursor} cursor 
  * @param {boolean} NOTscrollCursorIntoView 
  */
-function EDITOR_drawCursor(cursor, NOTscrollCursorIntoView) {
+function EDITOR_drawCursor(cursor: EDITOR_Cursor, NOTscrollCursorIntoView: boolean) {
     cursor.cursorTranslateYValue = (cursor.indexLine + get_EDITOR_offsetLine()) * get_EDITOR_lineHeight();
     cursor.cursorTranslateXValue = (cursor.indexColumn + get_EDITOR_offsetColumn()) * EDITOR_characterWidth;
 
@@ -2907,7 +2910,7 @@ function EDITOR_drawCursor(cursor, NOTscrollCursorIntoView) {
     }
 }
 
-function EDITOR_getLineAndColumnIndices_raw(positionIndex) {
+function EDITOR_getLineAndColumnIndices_raw(positionIndex: number) {
     let left = 0;
     let right = EDITOR_lineEndPositionList.count - 1;
 
@@ -3006,7 +3009,7 @@ function EDITOR_getLineAndColumnIndices(positionIndex: number): LineAndColumnInd
  * 
  * @param {EDITOR_Cursor} cursor 
  */
-function EDITOR_clearSelectionStyle(cursor) {
+function EDITOR_clearSelectionStyle(cursor: EDITOR_Cursor) {
     let shouldExistSelectionDiv = false;
     if (cursor.selectionDivExists) {
         for (var i = 0; i < cached_EDITOR_presentation.children.length; i++) {
@@ -3025,7 +3028,7 @@ function EDITOR_clearSelectionStyle(cursor) {
 /**
  * @param {EDITOR_Cursor} cursor 
  */
-function EDITOR_createStyleForSelection(cursor) {
+function EDITOR_createStyleForSelection(cursor: EDITOR_Cursor) {
     if (cursor.DRAWN_selectionAnchor !== cursor.selectionAnchor ||
         cursor.DRAWN_selectionEnd !== cursor.selectionEnd ||
         cursor.DRAWN_selection_virtualCount !== get_EDITOR_virtualCount() ||
@@ -3162,7 +3165,7 @@ function EDITOR_createStyleForSelection(cursor) {
     }
 }
 
-function EDITOR_createStyleForSelection_indentMore(cursor) {
+function EDITOR_createStyleForSelection_indentMore(cursor: EDITOR_Cursor) {
     let textSelectionDiv;
     if (cursor.selectionDivExists) {
         for (var i = 0; i < cached_EDITOR_presentation.children.length; i++) {
@@ -3682,7 +3685,7 @@ function EDITOR_onMouseMoveDetailRankThree(event, indexLineClicked, indexColumnC
  * @param {EDITOR_Cursor} cursor 
  * @returns 
  */
-function EDITOR_getPositionIndex(cursor) {
+function EDITOR_getPositionIndex(cursor: EDITOR_Cursor) {
     return EDITOR_getLineStart_pos(cursor.indexLine) + cursor.indexColumn;
 }
 
@@ -3694,7 +3697,7 @@ function EDITOR_getPositionIndex_Overload(indexLine, indexColumn) {
  * @param {EDITOR_Cursor} cursor 
  * @returns 
  */
-function EDITOR_getPositionIndex_raw(cursor) {
+function EDITOR_getPositionIndex_raw(cursor: EDITOR_Cursor) {
     return EDITOR_getLineStart_pos_raw(cursor.indexLine) + cursor.indexColumn;
 }
 
@@ -3887,7 +3890,7 @@ function EDITOR_onMouseDownDetailRankThree(event, indexLineClicked, indexColumnC
  * @param {EDITOR_Cursor} cursor 
  * @returns 
  */
-function EDITOR_insertGapBufferSpan(cursor) {
+function EDITOR_insertGapBufferSpan(cursor: EDITOR_Cursor) {
     walkLineUntilIndexColumn(cursor);
     if (w_indexColumn_Goal === -1 || !w_div || w_div.children.length === 0) {
         cursor.gapBufferWriteToSpanElement = null;
@@ -3918,7 +3921,7 @@ function EDITOR_insertGapBufferSpan(cursor) {
  * @param {*} editPosition 
  * @param {*} editLength 
  */
-function EDITOR_startEdit(cursor, editKind, editPosition, editLength) {
+function EDITOR_startEdit(cursor: EDITOR_Cursor, editKind: EditKind, editPosition: number, editLength: number) {
     cursor.editKind = editKind;
     cursor.editPosition = editPosition;
     cursor.editIndexLine = cursor.indexLine;
@@ -3937,7 +3940,7 @@ function EDITOR_startEdit(cursor, editKind, editPosition, editLength) {
  * @param {*} indexCursor 
  * @returns 
  */
-function EDITOR_NOTcanBatch_insert(cursor, indexCursor) {
+function EDITOR_NOTcanBatch_insert(cursor: EDITOR_Cursor, indexCursor: number) {
     return cursor.editKind != EditKind.InsertLtr ||
            cursor.indexLine !== cursor.editIndexLine ||
            cursor.indexColumn !== cursor.editIndexColumn + cursor.editLength ||
@@ -3950,7 +3953,7 @@ function EDITOR_NOTcanBatch_insert(cursor, indexCursor) {
  * @param {*} indexCursor 
  * @returns 
  */
-function EDITOR_NOTcanBatch_enter(cursor, indexCursor) {
+function EDITOR_NOTcanBatch_enter(cursor: EDITOR_Cursor, indexCursor: number) {
     return true || // turn off batching until it works. The initial enter event is what matters everything else can be recreated based on the amount of lineFeeds that were inserted.
            cursor.editKind != EditKind.Enter ||
            cursor.indexLine !== cursor.END_editIndexLine ||
@@ -3964,7 +3967,7 @@ function EDITOR_NOTcanBatch_enter(cursor, indexCursor) {
  * @param {EDITOR_Cursor} cursor 
  * @returns 
  */
-function EDITOR_NOTcanBatch_backspace(cursor) {
+function EDITOR_NOTcanBatch_backspace(cursor: EDITOR_Cursor) {
     return cursor.editKind != EditKind.BackspaceRtl ||
            cursor.indexLine !== cursor.editIndexLine ||
            cursor.indexColumn !== cursor.editIndexColumn ||
@@ -3975,7 +3978,7 @@ function EDITOR_NOTcanBatch_backspace(cursor) {
  * @param {EDITOR_Cursor} cursor 
  * @returns 
  */
-function EDITOR_NOTcanBatch_delete(cursor) {
+function EDITOR_NOTcanBatch_delete(cursor: EDITOR_Cursor) {
     return cursor.editKind != EditKind.DeleteLtr ||
            cursor.indexLine !== cursor.editIndexLine ||
            cursor.indexColumn !== cursor.editIndexColumn ||
@@ -3986,7 +3989,7 @@ function EDITOR_NOTcanBatch_delete(cursor) {
  * @param {EDITOR_Cursor} cursor 
  * @param {*} shiftKey 
  */
-function EDITOR_preKeyboardMovementSelectionLogic(cursor, shiftKey) {
+function EDITOR_preKeyboardMovementSelectionLogic(cursor: EDITOR_Cursor, shiftKey: boolean) {
     if (shiftKey) {
         if (!cursor.hasSelection()) {
             cursor.selectionAnchor = EDITOR_getPositionIndex(cursor);
@@ -4007,7 +4010,7 @@ function EDITOR_preKeyboardMovementSelectionLogic(cursor, shiftKey) {
  * @param {EDITOR_Cursor} cursor 
  * @param {*} shiftKey 
  */
-function EDITOR_postKeyboardMovementSelectionLogic(cursor, shiftKey) {
+function EDITOR_postKeyboardMovementSelectionLogic(cursor: EDITOR_Cursor, shiftKey: boolean) {
     if (shiftKey) {
         cursor.selectionEnd = EDITOR_getPositionIndex(cursor);
         cursor.selectionIndexEndLine = cursor.indexLine;
@@ -4198,7 +4201,7 @@ function EDITOR_cursorIndex_find_closestLessThanOrEqualToExistingCursorIndex(pos
  * @param {EDITOR_Cursor} cursor 
  * @param {*} shiftKey 
  */
-function EDITOR_arrowDown(cursor, shiftKey) {
+function EDITOR_arrowDown(cursor: EDITOR_Cursor, shiftKey: boolean) {
     EDITOR_movementBasedCacheInvalidation(cursor);
     EDITOR_preKeyboardMovementSelectionLogic(cursor, shiftKey);
     if (cursor.indexLine < EDITOR_lineEndPositionList.count - 1) {
@@ -4227,7 +4230,7 @@ function EDITOR_arrowDown(cursor, shiftKey) {
  * 
  * @param {EDITOR_Cursor} cursor 
  */
-function EDITOR_movementBasedCacheInvalidation(cursor) {
+function EDITOR_movementBasedCacheInvalidation(cursor: EDITOR_Cursor) {
     if (cursor.editKind === EditKind.Enter) {
         //
         // this only happens once even if you have many cursors because the next cursor that enters this function would be and editKind of None.
@@ -5744,7 +5747,7 @@ function EDITOR_render_do_IndentMore() {
 /**
  * @param {EDITOR_Cursor} cursor 
  */
-function EDITOR_indentMore(cursor) {
+function EDITOR_indentMore(cursor: EDITOR_Cursor) {
 
     // TODO: You need to move the logic that moves the tracked syntax to the finalize edit.
 
@@ -5966,7 +5969,7 @@ function EDITOR_render_do_IndentLess() {
 /**
  * @param {EDITOR_Cursor} cursor 
  */
-function EDITOR_indentLess(cursor) {
+function EDITOR_indentLess(cursor: EDITOR_Cursor) {
 
     // everything in indentMore / indentLess likely needs to use the '_raw' variants for each function.
     // as for indentLess, it likely HAS to be written correctly.
@@ -6024,7 +6027,7 @@ function EDITOR_indentLess(cursor) {
  * Invoking 'EDITOR_finalizeAllCursors()' is a good idea prior to invoking this. Long term perhaps this won't be so important.
  * @param {*} cursor 
  */
-async function EDITOR_copySelection(cursor) {
+async function EDITOR_copySelection(cursor: EDITOR_Cursor) {
 	if (!cursor.hasSelection()) {
 		// TODO: This code has a bug and doesn't work with multicursor... EDITOR_onMouseDownDetailRankThree needs to accept a cursor rather than acting on EDITOR_primaryCursor
     	EDITOR_onMouseDownDetailRankThree({shiftKey:false}, cursor.indexLine, cursor.indexColumn);
@@ -6048,7 +6051,7 @@ async function EDITOR_copySelection(cursor) {
  * Invoking 'EDITOR_finalizeAllCursors()' is a good idea prior to invoking this. Long term perhaps this won't be so important.
  * @param {EDITOR_Cursor} cursor 
  */
-async function EDITOR_duplicateSelection(cursor) {
+async function EDITOR_duplicateSelection(cursor: EDITOR_Cursor) {
 	if (!cursor.hasSelection()) {
 		// TODO: This code has a bug and doesn't work with multicursor... EDITOR_onMouseDownDetailRankThree needs to accept a cursor rather than acting on EDITOR_primaryCursor...
         // ...these days the todo is somewhat incorrect, it takes cursor now, but you'd need to check whether this causes the selection of two cursors to overlap.
@@ -6454,7 +6457,7 @@ function EDITOR_render_do_DuplicateOrPaste() {
                 linefeedLength = 0;
             }
 
-            function EDITOR_duplicate_and_paste_writeWord(wordLength, cursor, word) {
+            function EDITOR_duplicate_and_paste_writeWord(wordLength, cursor: EDITOR_Cursor, word) {
                 w_span.textContent = 
                     w_span.textContent.slice(0, w_indexColumn_SpanTextContentRelative) +
                     word +
@@ -6471,7 +6474,7 @@ function EDITOR_render_do_DuplicateOrPaste() {
  * @param {EDITOR_Cursor} cursor 
  * @param {*} content 
  */
-function EDITOR_paste(cursor, content) {
+function EDITOR_paste(cursor: EDITOR_Cursor, content: string) {
     let positionIndex = EDITOR_getPositionIndex(cursor);
 
     cursor.editPosition = positionIndex;
@@ -6635,7 +6638,7 @@ function EDITOR_paste(cursor, content) {
 /**
  * @returns {boolean} 'shouldPreserveCssClassWhenSplittingAmongLine'
  */
-function EDITOR_duplicate_and_paste_handleNotHasSeenLinefeed(hasSeenLinefeed, original_indexColumn_SpanTextContentRelative, original_span_textContent_length, indexPosition, cursor) {
+function EDITOR_duplicate_and_paste_handleNotHasSeenLinefeed(hasSeenLinefeed, original_indexColumn_SpanTextContentRelative, original_span_textContent_length, indexPosition, cursor: EDITOR_Cursor) {
     // The only way to invoke this is if you encountered a linefeed for the first time,
     // therefore 'w_span' is the original span and no variable for the original needs to be made.
     // (unless in the future you don't end up using the w_span in some way or etc...)
@@ -6704,7 +6707,7 @@ function EDITOR_render_do_TabKey() {
 /**
  * @param {EDITOR_Cursor} cursor 
  */
-function EDITOR_tabKey(cursor) {
+function EDITOR_tabKey(cursor: EDITOR_Cursor) {
 
     if (cursor.editLength === 0) {
         cursor.editPosition = EDITOR_getPositionIndex(cursor);
@@ -6723,7 +6726,7 @@ function EDITOR_tabKey(cursor) {
  * @param {EDITOR_Cursor} cursor 
  * @returns the COLUMN index that exclusively ends the indentation.
  */
-function EDITOR_findEndExclusiveIndentationIndexColumn(cursor) {
+function EDITOR_findEndExclusiveIndentationIndexColumn(cursor: EDITOR_Cursor) {
     let lastValidIndexColumn = EDITOR_getLastValidIndexColumn(cursor.indexLine);
     let line = EDITOR_getLineBoundaryPositions(cursor.indexLine);
 
@@ -6750,7 +6753,7 @@ function EDITOR_findEndExclusiveIndentationIndexColumn(cursor) {
  * @param {EDITOR_Cursor} cursor 
  * @returns 
  */
-function EDITOR_cacheIndentation(cursor) {
+function EDITOR_cacheIndentation(cursor: EDITOR_Cursor) {
     cursor.enterKey_newLinePlusIndentation_byteList = new ByteList(32);
     cursor.enterKey_newLinePlusIndentation_byteList.insert(cursor.enterKey_newLinePlusIndentation_byteList.count, 10 /* LINE_FEED '\n' */);
     let indentationBuilder = [];
@@ -7064,7 +7067,7 @@ function EDITOR_render_do_EnterKey() {
  * - "end of line":
  * - "among a line":
  */
-function EDITOR_EnterKey(cursor, ctrlKey, shiftKey) {
+function EDITOR_EnterKey(cursor: EDITOR_Cursor, ctrlKey, shiftKey) {
     if (!cursor.enterKey_newLinePlusIndentation_byteList)
         EDITOR_cacheIndentation(cursor);
 
@@ -7339,7 +7342,7 @@ And then I got response of
  * @param {EDITOR_Cursor} cursor 
  * @returns 
  */
-function EDITOR_removeSelection(cursor) {
+function EDITOR_removeSelection(cursor: EDITOR_Cursor) {
     if (cursor.editKind != EditKind.None) {
         // TODO: multicursor confusion scenario is likely to happy due to this code, but the code isn't related enough for me to change it yet.
         EDITOR_finalizeEdit(cursor);
@@ -7808,7 +7811,7 @@ function EDITOR_render_do_Delete() {
 }
 
 /** @param {EDITOR_Cursor} cursor  */
-function EDITOR_state_do_Delete(cursor, event) {
+function EDITOR_state_do_Delete(cursor: EDITOR_Cursor, event) {
     if (cursor.hasSelection()) {
         EDITOR_removeSelection(cursor);
         return;
@@ -7898,7 +7901,7 @@ function EDITOR_state_do_Delete(cursor, event) {
  * @param {*} event 
  * @returns 
  */
-function EDITOR_deleteDo(cursor, event) {
+function EDITOR_deleteDo(cursor: EDITOR_Cursor, event) {
     EDITOR_state_do_Delete(cursor, event);
 }
 
@@ -8001,7 +8004,7 @@ function EDITOR_render_do_Backspace() {
     }
 }
 
-function EDITOR_state_do_Backspace(cursor, event) {
+function EDITOR_state_do_Backspace(cursor: EDITOR_Cursor, event) {
     if (cursor.hasSelection()) {
         EDITOR_removeSelection(cursor);
         return;
@@ -8065,7 +8068,7 @@ function EDITOR_state_do_Backspace(cursor, event) {
  * @param {*} event 
  * @returns 
  */
-function EDITOR_backspaceDo(cursor, event) {
+function EDITOR_backspaceDo(cursor: EDITOR_Cursor, event) {
     EDITOR_state_do_Backspace(cursor, event);
 
     // EDITOR_render_request(RenderKind.BackspaceRtl);
@@ -8081,7 +8084,7 @@ function EDITOR_backspaceDo(cursor, event) {
  * @param {EDITOR_Cursor} cursor 
  * @param {string} character 
  */
-function EDITOR_insertDo(cursor, character) {
+function EDITOR_insertDo(cursor: EDITOR_Cursor, character) {
     /*
     TODO: (optimization idea) if you are inserting at the 0th or length position it might be worthwhile
     to have a conditional branch make the textContent with 1 less slice invocation.
@@ -8112,7 +8115,7 @@ function EDITOR_insertDo(cursor, character) {
     set_EDITOR_offsetWithinSpan(get_EDITOR_offsetWithinSpan() + cursor.gapBufferCount);
 }
 
-function EDITOR_stopTrackingIfTrackedSyntaxMadeToSpanSingleLine(cursor) {
+function EDITOR_stopTrackingIfTrackedSyntaxMadeToSpanSingleLine(cursor: EDITOR_Cursor) {
     // binary search for 'if (get_EDITOR_pooledTrackedSyntax_start() + get_EDITOR_pooledTrackedSyntax_length() > positionIndex)'
     let indexTrackedSyntax = EDITOR_drawViewPort_FindTrackedSyntax_StartingIndex(cursor.indexLine);
     if (indexTrackedSyntax === NaN || indexTrackedSyntax === -1) {
@@ -8161,7 +8164,7 @@ function EDITOR_stopTrackingIfTrackedSyntaxMadeToSpanSingleLine(cursor) {
 /**
  * @param {EDITOR_Cursor} cursor 
  */
-function EDITOR_scrollCursorIntoView(cursor) {
+function EDITOR_scrollCursorIntoView(cursor: EDITOR_Cursor) {
     let scrollX = 0;
     let scrollY = 0;
 

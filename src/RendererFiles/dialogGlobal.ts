@@ -54,7 +54,7 @@ let DIALOG_FindAll_options_matchWord = false;
 
 export let DIALOG_Settings_isDark = true;
 let DIALOG_Settings_trueTabs_falseSpaces = true;
-let DIALOG_Settings_editorDebugShowAdjacentCharacters = false;
+export let DIALOG_Settings_editorDebugShowAdjacentCharacters = false;
 
 let DIALOG_renderKindArray: number[] = [];
 let DIALOG_isRenderPending = false;
