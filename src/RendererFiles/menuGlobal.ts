@@ -1,28 +1,31 @@
 import { APP_lineHeight } from './applicationRendererRoot'
-//import { EXPLORER_MenuOnClick } from './explorerGlobal'
-//import { EDITOR_MenuOnClick } from './editorGlobal'
+import { EXPLORER_MenuOnClick, EXPLORER_pickFolderOrWorkspaceButton_MenuOnClick } from './explorerGlobal'
 
-const get_CommandKind_None = () => 0;
-const get_CommandKind_Submenu = () => 1;
-const get_CommandKind_Copy = () => 2;
-const get_CommandKind_CopyAbsolutePath = () => 3;
-const get_CommandKind_Cut = () => 4;
-const get_CommandKind_Paste = () => 5;
-const get_CommandKind_NewFile_Directory = () => 6;
-const get_CommandKind_NewFile_File = () => 7;
-const get_CommandKind_DeleteFile_Directory = () => 8;
-const get_CommandKind_DeleteFile_File = () => 9;
-const get_CommandKind_RenameFile_Directory = () => 10;
-const get_CommandKind_RenameFile_File = () => 11;
-const get_CommandKind_Find = () => 12;
-const get_CommandKind_SelectFolder = () => 13;
-const get_CommandKind_SelectWorkspace = () => 14;
+export const Menu_CommandKind = {
+    None: 0,
+    Submenu: 1,
+    Copy: 2,
+    CopyAbsolutePath: 3,
+    Cut: 4,
+    Paste: 5,
+    NewFile_Directory: 6,
+    NewFile_File: 7,
+    DeleteFile_Directory: 8,
+    DeleteFile_File: 9,
+    RenameFile_Directory: 10,
+    RenameFile_File: 11,
+    Find: 12,
+    SelectFolder: 13,
+    SelectWorkspace: 14,
+} as const;
+// Derive the type union from the object values
+export type Menu_CommandKind = typeof Menu_CommandKind[keyof typeof Menu_CommandKind];
 
 /**
  * This needs to wrap the list.js?
  */
-class MenuOption {
-    commandKind = get_CommandKind_None();
+export class MenuOption {
+    commandKind: Menu_CommandKind = Menu_CommandKind.None;
     text = '';
     /**
      * If submenu is not null, the commandKind will be overriden to be get_CommandKind_Submenu()
@@ -35,7 +38,7 @@ class MenuOption {
      * @param {string} text 
      * @param {MenuOption[]} submenu If submenu is not null, the commandKind will be overriden to be get_CommandKind_Submenu()
      */
-    constructor(commandKind: number, text: string, submenu: MenuOption[]) {
+    constructor(commandKind: Menu_CommandKind, text: string, submenu: MenuOption[] | null) {
         this.commandKind = commandKind;
         this.text = text;
         if (submenu) {
@@ -63,9 +66,9 @@ let MENU_ticketId_pending = 0;
 let MENU_ticketId_drawn = 0;
 
 let MENU_context: string | null = null;
-let MENU_target: any | null = null;
+export let MENU_target: any | null = null;
 
-let MENU_restoreFocusToElement: HTMLElement | null = null;
+export let MENU_restoreFocusToElement: HTMLElement | null = null;
 
 ////////
 ////////
@@ -79,7 +82,8 @@ let MENU_cursorIndex = 0;
 /** By duplicating this you guarantee the initial cursor index is what was expected. */
 let MENU_SET_index = 0;
 
-let MENU_HIDE_shouldRestoreFocus = true;
+export let MENU_HIDE_shouldRestoreFocus = true;
+export function MENU_HIDE_shouldRestoreFocus_SETTER(value: boolean): void { MENU_HIDE_shouldRestoreFocus = value; }
 
 let MENU_left = 0;
 let MENU_top = 0;
@@ -226,7 +230,7 @@ function MENU_render_do_Set() {
             optionElement.textContent = entry.text;
 
             if (entry.submenu) {
-                optionElement.setAttribute("data-command-kind", `${get_CommandKind_Submenu()}`);
+                optionElement.setAttribute("data-command-kind", `${Menu_CommandKind.Submenu}`);
                 optionElement.textContent += '>';
             }
             else {
@@ -301,7 +305,7 @@ function MENU_render_do_Set() {
     }
 }
 
-async function menuSet(context: string, target: any, optionList: MenuOption[], left: number, top: number, NOTshouldFocus: boolean, index: number | undefined | null, onHideAction: (() => Promise<void>) | null) {
+export async function menuSet(context: string, target: any, optionList: MenuOption[], left: number, top: number, NOTshouldFocus: boolean | undefined, index: number | undefined | null, onHideAction: (() => Promise<void>) | null) {
     MENU_ticketId_pending = MENU_ticketId_counter++;
     
     // TODO: These 'if (MENU_optionList)' and 'if (MENU_ArrayFrom_menuOptionList_children)' won't work because for some reason you decided that a menu could be "empty", thus these could be null and no longer would indicate that whether only the state function ran or both the state function and the render function ran or etc...
@@ -325,7 +329,9 @@ async function menuSet(context: string, target: any, optionList: MenuOption[], l
 
     MENU_optionList = optionList;
 
-    MENU_NOTshouldFocus = NOTshouldFocus;
+    if (typeof NOTshouldFocus === 'boolean') {
+        MENU_NOTshouldFocus = NOTshouldFocus;
+    }
 
     MENU_recentBoundingClientRectTop_EXISTS = false;
 

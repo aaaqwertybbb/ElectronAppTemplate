@@ -1,3 +1,4 @@
+import { EXPLORER_firstSpanWidth, EXPLORER_firstSpanWidthValue } from './explorerGlobal';
 
 /** File contains more than one class (noted only because it doesn't feel obvious that there would be more than one class, this note doesn't exist in every file) */
 
@@ -106,7 +107,7 @@
 // way too much to do right now I'm not dealing with this until later (and even then only maybe)
 
 
-const TreeView_RenderKind = {
+export const TreeView_RenderKind = {
     None: 0,
     Cursor: 1,
     Create: 2,
@@ -118,7 +119,7 @@ const TreeView_RenderKind = {
     Resize: 8,
 } as const;
 // Derive the type union from the object values
-type TreeView_RenderKind = typeof TreeView_RenderKind[keyof typeof TreeView_RenderKind];
+export type TreeView_RenderKind = typeof TreeView_RenderKind[keyof typeof TreeView_RenderKind];
 
 
 export const TreeView_NodeKind = {
@@ -174,6 +175,7 @@ export abstract class TreeViewComponent implements EventListenerObject {
     itemHeightNumber: number = 0;
     itemHeightStyleAttributeValueString: string = '0px';
     boundingClientRect_height: number = 0;
+    boundingClientRect_left: number = 0;
     boundingClientRect_top: number = 0;
     boundingClientRect_measurementsAreValid: boolean = false;
     virtualCount: number = 0;
@@ -783,6 +785,7 @@ export abstract class TreeViewComponent implements EventListenerObject {
         if (!this.boundingClientRect_measurementsAreValid) {
             let rect = this.rootElement.getBoundingClientRect();;
             this.boundingClientRect_height = rect.height;
+            this.boundingClientRect_left = rect.left;
             this.boundingClientRect_top = rect.top;
             this.boundingClientRect_measurementsAreValid = true;
             this.virtualCount = Math.ceil(this.rootElement.offsetHeight / this.itemHeightNumber);

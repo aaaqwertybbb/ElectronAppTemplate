@@ -1,4 +1,7 @@
-import { TreeViewComponent, TreeViewNodeList, TreeView_NodeKind, TreeView_pooledNode_key, TreeView_pooledNode_depth, TreeView_pooledNode_nodeKind } from './treeViewComponent';
+import { APP_lineHeight } from './applicationRendererRoot';
+import { TreeViewComponent, TreeViewNodeList, TreeView_NodeKind, TreeView_pooledNode_key, TreeView_pooledNode_depth, TreeView_pooledNode_nodeKind, TreeView_RenderKind } from './treeViewComponent';
+import { MenuOption, Menu_CommandKind, menuSet, MENU_target, MENU_HIDE_shouldRestoreFocus_SETTER, MENU_restoreFocusToElement } from './menuGlobal';
+//import { WIDGET_SHOW_value, WIDGET_target } from './widgetGlobal';
 
 /**
  * Need to track the largest width line that comes into view,
@@ -38,14 +41,14 @@ class EXPLORER_TreeViewComponent extends TreeViewComponent {
     scrollFetchData_virtualIndex: number;
     scrollFetchData_virtualCount: number;
     scrollFetchData_beltIndexZero: number;
-    pullData_result: Uint32Array<ArrayBuffer>;
+    pullData_result: Uint32Array<ArrayBuffer> | null;
     pullData_result_count: number;
-    arrayEntries: null;
+    arrayEntries: any[] | null;
     KEY_BITS: number;
     KEY_MASK: number;
     chosenDirectoryAbsolutePathId: number = 0;
     chosenWorkspace: any;
-    isCheckingTrailingEdge: boolean;
+    isCheckingTrailingEdge: boolean = false;
 
     constructor() {
         super();
@@ -189,9 +192,9 @@ class EXPLORER_TreeViewComponent extends TreeViewComponent {
             if (indexItem >= totalCount) {
                 if (divItem.lastChild instanceof Text) {
                     // TODO: Will the user agent remove a text node that has an "empty" nodeValue?
-                    (divItem.lastChild as Text).nodeValue = '~';
-                    // title property does not exist on Node or Text
-                    //(divItem.lastChild as Node).title = '';
+                    divItem.lastChild.nodeValue = '~';
+                    // TODO: Property 'title' does not exist on type 'Text'.
+                    //divItem.lastChild.title = '';
                 }
             }
             else {
@@ -209,11 +212,11 @@ class EXPLORER_TreeViewComponent extends TreeViewComponent {
                 // Whether this extra code compiles to JS overhead or not
                 // I'm gonna mix javascript and typescript when I'm done getting this to build.
                 if (divItem.lastChild instanceof Text) {
-
+                    divItem.lastChild.nodeValue = '...';//entry.basename;
+                    // TODO: Property 'title' does not exist on type 'Text'.
+                    //divItem.lastChild.title = '...';//entry.absolutePath;
                 }
-                let textNode = divItem.lastChild;
-                textNode.nodeValue = '...';//entry.basename;
-                textNode.title = '...';//entry.absolutePath;
+                
                 divItem.className = 'eN';
 
                 if (false /*isDirectory*/ /*&& !entry.isDirectory*/) {
@@ -377,6 +380,14 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
     };
 
     tvd_drawItem_BATCH_PullDataDrawResult () {
+
+        if (!this.arrayEntries) {
+            throw new Error('if (!this.arrayEntries)');
+        }
+        if (!this.pullData_result) {
+            throw new Error('if (!this.pullData_result)');
+        }
+
         if (this.scrollFetchData_virtualIndex === this._ONSCROLLvirtualIndex &&
            this.scrollFetchData_virtualCount === this._ONSCROLLvirtualCount &&
            this.scrollFetchData_beltIndexZero === this.beltIndexZero) {
@@ -396,10 +407,13 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
 
                 let nodeElement = itemListElement_children[beltIndexItem];
                 nodeElement.className = '';
-                let textNode = nodeElement.lastChild;
                 let entry = this.arrayEntries[i];
-                textNode.nodeValue = entry.basename;
-                textNode.title = entry.absolutePath;
+
+                if (nodeElement.lastChild instanceof Text) {
+                    nodeElement.lastChild.nodeValue = entry.basename;
+                    // TODO: Property 'title' does not exist on type 'Text'.
+                    //nodeElement.lastChild.title = entry.absolutePath;
+                }
 
                 // TODO: Reduce drawn width under some circumstance too
                 if (entry.basename.length > NEXT_WIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING) {
@@ -431,7 +445,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
     /**
      * Not every key invokes this. 
      */
-    async tvd_onkeydown_async(divItem, indexItem, eventKey) {
+    override async onkeydown_async(divItem: HTMLElement, indexItem: number, eventKey: string) {
         switch (eventKey) {
             case ' ':
             case 'Enter':
@@ -459,7 +473,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
         }
     }
     
-    async tvd_ondblclick_async(divItem, indexItem) {
+    override async ondblclick_async(divItem: HTMLElement, indexItem: number) {
         this.nodeList.getElementAt(indexItem);
         let key = TreeView_pooledNode_key;
         let depth = TreeView_pooledNode_depth;
@@ -476,14 +490,13 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
         }
     }
     
-    async tvd_oncontextmenu_async(divItem, indexItem, event, relativeIndex) {
+    override async oncontextmenu_async(divItem: HTMLElement, indexItem: number, event: MouseEvent, relativeIndex: number) {
         let optionList = [
-            new MenuOption(get_CommandKind_Copy(), 'Copy', null),
-            new MenuOption(get_CommandKind_CopyAbsolutePath(), 'Copy Absolute Path', null),
+            new MenuOption(Menu_CommandKind.Copy, 'Copy', null),
+            new MenuOption(Menu_CommandKind.CopyAbsolutePath, 'Copy Absolute Path', null),
         ];
 
         this.ensure_boundingClientRect();
-        let nodeListBoundingClientRect = this.boundingClientRect;
 
         // TODO: !!!! You might need to be careful with async and the TreeView_pooledNode; I'm not certain whether you do or don't have to be careful, and I don't feel like looking into it at the moment.
         this.nodeList.getElementAt(indexItem);
@@ -501,10 +514,10 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
 
         if (event.button === 2) {
             this.addSpecificMenuOptionsForTarget(optionList, divItem, target);
-            await menuSet('EXPLORER', target, optionList, menuOptionX=event.clientX, menuOptionY=event.clientY);
+            await menuSet('EXPLORER', target, optionList, menuOptionX=event.clientX, menuOptionY=event.clientY, undefined, undefined, null);
         } else {
             this.addSpecificMenuOptionsForTarget(optionList, divItem, target);
-            await menuSet('EXPLORER', target, optionList, menuOptionX=nodeListBoundingClientRect.left, menuOptionY=(nodeListBoundingClientRect.top + ((this.cursorIndex + 1) * this.itemHeightNumber) - this.rootElement.scrollTop));
+            await menuSet('EXPLORER', target, optionList, menuOptionX=this.boundingClientRect_left, menuOptionY=(this.boundingClientRect_top + ((this.cursorIndex + 1) * this.itemHeightNumber) - this.rootElement.scrollTop), undefined, undefined, null);
         }
     }
 
@@ -514,7 +527,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
      * ...thus, you should consider checking the x position of the event against the x position of the nodeElement.children[0].
      * @param {*} event 
      */
-    async tvd_expandCollapseIconWasClicked_async(divItem, indexItem) {
+    override async expandCollapseIconWasClicked_async(divItem: HTMLElement, indexItem: number) {
         // TODO: !!!! You might need to be careful with async and the TreeView_pooledNode; I'm not certain whether you do or don't have to be careful, and I don't feel like looking into it at the moment.
         this.nodeList.getElementAt(indexItem);
         let key = TreeView_pooledNode_key;
@@ -569,7 +582,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
         }
     }
     
-    async tvd_arrowRight_async(divItem, indexItem) {
+    override async arrowRight_async(divItem: HTMLElement, indexItem: number) {
     	// TODO: !!!! You might need to be careful with async and the TreeView_pooledNode; I'm not certain whether you do or don't have to be careful, and I don't feel like looking into it at the moment.
         this.nodeList.getElementAt(indexItem);
         let key = TreeView_pooledNode_key;
@@ -585,11 +598,11 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
             }
     	}
     	else if (nodeKind === TreeView_NodeKind.isExpandable_NOTisExpanded) {
-    		return this.tvd_expandCollapseIconWasClicked_async(divItem, indexItem);
+    		return this.expandCollapseIconWasClicked_async(divItem, indexItem);
     	}
 	}
     
-    async tvd_arrowLeft_async(divItem, indexItem) {
+    override async arrowLeft_async(divItem: HTMLElement, indexItem: number) {
     	// TODO: !!!! You might need to be careful with async and the TreeView_pooledNode; I'm not certain whether you do or don't have to be careful, and I don't feel like looking into it at the moment.
         this.nodeList.getElementAt(indexItem);
         let key = TreeView_pooledNode_key;
@@ -597,7 +610,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
         let nodeKind = TreeView_pooledNode_nodeKind;
         
         if (nodeKind === TreeView_NodeKind.isExpandable_isExpanded) {
-        	return this.tvd_expandCollapseIconWasClicked_async(divItem, indexItem);
+        	return this.expandCollapseIconWasClicked_async(divItem, indexItem);
         }
         else {
         	let distanceToParent = 0;
@@ -631,7 +644,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
      * @param {*} indexItem 
      * @returns 
      */
-    async removeFromNodeList_async(indexItem) {
+    async removeFromNodeList_async(indexItem: number) {
         this.nodeList.getElementAt(indexItem);
         let key = TreeView_pooledNode_key;
         let depth = TreeView_pooledNode_depth;
@@ -663,11 +676,11 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
     }
 
     /** TODO: any usage of this needs to respect the actual zeroth UI div not the literal. */
-    async setNodeListEntryId_async(indexItem, pathId) {
+    async setNodeListEntryId_async(indexItem: number, pathId: number) {
         this.nodeList.setKey(indexItem, pathId);
     }
 
-    addSpecificMenuOptionsForTarget(optionList, divItem, target) {
+    addSpecificMenuOptionsForTarget(optionList: MenuOption[], divItem: HTMLElement, target: any) {
         if (!divItem) return;
 
         // check the "text icon": { '-', '+', '' }
@@ -675,18 +688,18 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
             target.nodeKind === TreeView_NodeKind.isExpandable_NOTisExpanded) {
             
             // Directory
-            optionList.push(new MenuOption(get_CommandKind_NewFile_File(), 'NewFile', null));
-            optionList.push(new MenuOption(get_CommandKind_NewFile_Directory(), 'NewDirectory', null));
-            optionList.push(new MenuOption(get_CommandKind_DeleteFile_Directory(), 'Delete', null));
-            optionList.push(new MenuOption(get_CommandKind_RenameFile_Directory(), 'Rename', null));
-            optionList.push(new MenuOption(get_CommandKind_Paste(), 'Paste', null));
-            optionList.push(new MenuOption(get_CommandKind_Cut(), 'Cut', null));
+            optionList.push(new MenuOption(Menu_CommandKind.NewFile_File, 'NewFile', null));
+            optionList.push(new MenuOption(Menu_CommandKind.NewFile_Directory, 'NewDirectory', null));
+            optionList.push(new MenuOption(Menu_CommandKind.DeleteFile_Directory, 'Delete', null));
+            optionList.push(new MenuOption(Menu_CommandKind.RenameFile_Directory, 'Rename', null));
+            optionList.push(new MenuOption(Menu_CommandKind.Paste, 'Paste', null));
+            optionList.push(new MenuOption(Menu_CommandKind.Cut, 'Cut', null));
         }
         else {
             // File
-            optionList.push(new MenuOption(get_CommandKind_DeleteFile_File(), 'Delete', null));
-            optionList.push(new MenuOption(get_CommandKind_RenameFile_File(), 'Rename', null));
-            optionList.push(new MenuOption(get_CommandKind_Cut(), 'Cut', null));
+            optionList.push(new MenuOption(Menu_CommandKind.DeleteFile_File, 'Delete', null));
+            optionList.push(new MenuOption(Menu_CommandKind.RenameFile_File, 'Rename', null));
+            optionList.push(new MenuOption(Menu_CommandKind.Cut, 'Cut', null));
         }
     }
 }
@@ -701,16 +714,16 @@ const EXPLORER_offsetPerDepth = 8;
 let EXPLORER_show = true;
 
 /** 8 */
-let EXPLORER_firstSpanWidthValue = 8;
+export let EXPLORER_firstSpanWidthValue = 8;
 /** 8px */
-let EXPLORER_firstSpanWidth = '8px';
+export let EXPLORER_firstSpanWidth = '8px';
 
 let menuOptionX = 0;
 let menuOptionY = 0;
 
-let EXPLORER_menuOptionCut_object = null;
+let EXPLORER_menuOptionCut_object: any = null;
 
-let EXPLORER_director = new EXPLORER_TreeViewDirector();
+let EXPLORER_director = new EXPLORER_TreeViewComponent();
 
 function EXPLORER_init() {
     const EXPLORER_pickFolderOrWorkspaceButton = document.getElementById('EXPLORER_folderOrWorkspaceButtons');
@@ -718,7 +731,10 @@ function EXPLORER_init() {
 
     EXPLORER_pickFolderOrWorkspaceButton.addEventListener('click', EXPLORER_pickFolderOrWorkspaceButton_onClick);
     
-    let toggleShowExplorerButton = document.getElementById('HEADER_toggleShowExplorer');
+    let toggleShowExplorerButton = document.getElementById('HEADER_toggleShowExplorer') as HTMLInputElement;
+    if (!toggleShowExplorerButton) {
+        throw new Error();
+    }
     toggleShowExplorerButton.checked = EXPLORER_show;
     toggleShowExplorerButton.addEventListener('click', toggleShowExplorerButton_onClick);
 }
@@ -726,7 +742,7 @@ function EXPLORER_init() {
 function toggleShowExplorerButton_onClick() {
     // TODO: Will shadowing 'toggleShowExplorerButton' with a declaration of the same name in here cause any oddities in relation to app long garbage collection overhead....
     // ...presumably the answer is 99.999% no but I can't bear to deal with this right now, thus the variable name 'avoidClosureCausingAppLongLivingVariable_toggleShowExplorerButton'.
-    let avoidClosureCausingAppLongLivingVariable_toggleShowExplorerButton = document.getElementById('HEADER_toggleShowExplorer');
+    let avoidClosureCausingAppLongLivingVariable_toggleShowExplorerButton = document.getElementById('HEADER_toggleShowExplorer') as HTMLInputElement;
     if (avoidClosureCausingAppLongLivingVariable_toggleShowExplorerButton) {
         EXPLORER_setShow(avoidClosureCausingAppLongLivingVariable_toggleShowExplorerButton.checked);
     }
@@ -734,9 +750,12 @@ function toggleShowExplorerButton_onClick() {
 
 async function EXPLORER_pickFolderOrWorkspaceButton_onClick() {
     const EXPLORER_pickFolderOrWorkspaceButton = document.getElementById('EXPLORER_folderOrWorkspaceButtons');
+    if (!EXPLORER_pickFolderOrWorkspaceButton) {
+        throw new Error();
+    }
     let optionList = [
-        new MenuOption(get_CommandKind_SelectFolder(), 'Folder', null),
-        new MenuOption(get_CommandKind_SelectWorkspace(), 'Workspace', null),
+        new MenuOption(Menu_CommandKind.SelectFolder, 'Folder', null),
+        new MenuOption(Menu_CommandKind.SelectWorkspace, 'Workspace', null),
     ];
     let boundingClientRect = EXPLORER_pickFolderOrWorkspaceButton.getBoundingClientRect();
     await menuSet(/*context*/ 'EXPLORER_pickFolderOrWorkspaceButton', /*target*/ null, optionList, /*left*/ boundingClientRect.left, /*top*/ boundingClientRect.top + boundingClientRect.height, /*NOTshouldFocus*/ false, /*index*/ 0, /*onHideAction*/ null);
@@ -751,62 +770,77 @@ That being said, the explorer in this app IS integral, so I'll go down this rout
 
 ...more details involved but I'm thinking and deciding.
 */
-function EXPLORER_setShow(shouldShow) {
+function EXPLORER_setShow(shouldShow: boolean) {
     const EXPLORER_Element = document.getElementById('EXPLORER');
     if (!EXPLORER_Element) return;
 
 	if (shouldShow && !EXPLORER_show) {
 		let editorHackElement = document.getElementById('EDITOR_hack');
+        if (!editorHackElement) {
+            throw new Error();
+        }
 		EXPLORER_Element.style.width = '200px';
 		EXPLORER_Element.style.visibility = '';
 		editorHackElement.style.width = 'calc(100% - 200px)';
 		EXPLORER_show = shouldShow;
-		let toggleShowExplorerButton = document.getElementById('HEADER_toggleShowExplorer');
+		let toggleShowExplorerButton = document.getElementById('HEADER_toggleShowExplorer') as HTMLInputElement;
+        if (!toggleShowExplorerButton) {
+            throw new Error();
+        }
 		toggleShowExplorerButton.checked = EXPLORER_show;
-		EDITOR_onResize();
+		//EDITOR_onResize();
 	}
 	else if (!shouldShow && EXPLORER_show) {
 		// !show is redundant, but exists for readability.
 		let editorHackElement = document.getElementById('EDITOR_hack');
+        if (!editorHackElement) {
+            throw new Error();
+        }
 		EXPLORER_Element.style.width = '0px';
 		EXPLORER_Element.style.visibility = 'hidden';
 		editorHackElement.style.width = '100%';
 		EXPLORER_show = shouldShow;
-		let toggleShowExplorerButton = document.getElementById('HEADER_toggleShowExplorer');
+		let toggleShowExplorerButton = document.getElementById('HEADER_toggleShowExplorer') as HTMLInputElement;
+        if (!toggleShowExplorerButton) {
+            throw new Error();
+        }
 		toggleShowExplorerButton.checked = EXPLORER_show;
-		EDITOR_onResize();
+		//EDITOR_onResize();
 	}
 }
 
-async function EXPLORER_openInEditor(absolutePath, shouldFocus) {
-    const itHasBom = await window.myAPI.editorReadAllText(absolutePath);
-
-    if (!itHasBom.text && itHasBom.text != '') {
-        return;
-    }
-
-    EDITOR_setText(
-        itHasBom.text,
-        itHasBom.fileStartsWithBom,
-        /*textSourceIdentifier*/ absolutePath,
-        /*FORMATTED_textSourceIdentifier*/ itHasBom.formattedAbsolutePath,
-        /*extensionKind*/ EDITOR_toExtensionKind(itHasBom.extension));
-    if (shouldFocus) {
-        let editor = document.getElementById('EDITOR');
-        if (editor) {
-            editor.focus();
-        }
-    }
+async function EXPLORER_openInEditor(absolutePath: string, shouldFocus?: boolean) {
+    //const itHasBom = await window.myAPI.editorReadAllText(absolutePath);
+//
+    //if (!itHasBom.text && itHasBom.text != '') {
+    //    return;
+    //}
+//
+    //EDITOR_setText(
+    //    itHasBom.text,
+    //    itHasBom.fileStartsWithBom,
+    //    /*textSourceIdentifier*/ absolutePath,
+    //    /*FORMATTED_textSourceIdentifier*/ itHasBom.formattedAbsolutePath,
+    //    /*extensionKind*/ EDITOR_toExtensionKind(itHasBom.extension));
+    //if (shouldFocus) {
+    //    let editor = document.getElementById('EDITOR');
+    //    if (editor) {
+    //        editor.focus();
+    //    }
+    //}
 }
 
-async function EXPLORER_pickFolderOrWorkspaceButton_MenuOnClick(indexClicked, elementClicked) {
+export async function EXPLORER_pickFolderOrWorkspaceButton_MenuOnClick(indexClicked: number, elementClicked: HTMLElement) {
+    if (!elementClicked.dataset.commandKind) {
+        return;
+    }
     const commandKind = parseInt(elementClicked.dataset.commandKind, 10);
     if (!commandKind) {
         return;
     }
 
     switch (commandKind) {
-        case get_CommandKind_SelectFolder():
+        case Menu_CommandKind.SelectFolder:
             {
                 const EXPLORER_Element = document.getElementById('EXPLORER');
                 if (!EXPLORER_Element) return;
@@ -823,11 +857,11 @@ async function EXPLORER_pickFolderOrWorkspaceButton_MenuOnClick(indexClicked, el
                 EXPLORER_PickFolder.title = chosenDirectory;
     
                 EXPLORER_director.setChosenDirectory(chosenDirectory, chooseDirectoryResult.id);
-                EXPLORER_director.component.setItems(EXPLORER_director, APP_lineHeight, APP_lineHeight + 'px');
-                EXPLORER_director.component.draw_create_request(EXPLORER_Element, null);
+                EXPLORER_director.setItems(APP_lineHeight, APP_lineHeight + 'px');
+                EXPLORER_director.draw_create_request(EXPLORER_Element, null);
             }
             break;
-        case get_CommandKind_SelectWorkspace():
+        case Menu_CommandKind.SelectWorkspace:
             {
                 const EXPLORER_Element = document.getElementById('EXPLORER');
                 if (!EXPLORER_Element) return;
@@ -838,29 +872,37 @@ async function EXPLORER_pickFolderOrWorkspaceButton_MenuOnClick(indexClicked, el
                 EXPLORER_setShow(true);
     
                 let pickWorkspaceButton = document.getElementById('EXPLORER_folderOrWorkspaceButtons');
+                if (!pickWorkspaceButton) {
+                    throw new Error();
+                }
                 pickWorkspaceButton.textContent = chooseWorkspaceResult.workspaceFileNameWithoutExtension;
                 pickWorkspaceButton.title = chooseWorkspaceResult.workspaceFileAbsolutePath;
     
                 EXPLORER_director.setChosenWorkspace(chooseWorkspaceResult);
-                EXPLORER_director.component.setItems(EXPLORER_director, APP_lineHeight, APP_lineHeight + 'px');
-                EXPLORER_director.component.draw_create_request(EXPLORER_Element, null);
+                EXPLORER_director.setItems(APP_lineHeight, APP_lineHeight + 'px');
+                EXPLORER_director.draw_create_request(EXPLORER_Element, null);
             }
             break;
     }
 }
 
-async function EXPLORER_MenuOnClick(indexClicked, elementClicked) {
+export async function EXPLORER_MenuOnClick(indexClicked: number, elementClicked: HTMLElement) {
+
+    if (!elementClicked.dataset.commandKind) {
+        throw new Error();
+    }
+
     const commandKind = parseInt(elementClicked.dataset.commandKind, 10);
     if (!commandKind) {
         return;
     }
 
-    if (commandKind !== get_CommandKind_Cut() & commandKind !== get_CommandKind_Paste()) {
+    if (commandKind !== Menu_CommandKind.Cut && commandKind !== Menu_CommandKind.Paste) {
         EXPLORER_menuOptionCut_object = null;
     }
 
     switch (commandKind) {
-        case get_CommandKind_Copy():
+        case Menu_CommandKind.Copy:
             if (MENU_target.id) {
                 // TODO: optimize this?
                 const entry = await window.myAPI.getFilesystemEntryById(MENU_target.id);
@@ -868,7 +910,7 @@ async function EXPLORER_MenuOnClick(indexClicked, elementClicked) {
                 await window.myAPI.setClipboard('file:///' + entry.absolutePath);
             }
             break;
-        case get_CommandKind_Cut():
+        case Menu_CommandKind.Cut:
             // they don't fully work but I'm not feeling overly interested in anything at the moment I wanna just lay down and do nothing so I'm pleased that I did something at all
             if (MENU_target.id) {
                 // TODO: optimize this?
@@ -884,7 +926,7 @@ async function EXPLORER_MenuOnClick(indexClicked, elementClicked) {
                 await window.myAPI.setClipboard(text);
             }
             break;
-        case get_CommandKind_CopyAbsolutePath():
+        case Menu_CommandKind.CopyAbsolutePath:
             if (MENU_target.id) {
                 // TODO: optimize this?
                 const entry = await window.myAPI.getFilesystemEntryById(MENU_target.id);
@@ -892,7 +934,7 @@ async function EXPLORER_MenuOnClick(indexClicked, elementClicked) {
                 await window.myAPI.setClipboard(entry.absolutePath);
             }
             break;
-        case get_CommandKind_Paste():
+        case Menu_CommandKind.Paste:
             {
                 EXPLORER_director.nodeList.getElementAt(MENU_target.indexItem);
                 let nodeKind = TreeView_pooledNode_nodeKind;
@@ -961,19 +1003,19 @@ async function EXPLORER_MenuOnClick(indexClicked, elementClicked) {
 
                             EXPLORER_director.nodeList.insert(someIndex, nodeKind, pasteResult.pathId, MENU_target.depth + 1);
 
-                            if (EXPLORER_director.component.virtualCount > 0) {
-                                let largestIndexItemBeingShown = EXPLORER_director.component.virtualIndex_ofScrollTop + (EXPLORER_director.component.virtualCount - 1);
-                                if (someIndex >= EXPLORER_director.component.virtualIndex_ofScrollTop && someIndex <= largestIndexItemBeingShown) {
-                                    let finalDiv = EXPLORER_director.component.itemListElement.children[EXPLORER_director.component.itemListElement.children.length - 1];
+                            if (EXPLORER_director.virtualCount > 0) {
+                                let largestIndexItemBeingShown = EXPLORER_director.virtualIndex_ofScrollTop + (EXPLORER_director.virtualCount - 1);
+                                if (someIndex >= EXPLORER_director.virtualIndex_ofScrollTop && someIndex <= largestIndexItemBeingShown) {
+                                    let finalDiv = EXPLORER_director.itemListElement.children[EXPLORER_director.itemListElement.children.length - 1];
 
-                                    EXPLORER_director.component.itemHeightTotal = EXPLORER_director.tvd_getTotalCount() * EXPLORER_director.component.itemHeightNumber;
-                                    EXPLORER_director.component.virtualizationElement.style.height = EXPLORER_director.component.itemHeightTotal + 'px';
+                                    EXPLORER_director.itemHeightTotal = EXPLORER_director.tvd_getTotalCount() * EXPLORER_director.itemHeightNumber;
+                                    EXPLORER_director.virtualizationElement.style.height = EXPLORER_director.itemHeightTotal + 'px';
 
                                     // TODO: Check that the node you're pasting into is expanded.
 
                                     //await EXPLORER_director.tvd_drawItem_async(finalDiv, someIndex, /*isNull*/ false);
                                     if (someIndex !== largestIndexItemBeingShown) {
-                                        //EXPLORER_director.component.itemListElement.insertBefore(finalDiv, EXPLORER_director.component.itemListElement.children[MENU_target.divRelativeIndex + 1 + pasteResult.indexOf]);
+                                        //EXPLORER_director.itemListElement.insertBefore(finalDiv, EXPLORER_director.itemListElement.children[MENU_target.divRelativeIndex + 1 + pasteResult.indexOf]);
                                     }
                                 }
 
@@ -993,7 +1035,7 @@ async function EXPLORER_MenuOnClick(indexClicked, elementClicked) {
         
                                     if (divRelativeIndex <= largestIndexItemBeingShown) {
 
-                                        let countOfMoreEntriesToShow = EXPLORER_director.tvd_getTotalCount() - (EXPLORER_director.component.virtualIndex_ofScrollTop + EXPLORER_director.component.virtualCount);
+                                        let countOfMoreEntriesToShow = EXPLORER_director.tvd_getTotalCount() - (EXPLORER_director.virtualIndex_ofScrollTop + EXPLORER_director.virtualCount);
 
                                         let countChanges;
                                         
@@ -1005,26 +1047,26 @@ async function EXPLORER_MenuOnClick(indexClicked, elementClicked) {
                                             countChanges = 1;
                                         }
 
-                                        EXPLORER_director.component.itemHeightTotal = EXPLORER_director.tvd_getTotalCount() * EXPLORER_director.component.itemHeightNumber;
-                                        EXPLORER_director.component.virtualizationElement.style.height = EXPLORER_director.component.itemHeightTotal + 'px';
+                                        EXPLORER_director.itemHeightTotal = EXPLORER_director.tvd_getTotalCount() * EXPLORER_director.itemHeightNumber;
+                                        EXPLORER_director.virtualizationElement.style.height = EXPLORER_director.itemHeightTotal + 'px';
 
-                                        let remainingChangesToRender = countChanges < EXPLORER_director.component.virtualCount ? countChanges : EXPLORER_director.component.virtualCount - divRelativeIndex;
+                                        let remainingChangesToRender = countChanges < EXPLORER_director.virtualCount ? countChanges : EXPLORER_director.virtualCount - divRelativeIndex;
 
                                         if (countOfMoreEntriesToShow > remainingChangesToRender) {
                                             countOfMoreEntriesToShow = remainingChangesToRender;
                                         }
 
                                         for (let i = 0; i < remainingChangesToRender; i++) {
-                                            //let divItem = EXPLORER_director.component.itemListElement.children[divRelativeIndex];
+                                            //let divItem = EXPLORER_director.itemListElement.children[divRelativeIndex];
                     
                                             // TODO: if you remove including the eventual final div in the itemListElement then this moving of the div isn't accomplishing anything and could be skipped.
-                                            //EXPLORER_director.component.itemListElement.insertBefore(divItem, undefined);
+                                            //EXPLORER_director.itemListElement.insertBefore(divItem, undefined);
 
                                             if (countOfMoreEntriesToShow <= 0) {
-                                                //await EXPLORER_director.tvd_drawItem_async(divItem, EXPLORER_director.component.virtualIndex_ofScrollTop + EXPLORER_director.component.virtualCount - 1, /*isNull*/ true);
+                                                //await EXPLORER_director.tvd_drawItem_async(divItem, EXPLORER_director.virtualIndex_ofScrollTop + EXPLORER_director.virtualCount - 1, /*isNull*/ true);
                                             }
                                             else {
-                                                //await EXPLORER_director.tvd_drawItem_async(divItem, EXPLORER_director.component.virtualIndex_ofScrollTop + EXPLORER_director.component.virtualCount - (remainingChangesToRender - i), /*isNull*/ false);
+                                                //await EXPLORER_director.tvd_drawItem_async(divItem, EXPLORER_director.virtualIndex_ofScrollTop + EXPLORER_director.virtualCount - (remainingChangesToRender - i), /*isNull*/ false);
                                                 countOfMoreEntriesToShow--;
                                             }
                                         }
@@ -1034,71 +1076,71 @@ async function EXPLORER_MenuOnClick(indexClicked, elementClicked) {
                                 // TODO: fine grained redrawing of only the nodes that are:
                                 // - part of the virtualization result
                                 // - and have changed in some way that necessitates their UI be redrawn
-                                EXPLORER_director.component.draw_BATCH_request(EXPLORER_director.component.virtualIndex_ofScrollTop, EXPLORER_director.component.virtualCount, 3);
+                                EXPLORER_director.draw_BATCH_request(EXPLORER_director.virtualIndex_ofScrollTop, EXPLORER_director.virtualCount, 3);
                             }
                         }
                     }
                 break;
             }
-        case get_CommandKind_NewFile_Directory():
+        case Menu_CommandKind.NewFile_Directory:
             {
                 if (!MENU_target.id) return;
                 // TODO: optimize this?
                 const entry = await window.myAPI.getFilesystemEntryById(MENU_target.id);
                 if (!entry) return;
-                MENU_HIDE_shouldRestoreFocus = false;
+                MENU_HIDE_shouldRestoreFocus_SETTER(false);
                 WIDGET_restoreFocusToElementOverride = MENU_restoreFocusToElement;
                 await WIDGET_show(get_WidgetKind_InputText(), menuOptionX, menuOptionY, 'filename', entry, MENU_target, get_CommandKind_NewFile_Directory_WIDGET_InputText_callback);
                 break;
             }
-        case get_CommandKind_NewFile_File():
+        case Menu_CommandKind.NewFile_File:
             {
                 if (!MENU_target.id) return;
                 // TODO: optimize this?
                 const entry = await window.myAPI.getFilesystemEntryById(MENU_target.id);
                 if (!entry) return;
-                MENU_HIDE_shouldRestoreFocus = false;
+                MENU_HIDE_shouldRestoreFocus_SETTER(false);
                 WIDGET_restoreFocusToElementOverride = MENU_restoreFocusToElement;
                 await WIDGET_show(get_WidgetKind_InputText(), menuOptionX, menuOptionY, 'filename', entry, MENU_target, get_CommandKind_NewFile_File_WIDGET_InputText_callback);
                 break;
             }
-        case get_CommandKind_DeleteFile_Directory():
+        case Menu_CommandKind.DeleteFile_Directory:
             {
                 if (!MENU_target.id) return;
                 // TODO: optimize this?
                 const entry = await window.myAPI.getFilesystemEntryById(MENU_target.id);
                 if (!entry) return;
                 let filename = entry.basename;
-                MENU_HIDE_shouldRestoreFocus = false;
+                MENU_HIDE_shouldRestoreFocus_SETTER(false);
                 WIDGET_restoreFocusToElementOverride = MENU_restoreFocusToElement;
                 await WIDGET_show(get_WidgetKind_YesCancel(), menuOptionX, menuOptionY, 'delete ' + filename, entry, MENU_target, get_CommandKind_DeleteFile_Directory_YesCancel_callback);
                 break;
             }
-        case get_CommandKind_DeleteFile_File():
+        case Menu_CommandKind.DeleteFile_File:
             {
                 if (!MENU_target.id) return;
                 // TODO: optimize this?
                 const entry = await window.myAPI.getFilesystemEntryById(MENU_target.id);
                 if (!entry) return;
                 let filename = entry.basename;
-                MENU_HIDE_shouldRestoreFocus = false;
+                MENU_HIDE_shouldRestoreFocus_SETTER(false);
                 WIDGET_restoreFocusToElementOverride = MENU_restoreFocusToElement;
                 await WIDGET_show(get_WidgetKind_YesCancel(), menuOptionX, menuOptionY, 'delete ' + filename, entry, MENU_target, get_CommandKind_DeleteFile_File_YesCancel_callback);
                 break;
             }
-        case get_CommandKind_RenameFile_Directory():
+        case Menu_CommandKind.RenameFile_Directory:
             {
                 if (!MENU_target.id) return;
                 // TODO: optimize this?
                 const entry = await window.myAPI.getFilesystemEntryById(MENU_target.id);
                 if (!entry) return;
                 let filename = entry.basename;
-                MENU_HIDE_shouldRestoreFocus = false;
+                MENU_HIDE_shouldRestoreFocus_SETTER(false);
                 WIDGET_restoreFocusToElementOverride = MENU_restoreFocusToElement;
                 await WIDGET_show(get_WidgetKind_InputText(), menuOptionX, menuOptionY, 'rename', filename, {MENU_target:MENU_target, entry:entry}, get_CommandKind_RenameFile_Directory_InputText_callback);
                 break;
             }
-        case get_CommandKind_RenameFile_File():
+        case Menu_CommandKind.RenameFile_File:
             {
                 /*
                 Maybe the only difference between the _Directory and _File cases for each ..._...
@@ -1112,7 +1154,7 @@ async function EXPLORER_MenuOnClick(indexClicked, elementClicked) {
                 const entry = await window.myAPI.getFilesystemEntryById(MENU_target.id);
                 if (!entry) return;
                 let filename = entry.basename;
-                MENU_HIDE_shouldRestoreFocus = false;
+                MENU_HIDE_shouldRestoreFocus_SETTER(false);
                 WIDGET_restoreFocusToElementOverride = MENU_restoreFocusToElement;
                 await WIDGET_show(get_WidgetKind_InputText(), menuOptionX, menuOptionY, 'rename', filename, {MENU_target: MENU_target, entry: entry}, get_CommandKind_RenameFile_File_InputText_callback);
                 break;
@@ -1182,24 +1224,24 @@ async function get_CommandKind_NewFile_Directory_WIDGET_InputText_callback(resul
 
             EXPLORER_director.nodeList.insert(someIndex, nodeKind, newFileResult.pathId, WIDGET_target.depth + 1);
 
-            if (EXPLORER_director.component.virtualCount > 0) {
-                let largestIndexItemBeingShown = EXPLORER_director.component.virtualIndex_ofScrollTop + (EXPLORER_director.component.virtualCount - 1);
-                if (someIndex >= EXPLORER_director.component.virtualIndex_ofScrollTop && someIndex <= largestIndexItemBeingShown) {
-                    //let finalDiv = EXPLORER_director.component.itemListElement.children[EXPLORER_director.component.itemListElement.children.length - 1];
+            if (EXPLORER_director.virtualCount > 0) {
+                let largestIndexItemBeingShown = EXPLORER_director.virtualIndex_ofScrollTop + (EXPLORER_director.virtualCount - 1);
+                if (someIndex >= EXPLORER_director.virtualIndex_ofScrollTop && someIndex <= largestIndexItemBeingShown) {
+                    //let finalDiv = EXPLORER_director.itemListElement.children[EXPLORER_director.itemListElement.children.length - 1];
 
-                    EXPLORER_director.component.itemHeightTotal = EXPLORER_director.tvd_getTotalCount() * EXPLORER_director.component.itemHeightNumber;
-                    EXPLORER_director.component.virtualizationElement.style.height = EXPLORER_director.component.itemHeightTotal + 'px';
+                    EXPLORER_director.itemHeightTotal = EXPLORER_director.tvd_getTotalCount() * EXPLORER_director.itemHeightNumber;
+                    EXPLORER_director.virtualizationElement.style.height = EXPLORER_director.itemHeightTotal + 'px';
 
                     //await EXPLORER_director.tvd_drawItem_async(finalDiv, someIndex, /*isNull*/ false);
                     if (someIndex !== largestIndexItemBeingShown) {
-                        //EXPLORER_director.component.itemListElement.insertBefore(finalDiv, EXPLORER_director.component.itemListElement.children[WIDGET_target.divRelativeIndex + 1 + newFileResult.indexOf]);
+                        //EXPLORER_director.itemListElement.insertBefore(finalDiv, EXPLORER_director.itemListElement.children[WIDGET_target.divRelativeIndex + 1 + newFileResult.indexOf]);
                     }
                 }
 
                 // TODO: fine grained redrawing of only the nodes that are:
                 // - part of the virtualization result
                 // - and have changed in some way that necessitates their UI be redrawn
-                EXPLORER_director.component.draw_BATCH_request(EXPLORER_director.component.virtualIndex_ofScrollTop, EXPLORER_director.component.virtualCount, 3);
+                EXPLORER_director.draw_BATCH_request(EXPLORER_director.virtualIndex_ofScrollTop, EXPLORER_director.virtualCount, 3);
             }
         }
     }
@@ -1264,24 +1306,24 @@ async function get_CommandKind_NewFile_File_WIDGET_InputText_callback(result) {
 
             EXPLORER_director.nodeList.insert(someIndex, nodeKind, newFileResult.pathId, WIDGET_target.depth + 1);
     
-            if (EXPLORER_director.component.virtualCount > 0) {
-                let largestIndexItemBeingShown = EXPLORER_director.component.virtualIndex_ofScrollTop + (EXPLORER_director.component.virtualCount - 1);
-                if (someIndex >= EXPLORER_director.component.virtualIndex_ofScrollTop && someIndex <= largestIndexItemBeingShown) {
-                    //let finalDiv = EXPLORER_director.component.itemListElement.children[EXPLORER_director.component.itemListElement.children.length - 1];
+            if (EXPLORER_director.virtualCount > 0) {
+                let largestIndexItemBeingShown = EXPLORER_director.virtualIndex_ofScrollTop + (EXPLORER_director.virtualCount - 1);
+                if (someIndex >= EXPLORER_director.virtualIndex_ofScrollTop && someIndex <= largestIndexItemBeingShown) {
+                    //let finalDiv = EXPLORER_director.itemListElement.children[EXPLORER_director.itemListElement.children.length - 1];
     
-                    EXPLORER_director.component.itemHeightTotal = EXPLORER_director.tvd_getTotalCount() * EXPLORER_director.component.itemHeightNumber;
-                    EXPLORER_director.component.virtualizationElement.style.height = EXPLORER_director.component.itemHeightTotal + 'px';
+                    EXPLORER_director.itemHeightTotal = EXPLORER_director.tvd_getTotalCount() * EXPLORER_director.itemHeightNumber;
+                    EXPLORER_director.virtualizationElement.style.height = EXPLORER_director.itemHeightTotal + 'px';
     
                     //await EXPLORER_director.tvd_drawItem_async(finalDiv, someIndex, /*isNull*/ false);
                     if (someIndex !== largestIndexItemBeingShown) {
-                        //EXPLORER_director.component.itemListElement.insertBefore(finalDiv, EXPLORER_director.component.itemListElement.children[WIDGET_target.divRelativeIndex + 1 + newFileResult.indexOf]);
+                        //EXPLORER_director.itemListElement.insertBefore(finalDiv, EXPLORER_director.itemListElement.children[WIDGET_target.divRelativeIndex + 1 + newFileResult.indexOf]);
                     }
                 }
     
                 // TODO: fine grained redrawing of only the nodes that are:
                 // - part of the virtualization result
                 // - and have changed in some way that necessitates their UI be redrawn
-                EXPLORER_director.component.draw_BATCH_request(EXPLORER_director.component.virtualIndex_ofScrollTop, EXPLORER_director.component.virtualCount, 3);
+                EXPLORER_director.draw_BATCH_request(EXPLORER_director.virtualIndex_ofScrollTop, EXPLORER_director.virtualCount, 3);
             }
         }
     }
@@ -1292,30 +1334,30 @@ async function get_CommandKind_DeleteFile_Directory_YesCancel_callback(result) {
     let entry = WIDGET_SHOW_value;
     let deleteFileResult = await window.myAPI.deleteFile(entry.absolutePath, /*isDirectory*/ true);
     if (deleteFileResult) {
-        let countOfMoreEntriesToShow = EXPLORER_director.tvd_getTotalCount() - (EXPLORER_director.component.virtualIndex_ofScrollTop + EXPLORER_director.component.virtualCount);
+        let countOfMoreEntriesToShow = EXPLORER_director.tvd_getTotalCount() - (EXPLORER_director.virtualIndex_ofScrollTop + EXPLORER_director.virtualCount);
 
         let countChanges = await EXPLORER_director.removeFromNodeList_async(WIDGET_target.indexItem);
 
-        EXPLORER_director.component.itemHeightTotal = EXPLORER_director.tvd_getTotalCount() * EXPLORER_director.component.itemHeightNumber;
-        EXPLORER_director.component.virtualizationElement.style.height = EXPLORER_director.component.itemHeightTotal + 'px';
+        EXPLORER_director.itemHeightTotal = EXPLORER_director.tvd_getTotalCount() * EXPLORER_director.itemHeightNumber;
+        EXPLORER_director.virtualizationElement.style.height = EXPLORER_director.itemHeightTotal + 'px';
 
-        let remainingChangesToRender = countChanges < EXPLORER_director.component.virtualCount ? countChanges : EXPLORER_director.component.virtualCount - WIDGET_target.divRelativeIndex;
+        let remainingChangesToRender = countChanges < EXPLORER_director.virtualCount ? countChanges : EXPLORER_director.virtualCount - WIDGET_target.divRelativeIndex;
 
         if (countOfMoreEntriesToShow > remainingChangesToRender) {
             countOfMoreEntriesToShow = remainingChangesToRender;
         }
 
         for (let i = 0; i < remainingChangesToRender; i++) {
-            //let divItem = EXPLORER_director.component.itemListElement.children[WIDGET_target.divRelativeIndex];
+            //let divItem = EXPLORER_director.itemListElement.children[WIDGET_target.divRelativeIndex];
 
             // TODO: if you remove including the eventual final div in the itemListElement then this moving of the div isn't accomplishing anything and could be skipped.
-            //EXPLORER_director.component.itemListElement.insertBefore(divItem, undefined);
+            //EXPLORER_director.itemListElement.insertBefore(divItem, undefined);
 
             if (countOfMoreEntriesToShow <= 0) {
-                //await EXPLORER_director.tvd_drawItem_async(divItem, EXPLORER_director.component.virtualIndex_ofScrollTop + EXPLORER_director.component.virtualCount - 1, /*isNull*/ true);
+                //await EXPLORER_director.tvd_drawItem_async(divItem, EXPLORER_director.virtualIndex_ofScrollTop + EXPLORER_director.virtualCount - 1, /*isNull*/ true);
             }
             else {
-                //await EXPLORER_director.tvd_drawItem_async(divItem, EXPLORER_director.component.virtualIndex_ofScrollTop + EXPLORER_director.component.virtualCount - (remainingChangesToRender - i), /*isNull*/ false);
+                //await EXPLORER_director.tvd_drawItem_async(divItem, EXPLORER_director.virtualIndex_ofScrollTop + EXPLORER_director.virtualCount - (remainingChangesToRender - i), /*isNull*/ false);
                 countOfMoreEntriesToShow--;
             }
         }
@@ -1323,7 +1365,7 @@ async function get_CommandKind_DeleteFile_Directory_YesCancel_callback(result) {
         // TODO: fine grained redrawing of only the nodes that are:
         // - part of the virtualization result
         // - and have changed in some way that necessitates their UI be redrawn
-        EXPLORER_director.component.draw_BATCH_request(EXPLORER_director.component.virtualIndex_ofScrollTop, EXPLORER_director.component.virtualCount, 3);
+        EXPLORER_director.draw_BATCH_request(EXPLORER_director.virtualIndex_ofScrollTop, EXPLORER_director.virtualCount, 3);
     }
 }
 
@@ -1334,29 +1376,29 @@ async function get_CommandKind_DeleteFile_File_YesCancel_callback(result) {
     let entry = WIDGET_SHOW_value;
     let deleteFileResult = await window.myAPI.deleteFile(entry.absolutePath, /*isDirectory*/ false);
     if (deleteFileResult) {
-        let noMoreEntriesToShow = EXPLORER_director.component.virtualIndex_ofScrollTop + EXPLORER_director.component.virtualCount >= EXPLORER_director.tvd_getTotalCount();
+        let noMoreEntriesToShow = EXPLORER_director.virtualIndex_ofScrollTop + EXPLORER_director.virtualCount >= EXPLORER_director.tvd_getTotalCount();
 
         EXPLORER_director.nodeList.removeAt(WIDGET_target.indexItem, 1);
 
-        if (EXPLORER_director.component.virtualCount > 0) {
-            //let divItem = EXPLORER_director.component.itemListElement.children[WIDGET_target.divRelativeIndex];
+        if (EXPLORER_director.virtualCount > 0) {
+            //let divItem = EXPLORER_director.itemListElement.children[WIDGET_target.divRelativeIndex];
 
-            EXPLORER_director.component.itemHeightTotal = EXPLORER_director.tvd_getTotalCount() * EXPLORER_director.component.itemHeightNumber;
-            EXPLORER_director.component.virtualizationElement.style.height = EXPLORER_director.component.itemHeightTotal + 'px';
+            EXPLORER_director.itemHeightTotal = EXPLORER_director.tvd_getTotalCount() * EXPLORER_director.itemHeightNumber;
+            EXPLORER_director.virtualizationElement.style.height = EXPLORER_director.itemHeightTotal + 'px';
 
-            //EXPLORER_director.component.itemListElement.insertBefore(divItem, undefined);
+            //EXPLORER_director.itemListElement.insertBefore(divItem, undefined);
             if (noMoreEntriesToShow) {
-                //await EXPLORER_director.tvd_drawItem_async(divItem, EXPLORER_director.component.virtualIndex_ofScrollTop + EXPLORER_director.component.virtualCount - 1, /*isNull*/ true);
+                //await EXPLORER_director.tvd_drawItem_async(divItem, EXPLORER_director.virtualIndex_ofScrollTop + EXPLORER_director.virtualCount - 1, /*isNull*/ true);
             }
             else {
-                //await EXPLORER_director.tvd_drawItem_async(divItem, EXPLORER_director.component.virtualIndex_ofScrollTop + EXPLORER_director.component.virtualCount - 1, /*isNull*/ false);
+                //await EXPLORER_director.tvd_drawItem_async(divItem, EXPLORER_director.virtualIndex_ofScrollTop + EXPLORER_director.virtualCount - 1, /*isNull*/ false);
             }
         }
 
         // TODO: fine grained redrawing of only the nodes that are:
         // - part of the virtualization result
         // - and have changed in some way that necessitates their UI be redrawn
-        EXPLORER_director.component.draw_BATCH_request(EXPLORER_director.component.virtualIndex_ofScrollTop, EXPLORER_director.component.virtualCount, 3);
+        EXPLORER_director.draw_BATCH_request(EXPLORER_director.virtualIndex_ofScrollTop, EXPLORER_director.virtualCount, 3);
     }
 }
 
@@ -1368,7 +1410,7 @@ async function get_CommandKind_RenameFile_Directory_InputText_callback(result) {
     let renameFileResult = await window.myAPI.renameFile(entry.absolutePath, result.value, /*isDirectory*/ true);
     if (renameFileResult.success) {
         await EXPLORER_director.setNodeListEntryId_async(WIDGET_target.indexItem, renameFileResult.pathId);
-        let divItem = EXPLORER_director.component.itemListElement.children[WIDGET_target.divRelativeIndex];
+        let divItem = EXPLORER_director.itemListElement.children[WIDGET_target.divRelativeIndex];
         divItem.lastChild.nodeValue = result.value;
     }
 }
@@ -1381,7 +1423,7 @@ async function get_CommandKind_RenameFile_File_InputText_callback(result) {
     let renameFileResult = await window.myAPI.renameFile(entry.absolutePath, result.value, /*isDirectory*/ false);
     if (renameFileResult.success) {
         await EXPLORER_director.setNodeListEntryId_async(WIDGET_target.indexItem, renameFileResult.pathId);
-        let divItem = EXPLORER_director.component.itemListElement.children[WIDGET_target.divRelativeIndex];
+        let divItem = EXPLORER_director.itemListElement.children[WIDGET_target.divRelativeIndex];
         divItem.lastChild.nodeValue = result.value;
     }
 }
