@@ -207,6 +207,7 @@ let cached_EDITOR_textElement: HTMLElement;
 let virtualCount = 0;
 let virtualIndexLine = 0;
 
+let ONSCROLLvirtualCount = 0;
 let ONSCROLLvirtualIndexLine = 0;
 
 class EDITOR_Cursor {
@@ -805,7 +806,7 @@ function EDITOR_render_do_CreateViewport() {
     EDITOR_baseElement.scrollLeft = 0;
     lastReadNumber_scrollLeft = 0;
 
-    set_EDITOR_ONSCROLLvirtualCount(virtualCount);
+    ONSCROLLvirtualCount = virtualCount;
 
     cached_EDITOR_gutter.innerHTML = '';
     cached_EDITOR_textElement.innerHTML = '';
@@ -953,8 +954,8 @@ function EDITOR_render_do_Scroll(timestamp) {
 
         EDITOR_sum_diffPositive += diff;
 
-        // Note: this case has 'vertical = (prevVli + virtualCount) * get_EDITOR_lineHeight();' I believe 'virtualCount' === 'get_EDITOR_ONSCROLLvirtualCount' in this case, thus all vertical calculations can be moved after the if statements to be lowerBound * ... All cases other than this one were exact 1 to 1 matches.
-        lowerBound = prevVli + get_EDITOR_ONSCROLLvirtualCount();
+        // Note: this case has 'vertical = (prevVli + virtualCount) * get_EDITOR_lineHeight();' I believe 'virtualCount' === 'ONSCROLLvirtualCount' in this case, thus all vertical calculations can be moved after the if statements to be lowerBound * ... All cases other than this one were exact 1 to 1 matches.
+        lowerBound = prevVli + ONSCROLLvirtualCount;
         upperBound = lowerBound + diff;
 
         beltIndexLine = EDITOR_beltIndexZero;
@@ -1059,7 +1060,7 @@ function EDITOR_onScroll_LeadingEdge(timestamp) {
 
     if (get_EDITOR_ONSCROLLscrollTop() === lastReadNumber_scrollTop &&
         prevVli === virtualIndexLine &&
-        get_EDITOR_ONSCROLLvirtualCount() === virtualCount) {
+        ONSCROLLvirtualCount === virtualCount) {
             // TODO: this is directly tied to a scroll event on EDITOR_baseElement so handle it from there perhaps?
             // TODO: this code is duplicated inside EDITOR_drawHorizontalScrollbar, reduce duplication?
             if (cached_EDITOR_horizontal_scrollbar.scrollLeft !== lastReadNumber_scrollLeft) {
@@ -1068,7 +1069,7 @@ function EDITOR_onScroll_LeadingEdge(timestamp) {
             return true;
     }
 
-    if (get_EDITOR_ONSCROLLvirtualCount() !== virtualCount) {
+    if (ONSCROLLvirtualCount !== virtualCount) {
             // Force case 3
             prevVli = 0;
             currVli = virtualCount;
