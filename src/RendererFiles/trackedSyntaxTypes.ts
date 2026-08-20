@@ -1,7 +1,12 @@
-const get_TrackedSyntaxKind_None = () => 0;
-const get_TrackedSyntaxKind_String = () => 1;
-/** only multi-line-comments that span multiple lines are stored in EDITOR_trackedSyntaxList with the 'get_TrackedSyntaxKind_Comment()' */
-const get_TrackedSyntaxKind_Comment = () => 2;
+
+export const TrackedSyntaxKind = {
+    None: 0,
+    String: 1,
+    /** only multi-line-comments that span multiple lines are stored in EDITOR_trackedSyntaxList with the 'TrackedSyntaxKind.Comment' */
+    Comment: 2,
+} as const;
+// Derive the type union from the object values
+export type TrackedSyntaxKind = typeof TrackedSyntaxKind[keyof typeof TrackedSyntaxKind];
 
 class TrackedSyntaxList {
     data_literal;

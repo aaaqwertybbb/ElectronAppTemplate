@@ -1,7 +1,4 @@
-//__#__
-// preprocessor.cjs
-import "./fieldBuffer"
-//__#__
+import { TrackedSyntaxKind } from "./trackedSyntaxTypes";
 
 function JS_line_lex(div, substart, lineEnd, childIndex) {
     let pos = substart;
@@ -2197,10 +2194,10 @@ I did some exercises then about an hour long walk then showered...
             substart += length;
             pos += length;
             switch (EDITOR_pooledTrackedSyntax_trackedSyntaxKind) {
-                case get_TrackedSyntaxKind_Comment():
+                case TrackedSyntaxKind.Comment:
                     span.className = 'eCM';
                     break;
-                case get_TrackedSyntaxKind_String():
+                case TrackedSyntaxKind.String:
                     span.className = 'eSM';
                     break;
                 default:
