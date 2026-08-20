@@ -56,6 +56,15 @@ export type myAPI_chooseWorkspace_result = {
     canceled: boolean
 };
 
+export type myAPI_getFilesystemEntryById_ARRAY_entry = {
+    basename: string,
+    absolutePath: string,
+    // TODO: return 'null' not 'true'. And then the UI should interpret this as "whatever you currently have just keep it that way cause nobody knows what the file even is anymore"...
+    // ...because presumably a render happened between the time that the FS deleted the file, but before the UI removed it from the node list... this is only speculation but it probably is what is happening.
+    // thus the next render should correctly remove the node from the UI anyways.
+    isDirectory: boolean
+};
+
 init();
 
 function init() {

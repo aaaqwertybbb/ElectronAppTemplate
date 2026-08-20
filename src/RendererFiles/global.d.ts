@@ -7,7 +7,7 @@ export interface MyAPI {
   newFile: (parentDirectoryAbsolutePath, filename, isDirectory) => Promise<any>;
   deleteFile: (absolutePath, isDirectory) => Promise<any>;
   renameFile: (absolutePath, filename, isDirectory) => Promise<any>;
-  getFilesystemEntryById_ARRAY: (arrayKeys) => Promise<any>;
+  getFilesystemEntryById_ARRAY: (arrayKeys) => Promise<myAPI_getFilesystemEntryById_ARRAY_entry[]>;
   getFilesystemEntries_argumentIsId: (id) => Promise<any>;
   chooseDirectory: () => Promise<myAPI_chooseDirectory_result>;
   chooseWorkspace: () => Promise<myAPI_chooseWorkspace_result>;

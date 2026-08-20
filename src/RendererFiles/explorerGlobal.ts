@@ -1,4 +1,4 @@
-import { APP_lineHeight } from './applicationRendererRoot';
+import { APP_lineHeight, myAPI_getFilesystemEntryById_ARRAY_entry } from './applicationRendererRoot';
 import { TreeViewComponent, TreeViewNodeList, TreeView_NodeKind, TreeView_pooledNode_key, TreeView_pooledNode_depth, TreeView_pooledNode_nodeKind, TreeView_RenderKind } from './treeViewComponent';
 import { MenuOption, Menu_CommandKind, menuSet, MENU_target, MENU_HIDE_shouldRestoreFocus_SETTER, MENU_restoreFocusToElement } from './menuGlobal';
 import { WIDGET_restoreFocusToElementOverride_SETTER, WIDGET_show, WIDGET_SHOW_value, WIDGET_target, WIDGET_target_SETTER, WidgetCallbackArgs, WidgetKind } from './widgetGlobal';
@@ -44,7 +44,7 @@ class EXPLORER_TreeViewComponent extends TreeViewComponent {
     scrollFetchData_beltIndexZero: number;
     pullData_result: Uint32Array | null;
     pullData_result_count: number;
-    arrayEntries: any[] | null;
+    arrayEntries: myAPI_getFilesystemEntryById_ARRAY_entry[] | null;
     KEY_BITS: number;
     KEY_MASK: number;
     chosenDirectoryAbsolutePathId: number = 0;
