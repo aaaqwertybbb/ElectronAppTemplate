@@ -4166,8 +4166,8 @@ function EDITOR_editEvent(editKind, event, clipboardContent) {
 
         shouldFinalizeAllCursors = false;
         
-        if ((editKind === EditKind.Tab && EDITOR_cursorList.length === 1 && EDITOR_cursorList[0].editKind === get_EditKind_IndentMore()) ||
-            (editKind === EditKind.Tab && EDITOR_cursorList.length === 1 && EDITOR_cursorList[0].editKind === get_EditKind_IndentLess() && event.shiftKey)) {
+        if ((editKind === EditKind.Tab && EDITOR_cursorList.length === 1 && EDITOR_cursorList[0].editKind === EditKind.IndentMore) ||
+            (editKind === EditKind.Tab && EDITOR_cursorList.length === 1 && EDITOR_cursorList[0].editKind === EditKind.IndentLess && event.shiftKey)) {
 
                 // TODO: IndentLess when no selection however shiftTab then it does indentLess even still but I haven't gone out of the way to handle that hack...
                 // ...maybe it'll be covered maybe it won't.
@@ -4348,14 +4348,14 @@ function EDITOR_editEvent_theEditIself_Tab(event) {
         EDITOR_movementBasedCacheInvalidation(cursor);
         if (cursor.hasSelection()) {
             if (event.shiftKey) {
-                if (cursor.editKind !== get_EditKind_IndentLess()) {
-                    EDITOR_startEdit(cursor, get_EditKind_IndentLess(), EDITOR_getPositionIndex_raw(cursor), /*editLength*/ 0);
+                if (cursor.editKind !== EditKind.IndentLess) {
+                    EDITOR_startEdit(cursor, EditKind.IndentLess, EDITOR_getPositionIndex_raw(cursor), /*editLength*/ 0);
                 }
                 EDITOR_indentLess(cursor);
             }
             else {
-                if (cursor.editKind !== get_EditKind_IndentMore()) {
-                    EDITOR_startEdit(cursor, get_EditKind_IndentMore(), EDITOR_getPositionIndex_raw(cursor), /*editLength*/ 0);
+                if (cursor.editKind !== EditKind.IndentMore) {
+                    EDITOR_startEdit(cursor, EditKind.IndentMore, EDITOR_getPositionIndex_raw(cursor), /*editLength*/ 0);
                 }
                 EDITOR_indentMore(cursor);
             }
@@ -4367,8 +4367,8 @@ function EDITOR_editEvent_theEditIself_Tab(event) {
                 // ...everything is buggy and it is very anxiety inducing and for the time being I guess it just has to be that way as I transition
                 // towards a useable editor all the features are coming together but there's this awkward phase of "I can start using it but also not really" or something I just idk.
                 EDITOR_onMouseDownDetailRankThree({shiftKey:false}, cursor.indexLine, cursor.indexColumn);
-                if (cursor.editKind !== get_EditKind_IndentLess()) {
-                    EDITOR_startEdit(cursor, get_EditKind_IndentLess(), EDITOR_getPositionIndex_raw(cursor), /*editLength*/ 0);
+                if (cursor.editKind !== EditKind.IndentLess) {
+                    EDITOR_startEdit(cursor, EditKind.IndentLess, EDITOR_getPositionIndex_raw(cursor), /*editLength*/ 0);
                 }
                 EDITOR_indentLess(cursor);
             }
@@ -4386,7 +4386,7 @@ function EDITOR_editEvent_theEditIself_Tab(event) {
 function EDITOR_editEvent_theEditIself_Enter(event) {
     for (var i = 0; i < EDITOR_cursorList.length; i++) {
         let cursor = EDITOR_cursorList[i];
-        if (cursor.editKind !== get_EditKind_Enter()) {
+        if (cursor.editKind !== EditKind.Enter) {
             EDITOR_startEdit(cursor, EditKind.Enter, EDITOR_getPositionIndex_raw(cursor), /*editLength*/ 0);
         }
         EDITOR_EnterKey(cursor, event.ctrlKey, event.shiftKey);
@@ -4494,7 +4494,7 @@ function EDITOR_editEvent_checkFor_NOTcanBatch_IndentMore() {
         return true;
     }
     let cursor = EDITOR_cursorList[0];
-    if (cursor.editKind === get_EditKind_IndentLess()) {
+    if (cursor.editKind === EditKind.IndentLess) {
         return true;
     }
     
@@ -4549,7 +4549,7 @@ function EDITOR_editEvent_checkFor_NOTcanBatch_IndentLess() {
         return true;
     }
     let cursor = EDITOR_cursorList[0];
-    if (cursor.editKind === get_EditKind_IndentMore()) {
+    if (cursor.editKind === EditKind.IndentMore) {
         return true;
     }
     
@@ -4696,7 +4696,7 @@ async function EDITOR_onKeyDown(event) {
             break;
         case 'Enter':
             // Enter key relies on cached data that would be cleared, pattern doesn't match on purpose
-            EDITOR_editEvent(get_EditKind_Enter(), event);
+            EDITOR_editEvent(EditKind.Enter, event);
             break;
         case 'F12':
             EDITOR_doEditorGoToDefinitionRequest();
@@ -5594,7 +5594,7 @@ function EDITOR_render_do_IndentMore() {
 
     for (let i = EDITOR_cursorList.length - 1; i >= 0; i--) {
         let cursor = EDITOR_cursorList[i];
-        if (cursor.editKind !== get_EditKind_IndentMore()) {
+        if (cursor.editKind !== EditKind.IndentMore) {
             continue;
         }
         if (cursor.editRenderedDisplacement < cursor.editLength) {
@@ -5750,7 +5750,7 @@ function EDITOR_render_do_IndentLess() {
 
     for (let cursorI = EDITOR_cursorList.length - 1; cursorI >= 0; cursorI--) {
         let cursor = EDITOR_cursorList[cursorI];
-        if (cursor.editKind !== get_EditKind_IndentLess()) {
+        if (cursor.editKind !== EditKind.IndentLess) {
             continue;
         }
         if (cursor.editRenderedDisplacement < cursor.editLength) {
@@ -6573,7 +6573,7 @@ function EDITOR_render_do_TabKey() {
         if (cursor.editKind !== EditKind.Tab) {
             continue;
         }
-        if (cursor.editRenderedDisplacement < cursor.editLength || cursor.editKind === get_EditKind_Tab()) {
+        if (cursor.editRenderedDisplacement < cursor.editLength || cursor.editKind === EditKind.Tab) {
 
             cursor.indexColumn -= 4; // awkward thing to have 'walkLineUntilIndexColumn' invocation work then at end of block I '+= 4'.
 
