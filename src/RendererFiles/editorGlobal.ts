@@ -214,6 +214,8 @@ let ONSCROLLscrollTop = 0;
 let offsetLine = 0;
 let offsetColumn = 0;
 
+let lineHeight = 20;
+
 class EDITOR_Cursor {
 
     static STATIC_CURSOR_ID = 1;
@@ -920,7 +922,7 @@ function EDITOR_onScroll_WRAPIT() {
 
 function EDITOR_render_do_Scroll(timestamp: number) {
     // TODO: This floor logic seems very odd. Because given the previous and the current you can determine it without dividing maybe I think?
-    virtualIndexLine = (Math.floor(lastReadNumber_scrollTop / get_EDITOR_lineHeight()));
+    virtualIndexLine = (Math.floor(lastReadNumber_scrollTop / lineHeight));
     // ====
     // ==== end explicit inline (duplication) of 'update_VirtualIndexLine()';
     prevVli = ONSCROLLvirtualIndexLine; // If I delay setting 'ONSCROLLvirtualIndexLine' then I can just use that. I can't bear to do that right now though. I'm just gonna make this variable.
@@ -958,7 +960,7 @@ function EDITOR_render_do_Scroll(timestamp: number) {
 
         EDITOR_sum_diffPositive += diff;
 
-        // Note: this case has 'vertical = (prevVli + virtualCount) * get_EDITOR_lineHeight();' I believe 'virtualCount' === 'ONSCROLLvirtualCount' in this case, thus all vertical calculations can be moved after the if statements to be lowerBound * ... All cases other than this one were exact 1 to 1 matches.
+        // Note: this case has 'vertical = (prevVli + virtualCount) * lineHeight;' I believe 'virtualCount' === 'ONSCROLLvirtualCount' in this case, thus all vertical calculations can be moved after the if statements to be lowerBound * ... All cases other than this one were exact 1 to 1 matches.
         lowerBound = prevVli + ONSCROLLvirtualCount;
         upperBound = lowerBound + diff;
 
@@ -991,7 +993,7 @@ function EDITOR_render_do_Scroll(timestamp: number) {
         beltIndexLine = EDITOR_beltIndexZero;
     }
 
-    let vertical = lowerBound * get_EDITOR_lineHeight();
+    let vertical = lowerBound * lineHeight;
 
     beltIndexLine--; // The 0th loop will increment somewhat awkwardly. This decrement avoids that.
 
@@ -1038,7 +1040,7 @@ function EDITOR_render_do_Scroll(timestamp: number) {
         }
 
         let translateY = `translateY(${vertical}px)`;
-        vertical += get_EDITOR_lineHeight();
+        vertical += lineHeight;
 
         gutter.style.transform = translateY;
         div.style.transform = translateY;
@@ -1505,7 +1507,7 @@ export function EDITOR_setText(text: string, fileStartsWithBom: boolean, textSou
  */
 function update_verticalVirtualizationBoundary(lineCount: number) {
     if (!lineCount) lineCount = EDITOR_lineEndPositionList.count;
-    cached_EDITOR_virtualization_vertical.style.height = ((lineCount + virtualCount - 1) * get_EDITOR_lineHeight()) + 'px';
+    cached_EDITOR_virtualization_vertical.style.height = ((lineCount + virtualCount - 1) * lineHeight) + 'px';
 }
 
 /**
@@ -1519,11 +1521,11 @@ function update_VirtualIndexLine() {
     lastReadNumber_scrollLeft = EDITOR_baseElement.scrollLeft;
     lastReadNumber_scrollTop = EDITOR_baseElement.scrollTop;
     // TODO: This floor logic seems very odd. Because given the previous and the current you can determine it without dividing maybe I think?
-    virtualIndexLine = (Math.floor(lastReadNumber_scrollTop / get_EDITOR_lineHeight()));
+    virtualIndexLine = (Math.floor(lastReadNumber_scrollTop / lineHeight));
 }
 
 function update_virtualCount() {
-    virtualCount = (Math.ceil(lastReadNumber_offsetHeight / get_EDITOR_lineHeight()));
+    virtualCount = (Math.ceil(lastReadNumber_offsetHeight / lineHeight));
 }
 
 /**
@@ -2902,7 +2904,7 @@ function EDITOR_draw_all_cursors() {
  * @param {boolean} NOTscrollCursorIntoView 
  */
 function EDITOR_drawCursor(cursor: EDITOR_Cursor, NOTscrollCursorIntoView?: boolean) {
-    cursor.cursorTranslateYValue = (cursor.indexLine + offsetLine) * get_EDITOR_lineHeight();
+    cursor.cursorTranslateYValue = (cursor.indexLine + offsetLine) * lineHeight;
     cursor.cursorTranslateXValue = (cursor.indexColumn + offsetColumn) * EDITOR_characterWidth;
 
     cursor.caretRow.style.transform = `translateY(${cursor.cursorTranslateYValue}px)`;
@@ -3167,7 +3169,7 @@ function EDITOR_createStyleForSelection(cursor: EDITOR_Cursor) {
             lineSelectionDiv = textSelectionDiv.children[childDivIndex++];
             lineSelectionDiv.className = 'EDITOR_selection';
             lineSelectionDiv.style.left = gutterWidthTotal_withPxUnits;
-            lineSelectionDiv.style.transform = `translate(${startColumn * EDITOR_characterWidth}px, ${get_EDITOR_lineHeight() * startLine}px)`;
+            lineSelectionDiv.style.transform = `translate(${startColumn * EDITOR_characterWidth}px, ${lineHeight * startLine}px)`;
             lineSelectionDiv.style.width = (INCLUSIVEendColumn - startColumn) * EDITOR_characterWidth + 'px';
         }
         else {
@@ -3175,7 +3177,7 @@ function EDITOR_createStyleForSelection(cursor: EDITOR_Cursor) {
             lineSelectionDiv = textSelectionDiv.children[childDivIndex++];
             lineSelectionDiv.className = 'EDITOR_selection';
             lineSelectionDiv.style.left = gutterWidthTotal_withPxUnits;
-            lineSelectionDiv.style.transform = `translate(${startColumn * EDITOR_characterWidth}px, ${get_EDITOR_lineHeight() * startLine}px)`;
+            lineSelectionDiv.style.transform = `translate(${startColumn * EDITOR_characterWidth}px, ${lineHeight * startLine}px)`;
             let line = EDITOR_getLineBoundaryPositions(startLine);
             let lineLength = line.end - line.start;
             lineSelectionDiv.style.width = (lineLength + 1 - startColumn) * EDITOR_characterWidth + 'px';
@@ -3185,7 +3187,7 @@ function EDITOR_createStyleForSelection(cursor: EDITOR_Cursor) {
                 lineSelectionDiv = textSelectionDiv.children[childDivIndex++];
                 lineSelectionDiv.className = 'EDITOR_selection';
                 lineSelectionDiv.style.left = gutterWidthTotal_withPxUnits;
-                lineSelectionDiv.style.transform = `translateY(${get_EDITOR_lineHeight() * lineI}px)`;
+                lineSelectionDiv.style.transform = `translateY(${lineHeight * lineI}px)`;
                 let line = EDITOR_getLineBoundaryPositions(lineI);
                 let lineLength = line.end - line.start;
                 lineSelectionDiv.style.width = (lineLength + 1) * EDITOR_characterWidth + 'px';
@@ -3195,7 +3197,7 @@ function EDITOR_createStyleForSelection(cursor: EDITOR_Cursor) {
             lineSelectionDiv = textSelectionDiv.children[childDivIndex++];
             lineSelectionDiv.className = 'EDITOR_selection';
             lineSelectionDiv.style.left = gutterWidthTotal_withPxUnits;
-            lineSelectionDiv.style.transform = `translateY(${get_EDITOR_lineHeight() * INCLUSIVEendLine}px)`;
+            lineSelectionDiv.style.transform = `translateY(${lineHeight * INCLUSIVEendLine}px)`;
             lineSelectionDiv.style.width = INCLUSIVEendColumn * EDITOR_characterWidth + 'px';
         }
     }
@@ -3374,7 +3376,7 @@ function EDITOR_onMouseMove_WRAPIT(event: MouseEvent) {
         let rY = event.clientY - get_EDITOR_recentBoundingClientRect_top() + lastReadNumber_scrollTop;
 
         let indexColumn = Math.round(rX / EDITOR_characterWidth);
-        let indexLine = Math.floor(rY / get_EDITOR_lineHeight());
+        let indexLine = Math.floor(rY / lineHeight);
 
         if (indexColumn < 0) {
             indexColumn = 0;
@@ -4952,7 +4954,7 @@ function EDITOR_onKeyDown_ArrowDown(event: KeyboardEvent) {
     event.stopPropagation();
     if (event.ctrlKey) {
         // TODO: raf or something this scrollBy?
-        EDITOR_baseElement.scrollBy(0, get_EDITOR_lineHeight());
+        EDITOR_baseElement.scrollBy(0, lineHeight);
     }
     else if (event.altKey) {
         if (event.shiftKey) {
@@ -4984,7 +4986,7 @@ function EDITOR_onKeyDown_ArrowUp(event: KeyboardEvent) {
     event.stopPropagation();
     if (event.ctrlKey) {
         // TODO: raf or something this scrollBy?
-        EDITOR_baseElement.scrollBy(0, -1 * get_EDITOR_lineHeight());
+        EDITOR_baseElement.scrollBy(0, -1 * lineHeight);
     }
     else {
         let firstCursor = EDITOR_cursorList[0];
@@ -5315,7 +5317,7 @@ function EDITOR_onMouseDown(event) {
     let rY = event.clientY - get_EDITOR_recentBoundingClientRect_top() + lastReadNumber_scrollTop;
     let rX = event.clientX - get_EDITOR_recentBoundingClientRect_left() - get_EDITOR_gutterWidthTotal() + lastReadNumber_scrollLeft;
     
-    let indexLine = Math.floor(rY / get_EDITOR_lineHeight());
+    let indexLine = Math.floor(rY / lineHeight);
     let indexColumn = Math.round(rX / EDITOR_characterWidth);
 
     if (indexLine < 0) {
@@ -5371,7 +5373,7 @@ async function EDITOR_onContextMenu(event) {
     ];
 
     let menuLeft = get_EDITOR_recentBoundingClientRect_left() + get_EDITOR_gutterWidthTotal() + EDITOR_primaryCursor.cursorTranslateXValue - lastReadNumber_scrollLeft;
-    let menuTop = get_EDITOR_recentBoundingClientRect_top() + EDITOR_primaryCursor.cursorTranslateYValue + get_EDITOR_lineHeight() - lastReadNumber_scrollTop;
+    let menuTop = get_EDITOR_recentBoundingClientRect_top() + EDITOR_primaryCursor.cursorTranslateYValue + lineHeight - lastReadNumber_scrollTop;
 
     await menuSet('EDITOR', null, optionList, menuLeft, menuTop);
 }
@@ -8233,7 +8235,7 @@ function EDITOR_scrollCursorIntoView(cursor: EDITOR_Cursor) {
         // make the bottom touch then add lineHeight is probably the algorithm to get a perfect fill maybe do lineHeight * 2 skip an event when spamming arrowDown?
         let currentBottom = lastReadNumber_scrollTop + lastReadNumber_offsetHeight;
         let changeToMakeBottomTouch = cursor.cursorTranslateYValue - currentBottom;
-        scrollY = changeToMakeBottomTouch + (2 * get_EDITOR_lineHeight());
+        scrollY = changeToMakeBottomTouch + (2 * lineHeight);
     }
 
     if (cursor.cursorTranslateXValue < lastReadNumber_scrollLeft) {
@@ -8853,14 +8855,14 @@ function EDITOR_measureLineHeightAndCharacterWidth() {
     measureElement.innerHTML = 'A'.repeat(len);
     let measureElementBoundingClientRect = measureElement.getBoundingClientRect();
     EDITOR_characterWidth = measureElementBoundingClientRect.width / len; // 7.146002258917298
-    set_EDITOR_lineHeight(Math.ceil(measureElementBoundingClientRect.height)); // 15
+    lineHeight = (Math.ceil(measureElementBoundingClientRect.height)); // 15
 
     wrapper.removeChild(measureElement);
     cached_EDITOR_textElement.removeChild(wrapper);
 
     const root = document.documentElement;
     const computedStyles = window.getComputedStyle(root);
-    let teLineHeight = get_EDITOR_lineHeight() + 'px';
+    let teLineHeight = lineHeight + 'px';
     let propertyName = '--EDITOR-line-height';
     if (computedStyles.getPropertyValue(propertyName) !== teLineHeight) {
         // avoid layout with if statement
@@ -8945,7 +8947,7 @@ function EDITOR_requestLspHover() {
     let rY = event.clientY - get_EDITOR_recentBoundingClientRect_top() + lastReadNumber_scrollTop;
     let rX = event.clientX - get_EDITOR_recentBoundingClientRect_left() - get_EDITOR_gutterWidthTotal() + lastReadNumber_scrollLeft;
     
-    let indexLine = Math.floor(rY / get_EDITOR_lineHeight());
+    let indexLine = Math.floor(rY / lineHeight);
     let indexColumn = Math.round(rX / EDITOR_characterWidth);
 
     if (indexLine < 0) return;
