@@ -216,6 +216,10 @@ let offsetColumn = 0;
 
 let lineHeight = 20;
 
+let didChangeTextDocument_version = 0;
+
+let get_EDITOR_longestLine_indexLine = 0;
+
 class EDITOR_Cursor {
 
     static STATIC_CURSOR_ID = 1;
@@ -1801,8 +1805,8 @@ function EDITOR_finalizeEdit_InsertLtr(cursor: EDITOR_Cursor, indexLine_editOccu
     }
     // TODO: Account for any '\t\0\0\0' that exist on the line
     let text = EDITOR_decoder.decode(cursor.gapBuffer.subarray(0, cursor.gapBufferCount));
-    set_didChangeTextDocument_version(get_didChangeTextDocument_version() + 1);
-    let version = get_didChangeTextDocument_version();
+    didChangeTextDocument_version++;
+    let version = didChangeTextDocument_version;
 
     // --- CLEAN INTEGRATION ---
     enqueueLSPNotification({
@@ -2381,6 +2385,9 @@ function EDITOR_finalizeEdit_DeleteLtr_BackspaceRtl_RemoveTextNoBatching(cursor:
     else {
         startLineAndColumnIndices = EDITOR_getLineAndColumnIndices_raw(cursor.editPosition);
     }
+    if (startLineAndColumnIndices === undefined) {
+        throw new Error();
+    }
     let endLineAndColumnIndices;
     if (cursor.editKind === EditKind.RemoveTextNoBatching) {
         endLineAndColumnIndices = {
@@ -2390,6 +2397,9 @@ function EDITOR_finalizeEdit_DeleteLtr_BackspaceRtl_RemoveTextNoBatching(cursor:
     }
     else {
         endLineAndColumnIndices = EDITOR_getLineAndColumnIndices_raw(cursor.editPosition + cursor.editLength);
+    }
+    if (endLineAndColumnIndices === undefined) {
+        throw new Error();
     }
 
     if (cursor.editLineFeedCount > 0) {
@@ -2451,8 +2461,8 @@ function EDITOR_finalizeEdit_DeleteLtr_BackspaceRtl_RemoveTextNoBatching(cursor:
     let textSourceIdentifier = EDITOR_FORMATTED_textSourceIdentifier;
     // TODO: Account for any '\t\0\0\0' that exist on the line            
     let text = '';
-    set_didChangeTextDocument_version(get_didChangeTextDocument_version() + 1);
-    let version = get_didChangeTextDocument_version();
+    didChangeTextDocument_version++;
+    let version = didChangeTextDocument_version;
 
     // --- CLEAN INTEGRATION ---
     enqueueLSPNotification({
