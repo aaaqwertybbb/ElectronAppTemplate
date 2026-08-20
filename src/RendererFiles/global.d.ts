@@ -10,6 +10,7 @@ export interface MyAPI {
   chooseDirectory: () => Promise<any>;
   chooseWorkspace: () => Promise<any>;
   onMessage: (callback) => Promise<any>;
+  editorCompletionRequest_slice: (indexStart: number, indexEnd: number) => Promise<any>;
 }
 
 declare global {

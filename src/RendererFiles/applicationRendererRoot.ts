@@ -11,6 +11,31 @@ export let APP_lineHeight = 20;
 
 export type myAPI_languageServer_response = { method: string; value: any };
 
+export type myAPI_languageServer_response_TextDocumentCompletionItem = {
+    label: string,
+    kind: number,
+    detail: string,
+    insertText: string,
+    documentation: string,
+};
+
+export type myAPI_languageServer_SLICEresponse = {
+    isIncomplete: boolean,
+    items: myAPI_languageServer_response_TextDocumentCompletionItem[],
+    /// <summary>
+    /// I don't think this is in LSP specification but I need to start like this cause it is only way I'll get something "initially working".
+    /// </summary>
+    itemsStart: number,
+    /// <summary>
+    /// I don't think this is in LSP specification but I need to start like this cause it is only way I'll get something "initially working".
+    /// </summary>
+    itemsEnd: number,
+    /// <summary>
+	/// I don't think this is in LSP specification but I need to start like this cause it is only way I'll get something "initially working".
+	/// </summary>
+    totalLength: number,
+};
+
 init();
 
 function init() {

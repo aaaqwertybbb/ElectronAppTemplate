@@ -1,9 +1,9 @@
-import { APP_lineHeight } from "./applicationRendererRoot";
+import { APP_lineHeight, myAPI_languageServer_SLICEresponse } from "./applicationRendererRoot";
 import { EXPLORER_firstSpanWidthValue } from "./explorerGlobal";
 
 let AUTOCOMPLETE_exists = false;
 
-let AUTOCOMPLETE_pending_lspResult = null;
+let AUTOCOMPLETE_pending_lspResult: myAPI_languageServer_SLICEresponse | null = null;
 // I don't think 'slice' is in LSP specification but I need to start like this cause it is only way I'll get something "initially working".
 let AUTOCOMPLETE_items_slice = null;
 let AUTOCOMPLETE_items_slice_start = 0;
@@ -37,7 +37,7 @@ let AUTOCOMPLETE_virtualIndex = 0;
 
 let AUTOCOMPLETE_beltIndexZero = 0;
 
-let AUTOCOMPLETEElement = null;
+let AUTOCOMPLETEElement: HTMLElement | null = null;
 let AUTOCOMPLETE_scrollTop = 0;
 let AUTOCOMPLETE_arrayFromItemListElement: HTMLElement[] | null = null;
 
@@ -52,7 +52,7 @@ let AUTOCOMPLETE_sliceVirtualIndex_SLICE = 0;
 let AUTOCOMPLETE_sliceVirtualCount_SLICE = 0;
 let AUTOCOMPLETE_sliceBeltIndexZero_SLICE = 0;
 
-function AUTOCOMPLETE_render_request(renderKind) {
+function AUTOCOMPLETE_render_request(renderKind: Autocomplete_RenderKind) {
     if (AUTOCOMPLETE_renderKindArray[AUTOCOMPLETE_renderKindArray.length - 1] !== renderKind) {
         AUTOCOMPLETE_renderKindArray.push(renderKind);
     }
@@ -63,7 +63,7 @@ function AUTOCOMPLETE_render_request(renderKind) {
     }
 }
 
-function AUTOCOMPLETE_renderDo(timestamp) {
+function AUTOCOMPLETE_renderDo(timestamp: number) {
     let renderKind;
 
     while (renderKind = AUTOCOMPLETE_renderKindArray.shift()) {
@@ -78,7 +78,7 @@ function AUTOCOMPLETE_renderDo(timestamp) {
                 AUTOCOMPLETE_cursor_render_set();
                 break;
             case Autocomplete_RenderKind.CreateLines:
-                AUTOCOMPLETE_render_create_lines();
+                AUTOCOMPLETE_render_create_lines(null);
                 break;
             case Autocomplete_RenderKind.Scroll:
                 AUTOCOMPLETE_events_scroll_render(timestamp);
@@ -89,7 +89,7 @@ function AUTOCOMPLETE_renderDo(timestamp) {
     AUTOCOMPLETE_isRenderPending = false; // Reset the lock
 }
 
-function AUTOCOMPLETE_render_create_lines(AUTOCOMPLETE_itemList) {
+function AUTOCOMPLETE_render_create_lines(AUTOCOMPLETE_itemList: HTMLElement | null) {
 
     if (!AUTOCOMPLETE_itemList) {
         AUTOCOMPLETE_itemList = document.getElementById('AUTOCOMPLETE_itemList');
@@ -134,10 +134,18 @@ function AUTOCOMPLETE_render_create_lines(AUTOCOMPLETE_itemList) {
         verticalOffset += APP_lineHeight;
     }
 
-    AUTOCOMPLETE_arrayFromItemListElement = Array.from(AUTOCOMPLETE_itemList.children);
+    AUTOCOMPLETE_arrayFromItemListElement = Array.from(AUTOCOMPLETE_itemList.children) as HTMLElement[];
 }
 
-function AUTOCOMPLETE_render_RESET_lines(AUTOCOMPLETE_itemList) {
+function AUTOCOMPLETE_render_RESET_lines(AUTOCOMPLETE_itemList: HTMLElement | null) {
+
+    if (!AUTOCOMPLETEElement) {
+        throw new Error();
+    }
+
+    if (!AUTOCOMPLETE_arrayFromItemListElement) {
+        throw new Error();
+    }
 
     if (!AUTOCOMPLETE_itemList) {
         AUTOCOMPLETE_itemList = document.getElementById('AUTOCOMPLETE_itemList');
@@ -152,7 +160,10 @@ function AUTOCOMPLETE_render_RESET_lines(AUTOCOMPLETE_itemList) {
     AUTOCOMPLETE_beltIndexZero = 0;
     AUTOCOMPLETE_scrollTop = 0;
 
-    AUTOCOMPLETEElement.removeEventListener('scroll', AUTOCOMPLETE_events_scroll_receive, { passive: true });
+    // TODO: '{ passive: true }' is not part of 'removeEventListener' only the 'add'...
+    // ...remove the commented out '{ passive: true }' text.
+    //
+    AUTOCOMPLETEElement.removeEventListener('scroll', AUTOCOMPLETE_events_scroll_receive/*, { passive: true }*/);
     AUTOCOMPLETEElement.scrollTop = 0;
     AUTOCOMPLETEElement.addEventListener('scroll', AUTOCOMPLETE_events_scroll_receive, { passive: true });
     AUTOCOMPLETE_cursorIndex = 0;
@@ -209,7 +220,7 @@ function AUTOCOMPLETE_render_do_show(timestamp: number) {
         // I take on the state corruption risk, otherwise I just defensively handle it.
         if (!local_AUTOCOMPLETEElement) {
             AUTOCOMPLETE_exists = false;
-            AUTOCOMPLETE_render_do_show();
+            AUTOCOMPLETE_render_do_show(timestamp);
             return;
         }
 
@@ -251,6 +262,9 @@ function AUTOCOMPLETE_render_do_show(timestamp: number) {
     }
     
     let lspResult = AUTOCOMPLETE_pending_lspResult;
+    if (!lspResult) {
+        throw new Error();
+    }
     AUTOCOMPLETE_pending_lspResult = null;
     AUTOCOMPLETE_items_slice = lspResult.items;
     AUTOCOMPLETE_items_slice_start = lspResult.itemsStart;
@@ -272,18 +286,22 @@ function AUTOCOMPLETE_render_do_show(timestamp: number) {
     AUTOCOMPLETE_virtualIndex = 0;
 }
 
-function AUTOCOMPLETE_show(lspResult) {
+function AUTOCOMPLETE_show(lspResult: myAPI_languageServer_SLICEresponse) {
     AUTOCOMPLETE_pending_lspResult = lspResult;
     AUTOCOMPLETE_render_request(Autocomplete_RenderKind.Show);
 }
 
-function AUTOCOMPLETE_slice(lspResult) {
+function AUTOCOMPLETE_slice(lspResult: myAPI_languageServer_SLICEresponse) {
 
     AUTOCOMPLETE_scrollIsFetchingData = false;
     if (AUTOCOMPLETE_sliceVirtualIndex_SLICE != AUTOCOMPLETE_virtualIndex ||
         AUTOCOMPLETE_sliceVirtualCount_SLICE != AUTOCOMPLETE_virtualCount ||
         AUTOCOMPLETE_sliceBeltIndexZero_SLICE != AUTOCOMPLETE_beltIndexZero) {
             return;
+    }
+
+    if (!AUTOCOMPLETE_arrayFromItemListElement) {
+        throw new Error();
     }
 
     let local_AUTOCOMPLETE_arrayFromItemListElement = AUTOCOMPLETE_arrayFromItemListElement;
@@ -347,8 +365,15 @@ function AUTOCOMPLETE_hide() {
 
 function AUTOCOMPLETE_cursor_render_set() {
     if (!AUTOCOMPLETE_exists) return;
+
+    if (!AUTOCOMPLETEElement) {
+        throw new Error();
+    }
     
     let cursorElement = document.getElementById('AUTOCOMPLETE_cursor');
+    if (!cursorElement) {
+        throw new Error();
+    }
 
     // Determine the number without modifying styles so you can use this variable to determine the need to scroll into view without synchronous layout.
     let cursorTranslateYNumber = AUTOCOMPLETE_topPadding + (APP_lineHeight * AUTOCOMPLETE_cursorIndex);
@@ -374,12 +399,12 @@ function AUTOCOMPLETE_cursor_render_set() {
     cursorElement.style.transform = `translateY(${cursorTranslateYNumber}px)`;
 }
 
-function AUTOCOMPLETE_cursor_do_set(cursorIndex) {
+function AUTOCOMPLETE_cursor_do_set(cursorIndex: number) {
     AUTOCOMPLETE_cursorIndex = cursorIndex;
     AUTOCOMPLETE_render_request(Autocomplete_RenderKind.CursorSet);
 }
 
-function AUTOCOMPLETE_cursor_validate(cursorIndex) {
+function AUTOCOMPLETE_cursor_validate(cursorIndex: number) {
     if (cursorIndex >= AUTOCOMPLETE_items_totalLength) {
         cursorIndex = AUTOCOMPLETE_items_totalLength - 1;
     }
@@ -390,6 +415,10 @@ function AUTOCOMPLETE_cursor_validate(cursorIndex) {
 }
 
 function AUTOCOMPLETE_ensure_boundingClientRect() {
+    if (!AUTOCOMPLETEElement) {
+        throw new Error();
+    }
+
     if (AUTOCOMPLETE_rect_isNull && AUTOCOMPLETE_exists) {
         let rect = AUTOCOMPLETEElement.getBoundingClientRect();
         AUTOCOMPLETE_rectHeight = rect.height;
@@ -399,16 +428,21 @@ function AUTOCOMPLETE_ensure_boundingClientRect() {
     }
 }
 
-function AUTOCOMPLETE_events_add(AUTOCOMPLETEElement) {
+function AUTOCOMPLETE_events_add(AUTOCOMPLETEElement: HTMLElement) {
     AUTOCOMPLETEElement.addEventListener('keydown', AUTOCOMPLETE_events_onkeydown);
     AUTOCOMPLETEElement.addEventListener('scroll', AUTOCOMPLETE_events_scroll_receive, { passive: true });
     AUTOCOMPLETEElement.addEventListener('blur', AUTOCOMPLETE_events_blur_receive);
     window.addEventListener('resize', AUTOCOMPLETE_events_resize);
 }
 
-function AUTOCOMPLETE_events_remove(AUTOCOMPLETEElement) {
+function AUTOCOMPLETE_events_remove(AUTOCOMPLETEElement: HTMLElement) {
     AUTOCOMPLETEElement.removeEventListener('keydown', AUTOCOMPLETE_events_onkeydown);
-    AUTOCOMPLETEElement.removeEventListener('scroll', AUTOCOMPLETE_events_scroll_receive, { passive: true });
+
+    // TODO: '{ passive: true }' is not part of 'removeEventListener' only the 'add'...
+    // ...remove the commented out '{ passive: true }' text.
+    //
+    AUTOCOMPLETEElement.removeEventListener('scroll', AUTOCOMPLETE_events_scroll_receive/*, { passive: true }*/);
+
     AUTOCOMPLETEElement.removeEventListener('blur', AUTOCOMPLETE_events_blur_receive);
     window.removeEventListener('resize', AUTOCOMPLETE_events_resize);
 }
@@ -421,7 +455,10 @@ function AUTOCOMPLETE_events_blur_receive() {
     AUTOCOMPLETE_hide();
 }
 
-function AUTOCOMPLETE_events_scroll_receive(event) {
+function AUTOCOMPLETE_events_scroll_receive() {
+    if (!AUTOCOMPLETEElement) {
+        throw new Error();
+    }
     // it might be better as event.target.scrollTop or something... or????
     //
     // Something is still breaking
@@ -430,7 +467,11 @@ function AUTOCOMPLETE_events_scroll_receive(event) {
     AUTOCOMPLETE_render_request(Autocomplete_RenderKind.Scroll);
 }
 
-function AUTOCOMPLETE_events_scroll_render(timestamp) {
+function AUTOCOMPLETE_events_scroll_render(timestamp: number) {
+
+    if (!AUTOCOMPLETE_arrayFromItemListElement) {
+        throw new Error();
+    }
 
     AUTOCOMPLETE_scrollEndDeadline = timestamp + 300;
 
@@ -506,7 +547,7 @@ function AUTOCOMPLETE_events_scroll_render(timestamp) {
     }
 }
 
-function AUTOCOMPLETE_events_scroll_render_trailingEdgeCheck(timestamp) {
+function AUTOCOMPLETE_events_scroll_render_trailingEdgeCheck(timestamp: number) {
     if (timestamp < AUTOCOMPLETE_scrollEndDeadline) {
         requestAnimationFrame(AUTOCOMPLETE_events_scroll_render_trailingEdgeCheck);
         return;
@@ -526,7 +567,7 @@ function AUTOCOMPLETE_events_scroll_render_trailingEdgeDo() {
     }
 }
 
-function AUTOCOMPLETE_events_onkeydown(event) {
+function AUTOCOMPLETE_events_onkeydown(event: KeyboardEvent) {
     // Goal is to just have it disappear 99% of the time you interact with it and pull back on a key by key basis in time.
     switch (event.key) {
         case 'Shift':
@@ -546,9 +587,9 @@ function AUTOCOMPLETE_events_onkeydown(event) {
             break;
         default:
             AUTOCOMPLETE_hide();
-            if (EDITOR_baseElement) {
-                EDITOR_baseElement.focus();
-            }
+            //if (EDITOR_baseElement) {
+            //    EDITOR_baseElement.focus();
+            //}
             break;
     }
 }
