@@ -1,5 +1,5 @@
 import { DIALOG_show_async } from './dialogGlobal';
-import { EXPLORER_firstSpanWidth_SETTER, EXPLORER_firstSpanWidthValue, EXPLORER_firstSpanWidthValue_SETTER, EXPLORER_setShow } from './explorerGlobal';
+import { EXPLORER_firstSpanWidth_SETTER, EXPLORER_firstSpanWidthValue, EXPLORER_firstSpanWidthValue_SETTER, EXPLORER_setShow, EXPLORER_init } from './explorerGlobal';
 
 /**
  * This value ought to be an int (no decimal places) due to its high frequency usage in drawing UI,
@@ -66,8 +66,8 @@ function init() {
  * TODO: "Nothing stops you" from interacting with the UI thus it is possible to do things pre-initialization? TODO: Don't let this be the case?
  */
 function APP_render_init() {
-    //APP_measureLineHeightAndCharacterWidth();
-    //EXPLORER_init();
+    APP_measureLineHeightAndCharacterWidth();
+    EXPLORER_init();
     //EDITOR_init();
 }
 
