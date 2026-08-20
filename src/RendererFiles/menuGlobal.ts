@@ -842,4 +842,43 @@ The focus and energy I think will come from that alongside diet and exercise.
 The 25mg iron supplement.
 I didn't end up taking it last night I decided it was a little too high of an amount.
 
+====
+
+There's so many people who don't understand what AI is.
+Either that or they're just joining the hivemind for clicks and engagement with their videos.
+
+0% AI is bad
+100% AI is bad
+
+Remember these activities they probably had you do when learning coding for the first time:
+"describe to me how to make a peanut butter and jelly sandwich"
+"give me directions to the library"
+
+They showcased the mass amount of inference necessary to understand a language.
+
+Back in the day when you googled a question, maybe you scoured through various results that came up
+stack overflow, reddit, etc...
+
+You can ask a naturally worded question, and AI will infer what you mean by it,
+and as a result can search a far broader range of information rather than taking your search somewhat literally word for word.
+
+This inference results in expected inaccuracy.
+But you know this is inaccurate and your goal is to harness that inaccuracy as a means to search a large body of knowledge
+with a single wording of a question.
+
+You cannot ever trust what an AI says.
+
+"I don't like programming cause AI"
+
+omg I don't know I'm just triggered from a video I saw today.
+
+Clueless people everywhere. That just wanna complain to the lowest common denominator for clicks on their videos.
+
+Every line of code in this repo I've read.
+
+Even on the rare occassion that I generate a code snippet with AI I've read it from start to finish.
+
+You have a skill issue if you are black and white for or against AI.
+And if you don't "get good" you're gonna fall behind.
+
 */
