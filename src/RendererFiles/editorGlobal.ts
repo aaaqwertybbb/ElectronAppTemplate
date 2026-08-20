@@ -207,6 +207,8 @@ let cached_EDITOR_textElement: HTMLElement;
 let virtualCount = 0;
 let virtualIndexLine = 0;
 
+let ONSCROLLvirtualIndexLine = 0;
+
 class EDITOR_Cursor {
 
     static STATIC_CURSOR_ID = 1;
@@ -762,7 +764,7 @@ function EDITOR_render_do_Clear() {
     EDITOR_render_do_CreateViewport();
 }
 
-function EDITOR_render_do_SetText(timestamp) {
+function EDITOR_render_do_SetText(timestamp: number) {
     EDITOR_render_do_Clear();
 
     // TODO: This code paragraph will run when scrolling horizontally at the moment, this is unfortunate because it relates to scrolling vertically.
@@ -771,9 +773,9 @@ function EDITOR_render_do_SetText(timestamp) {
 
     EDITOR_render_do_Scroll(timestamp)
 
-    prevVli = get_EDITOR_ONSCROLLvirtualIndexLine(); // If I delay setting 'set_EDITOR_ONSCROLLvirtualIndexLine()' then I can just use that. I can't bear to do that right now though. I'm just gonna make this variable.
+    prevVli = ONSCROLLvirtualIndexLine; // If I delay setting 'ONSCROLLvirtualIndexLine' then I can just use that. I can't bear to do that right now though. I'm just gonna make this variable.
     currVli = virtualIndexLine;
-    set_EDITOR_ONSCROLLvirtualIndexLine(virtualIndexLine);
+    ONSCROLLvirtualIndexLine = virtualIndexLine;
 
     EDITOR_scrollEndDeadline = timestamp + 1000;
     if (!isCheckingTrailingEdge) {
@@ -916,9 +918,9 @@ function EDITOR_render_do_Scroll(timestamp) {
     virtualIndexLine = (Math.floor(lastReadNumber_scrollTop / get_EDITOR_lineHeight()));
     // ====
     // ==== end explicit inline (duplication) of 'update_VirtualIndexLine()';
-    prevVli = get_EDITOR_ONSCROLLvirtualIndexLine(); // If I delay setting 'set_EDITOR_ONSCROLLvirtualIndexLine()' then I can just use that. I can't bear to do that right now though. I'm just gonna make this variable.
+    prevVli = ONSCROLLvirtualIndexLine; // If I delay setting 'ONSCROLLvirtualIndexLine' then I can just use that. I can't bear to do that right now though. I'm just gonna make this variable.
     currVli = virtualIndexLine;
-    set_EDITOR_ONSCROLLvirtualIndexLine(virtualIndexLine);
+    ONSCROLLvirtualIndexLine = virtualIndexLine;
 
     EDITOR_scrollEndDeadline = timestamp + 1000;
 
@@ -1477,7 +1479,7 @@ function EDITOR_state_setText(text, fileStartsWithBom, textSourceIdentifier, FOR
     // ...the difference between the previous and new value is 'virtualCount'...
     // ...thus 'virtualCount' amount of lines get redrawn...
     // ...i.e.: the entire viewport is redrawn with the new file's text.
-    set_EDITOR_ONSCROLLvirtualIndexLine(virtualCount);
+    ONSCROLLvirtualIndexLine = virtualCount;
 }
 
 /**
