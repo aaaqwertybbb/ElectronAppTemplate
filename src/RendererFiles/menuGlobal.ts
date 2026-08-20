@@ -836,4 +836,10 @@ Same goes for COQ10 and NAC, I just wanna check the nutritional boxes.
 
 The focus and energy I think will come from that alongside diet and exercise.
 
+
+====
+
+The 25mg iron supplement.
+I didn't end up taking it last night I decided it was a little too high of an amount.
+
 */
