@@ -219,6 +219,7 @@ let lineHeight = 20;
 let didChangeTextDocument_version = 0;
 
 let longestLine_indexLine = 0;
+let longestLine_length = 0;
 
 class EDITOR_Cursor {
 
@@ -1365,7 +1366,7 @@ function EDITOR_state_clear() {
     EDITOR_lineEndPositionList.clear();
     EDITOR_textByteList.clear();
     longestLine_indexLine = 0;
-    set_EDITOR_longestLine_length(0);
+    longestLine_length = 0;
     
     // Explicitly inlining 'clearMulticursorState()' because it currently is and I just don't want to make a decision about this right now.
     // So what I can do is mark the code paragraph for later decision making.
@@ -1424,8 +1425,8 @@ function EDITOR_state_setText(text, fileStartsWithBom, textSourceIdentifier, FOR
                         EDITOR_lineEndString = '\r';
                     }
                 }
-                if (lineLength > get_EDITOR_longestLine_length()) {
-                    set_EDITOR_longestLine_length(lineLength);
+                if (lineLength > longestLine_length) {
+                    longestLine_length = lineLength;
                     longestLine_indexLine = EDITOR_lineEndPositionList.count;
                 }
                 lineLength = 0;
@@ -1436,8 +1437,8 @@ function EDITOR_state_setText(text, fileStartsWithBom, textSourceIdentifier, FOR
                 if (!EDITOR_lineEndString) {
                     EDITOR_lineEndString = '\n';
                 }
-                if (lineLength > get_EDITOR_longestLine_length()) {
-                    set_EDITOR_longestLine_length(lineLength);
+                if (lineLength > longestLine_length) {
+                    longestLine_length = lineLength;
                     longestLine_indexLine = EDITOR_lineEndPositionList.count;
                 }
                 lineLength = 0;
@@ -1596,11 +1597,11 @@ function EDITOR_drawHorizontalScrollbar() {
         cached_EDITOR_horizontal_scrollbar.style.width = EDITOR_horizontal_scrollbar_widthValue + 'px';
     }
 
-    if (get_EDITOR_longestLine_length() !== get_EDITOR_longestLine_length_PreviousValueWhenLastDrewHorizontalScrollbar()) {
+    if (longestLine_length !== get_EDITOR_longestLine_length_PreviousValueWhenLastDrewHorizontalScrollbar()) {
         
-        set_EDITOR_longestLine_length_PreviousValueWhenLastDrewHorizontalScrollbar(get_EDITOR_longestLine_length());
+        set_EDITOR_longestLine_length_PreviousValueWhenLastDrewHorizontalScrollbar(longestLine_length);
 
-        set_EDITOR_contentWidth(Math.ceil(get_EDITOR_longestLine_length() * EDITOR_characterWidth));
+        set_EDITOR_contentWidth(Math.ceil(longestLine_length * EDITOR_characterWidth));
 
         if ((get_EDITOR_contentWidth() < (EDITOR_baseElement.clientWidth - get_EDITOR_gutterWidthTotal())) && (EDITOR_baseElement.clientWidth - get_EDITOR_gutterWidthTotal() > 0)) {
             set_EDITOR_contentWidth(Math.floor(EDITOR_baseElement.clientWidth - get_EDITOR_gutterWidthTotal()));
@@ -1821,7 +1822,7 @@ function EDITOR_finalizeEdit_InsertLtr(cursor: EDITOR_Cursor, indexLine_editOccu
     // -------------------------
 
     if (indexLine_editOccurredOn === longestLine_indexLine) {
-        set_EDITOR_longestLine_length(get_EDITOR_longestLine_length() + cursor.editLength);
+        longestLine_length = longestLine_length + cursor.editLength;
     }
 
     EDITOR_finalizeEdit_ClearEditState(cursor);
@@ -2477,7 +2478,7 @@ function EDITOR_finalizeEdit_DeleteLtr_BackspaceRtl_RemoveTextNoBatching(cursor:
     // -------------------------
 
     if (indexLine_editOccurredOn === longestLine_indexLine) {
-        set_EDITOR_longestLine_length(get_EDITOR_longestLine_length() - cursor.editLength);
+        longestLine_length = longestLine_length - cursor.editLength;
     }
 
     EDITOR_finalizeEdit_ClearEditState(cursor);
@@ -2939,7 +2940,7 @@ function EDITOR_drawCursor(cursor: EDITOR_Cursor, NOTscrollCursorIntoView?: bool
         
         text += ' | (' + cursor.editLength + ')';
 
-        text += ' | (' + longestLine_indexLine + ', ' + get_EDITOR_longestLine_length() + ')';
+        text += ' | (' + longestLine_indexLine + ', ' + longestLine_length + ')';
 
         EDITOR_debug.replaceChildren(text);
 
