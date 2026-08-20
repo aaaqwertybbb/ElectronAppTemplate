@@ -592,37 +592,37 @@ function EDITOR_render_do(timestamp) {
             case RenderKind.IndentLess:
                 EDITOR_render_do_IndentLess();
                 break;
-            case get_RenderKind_BackspaceRtl():
+            case RenderKind.BackspaceRtl:
                 EDITOR_render_do_Backspace();
                 break;
-            case get_RenderKind_DeleteLtr():
+            case RenderKind.DeleteLtr:
                 EDITOR_render_do_Delete();
                 break;
-            case get_RenderKind_RemoveSelection():
+            case RenderKind.RemoveSelection:
                 EDITOR_render_do_RemoveSelection();
                 break;
-            case get_RenderKind_Enter():
+            case RenderKind.Enter:
                 EDITOR_render_do_EnterKey();
                 break;
-            case get_RenderKind_DuplicateOrPaste():
+            case RenderKind.DuplicateOrPaste:
                 EDITOR_render_do_DuplicateOrPaste();
                 break;
-            case get_RenderKind_Clear():
+            case RenderKind.Clear:
                 EDITOR_render_do_Clear();
                 break;
-            case get_RenderKind_SetText():
+            case RenderKind.SetText:
                 EDITOR_render_do_SetText(timestamp);
                 break;
-            case get_RenderKind_CreateViewport():
+            case RenderKind.CreateViewport:
                 EDITOR_render_do_CreateViewport();
                 break;
-            case get_RenderKind_SyntaxHighlighting():
+            case RenderKind.SyntaxHighlighting:
                 EDITOR_render_do_SyntaxHighlighting();
                 break;
             // Don't include these you're wasting stackframe space.
             // You could perhaps "debug mode" check for these
-            //case get_RenderKind_None(): // this is a duplicate case ???
-            //case get_RenderKind_Cursor_flag_doNotScrollIntoView(): // TODO: This is a silent error
+            //case RenderKind.None: // this is a duplicate case ???
+            //case RenderKind.Cursor_flag_doNotScrollIntoView: // TODO: This is a silent error
             //case get_RenderKind_Cursor_flag_scrollIntoViewExplicit(): // TODO: This is a silent error
             //    break;
             default:
@@ -647,7 +647,7 @@ function EDITOR_render_do_cursor(timestamp, renderKind) {
     let flag_scrollIntoViewExplicit = false;
 
     let entryZero = EDITOR_renderKindArray[0];
-    if (entryZero === get_RenderKind_Cursor_flag_doNotScrollIntoView()) {
+    if (entryZero === RenderKind.Cursor_flag_doNotScrollIntoView) {
         EDITOR_renderKindArray.shift();
         notShouldScrollIntoView = true;
     }
@@ -788,7 +788,7 @@ function EDITOR_render_do_CreateViewport() {
 }
 
 function EDITOR_createViewport() {
-    EDITOR_render_request(get_RenderKind_CreateViewport());
+    EDITOR_render_request(RenderKind.CreateViewport);
 }
 
 /**
@@ -1034,7 +1034,7 @@ function EDITOR_render_do_ScrollTrailingEdgeCheck(timestamp) {
 function EDITOR_onScroll_TrailingEdge() {
     isScrolling = false;
     isCheckingTrailingEdge = false; // Reset the flag here
-    EDITOR_render_request(get_RenderKind_SyntaxHighlighting());
+    EDITOR_render_request(RenderKind.SyntaxHighlighting);
 }
 
 
@@ -1306,7 +1306,7 @@ function EDITOR_state_clear() {
 
 function EDITOR_clear() {
     EDITOR_state_clear();
-    EDITOR_render_request(get_RenderKind_Clear());
+    EDITOR_render_request(RenderKind.Clear);
 }
 
 function EDITOR_state_setText(text, fileStartsWithBom, textSourceIdentifier, FORMATTED_textSourceIdentifier, extensionKind, lineEndString) {
@@ -1425,7 +1425,7 @@ function EDITOR_state_setText(text, fileStartsWithBom, textSourceIdentifier, FOR
  */
 function EDITOR_setText(text, fileStartsWithBom, textSourceIdentifier, FORMATTED_textSourceIdentifier, extensionKind, lineEndString) {
     EDITOR_state_setText(text, fileStartsWithBom, textSourceIdentifier, FORMATTED_textSourceIdentifier, extensionKind, lineEndString);
-    EDITOR_render_request(get_RenderKind_SetText());
+    EDITOR_render_request(RenderKind.SetText);
 }
 
 /**
@@ -5142,7 +5142,7 @@ async function EDITOR_onKeyDown_keyLengthEqualsOne_ctrlKey(event) {
             EDITOR_primaryCursor.indexLine = selectionEndLineAndColumnIndices.indexLine;
             EDITOR_primaryCursor.indexColumn = selectionEndLineAndColumnIndices.indexColumn;
             EDITOR_render_request(get_RenderKind_Cursor_n() + indexCursor);
-            EDITOR_render_request(get_RenderKind_Cursor_flag_doNotScrollIntoView());
+            EDITOR_render_request(RenderKind.Cursor_flag_doNotScrollIntoView);
             break;
         case 'f':
 
@@ -6038,7 +6038,7 @@ async function EDITOR_duplicateSelection(cursor) {
     cursor.selectionEnd = large + length;
 
     // TODO: The previous render logic was actually moving the cursor as well. Just something to keep in mind, you might see a bug related to this.
-    EDITOR_render_request(get_RenderKind_DuplicateOrPaste());
+    EDITOR_render_request(RenderKind.DuplicateOrPaste);
 }
 
 function EDITOR_render_do_DuplicateOrPaste() {
@@ -6581,7 +6581,7 @@ function EDITOR_paste(cursor, content) {
     }
 
     // TODO: The previous render logic was actually moving the cursor as well. Just something to keep in mind, you might see a bug related to this.
-    EDITOR_render_request(get_RenderKind_DuplicateOrPaste());
+    EDITOR_render_request(RenderKind.DuplicateOrPaste);
 }
 
 /**
@@ -7061,7 +7061,7 @@ function EDITOR_EnterKey(cursor, ctrlKey, shiftKey) {
     cursor.END_editIndexLine = cursor.indexLine;
     cursor.END_editIndexColumn = cursor.indexColumn;
 
-    EDITOR_render_request(get_RenderKind_Enter());
+    EDITOR_render_request(RenderKind.Enter);
 }
 
 /**
@@ -7337,7 +7337,7 @@ function EDITOR_removeSelection(cursor) {
     
     cursor.STORED_indexColumn = cursor.indexColumn;
 
-    EDITOR_render_request(get_RenderKind_RemoveSelection());
+    EDITOR_render_request(RenderKind.RemoveSelection);
 }
 
 function EDITOR_render_do_RemoveSelection() {
@@ -7794,7 +7794,7 @@ function EDITOR_state_do_Delete(cursor, event) {
 
             cursor.edit_flagLineChanged = cursor.editLength;
 
-            EDITOR_render_request(get_RenderKind_DeleteLtr());
+            EDITOR_render_request(RenderKind.DeleteLtr);
         }
         else {
             // Start of file
@@ -7841,7 +7841,7 @@ function EDITOR_state_do_Delete(cursor, event) {
             cursor.editLength++;
         }
 
-        EDITOR_render_request(get_RenderKind_DeleteLtr());
+        EDITOR_render_request(RenderKind.DeleteLtr);
     }
 }
 
@@ -8009,7 +8009,7 @@ function EDITOR_state_do_Backspace(cursor, event) {
         }
     }
 
-    EDITOR_render_request(get_RenderKind_BackspaceRtl());
+    EDITOR_render_request(RenderKind.BackspaceRtl);
 }
 
 /**
@@ -8020,10 +8020,10 @@ function EDITOR_state_do_Backspace(cursor, event) {
 function EDITOR_backspaceDo(cursor, event) {
     EDITOR_state_do_Backspace(cursor, event);
 
-    // EDITOR_render_request(get_RenderKind_BackspaceRtl());
+    // EDITOR_render_request(RenderKind.BackspaceRtl);
     //
     // This is too confusing for me to read given my current mood / energy levels. (I tell myself it is just my current mood / energy levels to cope with my incompetence)
-    // I'm just gonna isolate the code that doesn't remove a lineEnd and get that part working with 'EDITOR_render_request(get_RenderKind_BackspaceRtl());'
+    // I'm just gonna isolate the code that doesn't remove a lineEnd and get that part working with 'EDITOR_render_request(RenderKind.BackspaceRtl);'
     // first.
 
     // I'm exhausted I'll probably do non-lineEnd delete key then be done
