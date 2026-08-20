@@ -181,6 +181,8 @@ export let EDITOR_textByteList = new ByteList(1024);
 const EDITOR_encoder = new TextEncoder();
 export const EDITOR_decoder = new TextDecoder();
 
+const EDITOR_baseElement = document.getElementById('EDITOR');
+
 let cached_EDITOR_virtualization_horizontal: HTMLElement;
 let cached_EDITOR_virtualization_vertical: HTMLElement;
 let cached_EDITOR_gutter: HTMLElement;
@@ -419,6 +421,17 @@ const EDITOR_findOverlay = document.getElementById('EDITOR_findOverlay');
 EDITOR_findOverlay.style.visibility = 'hidden';
 
 const EDITOR_gutterBackgroundColor = document.getElementById('EDITOR_gutter_background_color');
+
+const EDITOR_tab_tabsbytes = new Uint8Array(4);
+EDITOR_tab_tabsbytes[0] = 9 /* TAB '\t' */;
+EDITOR_tab_tabsbytes[1] = 0;
+EDITOR_tab_tabsbytes[2] = 0;
+EDITOR_tab_tabsbytes[3] = 0;
+const EDITOR_tab_spacesbytes = new Uint8Array(4);
+EDITOR_tab_spacesbytes[0] = 32 /* SPACE ' ' */;
+EDITOR_tab_spacesbytes[1] = 32 /* SPACE ' ' */;
+EDITOR_tab_spacesbytes[2] = 32 /* SPACE ' ' */;
+EDITOR_tab_spacesbytes[3] = 32 /* SPACE ' ' */;
 
 /**
  * Null characters provide visual width for proportional fonts. They do not get copied or saved out.
@@ -1631,7 +1644,7 @@ function EDITOR_finalizeAllCursors_andClearNonPrimaryCursors() {
  * 
  * @param {EDITOR_Cursor} cursor 
  */
-function EDITOR_finalizeEdit(cursor) {
+function EDITOR_finalizeEdit(cursor: EDITOR_Cursor) {
     /**
      * Later code needs to know the line index that the removal occurred on.
      * In a naive approach, presume every edit only spans a single line.
@@ -1718,7 +1731,7 @@ function EDITOR_finalizeEdit(cursor) {
 /**
  * @param {EDITOR_Cursor} cursor 
  */
-function EDITOR_finalizeEdit_InsertLtr(cursor, indexLine_editOccurredOn) {
+function EDITOR_finalizeEdit_InsertLtr(cursor: EDITOR_Cursor, indexLine_editOccurredOn: number) {
     for (let i = EDITOR_lineEndPositionList.count - 1; i >= 0; i--) {
         if (cursor.editPosition <= EDITOR_lineEndPositionList.data[i]) {
             EDITOR_lineEndPositionList.data[i] += cursor.editLength;
@@ -1784,7 +1797,7 @@ function EDITOR_finalizeEdit_InsertLtr(cursor, indexLine_editOccurredOn) {
 /**
  * @param {EDITOR_Cursor} cursor 
  */
-function EDITOR_finalizeEdit_Enter(cursor, indexLine_editOccurredOn) {
+function EDITOR_finalizeEdit_Enter(cursor: EDITOR_Cursor, indexLine_editOccurredOn: number) {
     if (cursor.editRenderedDisplacement !== cursor.editLength) {
         EDITOR_render_do_EnterKey();
     }
@@ -1816,7 +1829,7 @@ function EDITOR_finalizeEdit_Enter(cursor, indexLine_editOccurredOn) {
 /**
  * @param {EDITOR_Cursor} cursor 
  */
-function EDITOR_finalizeEdit_Tab(cursor, indexLine_editOccurredOn) {
+function EDITOR_finalizeEdit_Tab(cursor: EDITOR_Cursor, indexLine_editOccurredOn: number) {
 
     let that_four = 4;
 
@@ -1850,7 +1863,7 @@ function EDITOR_finalizeEdit_Tab(cursor, indexLine_editOccurredOn) {
 /**
  * @param {EDITOR_Cursor} cursor 
  */
-function EDITOR_finalizeEdit_IndentMore(cursor, indexLine_editOccurredOn) {
+function EDITOR_finalizeEdit_IndentMore(cursor: EDITOR_Cursor, indexLine_editOccurredOn: number) {
 
     let startingIndex = get_EDITOR_indent_startingIndex();
     set_EDITOR_indent_startingIndex(0);
@@ -1960,7 +1973,7 @@ function EDITOR_finalizeEdit_IndentMore(cursor, indexLine_editOccurredOn) {
 /**
  * @param {EDITOR_Cursor} cursor 
  */
-function EDITOR_finalizeEdit_IndentLess(cursor, indexLine_editOccurredOn) {
+function EDITOR_finalizeEdit_IndentLess(cursor: EDITOR_Cursor, indexLine_editOccurredOn: number) {
 
     // Both indentMore and indentLess have logic in the initial event that needs to be moved here.
     // Nevertheless there is a difference between indentLess and indentMore in that you cannot simply
@@ -2227,7 +2240,7 @@ function EDITOR_finalizeEdit_IndentLess(cursor, indexLine_editOccurredOn) {
 /**
  * @param {EDITOR_Cursor} cursor 
  */
-function EDITOR_finalizeEdit_Paste(cursor, indexLine_editOccurredOn) {
+function EDITOR_finalizeEdit_Paste(cursor: EDITOR_Cursor, indexLine_editOccurredOn: number) {
     
     EDITOR_trackedSyntaxList_inefficientUpdateStartAndLength(cursor.editPosition, cursor.editLength);
     
@@ -2277,7 +2290,7 @@ function EDITOR_finalizeEdit_Paste(cursor, indexLine_editOccurredOn) {
 /**
  * @param {EDITOR_Cursor} cursor 
  */
-function EDITOR_finalizeEdit_Duplicate(cursor, indexLine_editOccurredOn) {
+function EDITOR_finalizeEdit_Duplicate(cursor: EDITOR_Cursor, indexLine_editOccurredOn: number) {
 
     EDITOR_trackedSyntaxList_inefficientUpdateStartAndLength(cursor.editPosition, cursor.editLength);
 
@@ -6757,7 +6770,7 @@ function EDITOR_cacheIndentation(cursor) {
         let c = getCharacter(line.start + i);
         switch (c) {
             case ' ':
-                cursor.enterKey_newLinePlusIndentation_byteList.insert(cursor.enterKey_newLinePlusIndentation_byteList.count, get_EDITOR_ASCII_SPACE());
+                cursor.enterKey_newLinePlusIndentation_byteList.insert(cursor.enterKey_newLinePlusIndentation_byteList.count, 32 /* SPACE ' ' */);
                 indentationBuilder.push(c);
                 break;
             case '\t':
