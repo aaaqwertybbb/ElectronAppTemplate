@@ -42,7 +42,7 @@ class EXPLORER_TreeViewComponent extends TreeViewComponent {
     scrollFetchData_virtualIndex: number;
     scrollFetchData_virtualCount: number;
     scrollFetchData_beltIndexZero: number;
-    pullData_result: Uint32Array<ArrayBuffer> | null;
+    pullData_result: Uint32Array | null;
     pullData_result_count: number;
     arrayEntries: any[] | null;
     KEY_BITS: number;
