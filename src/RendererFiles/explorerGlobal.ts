@@ -773,7 +773,7 @@ That being said, the explorer in this app IS integral, so I'll go down this rout
 
 ...more details involved but I'm thinking and deciding.
 */
-function EXPLORER_setShow(shouldShow: boolean) {
+export function EXPLORER_setShow(shouldShow: boolean) {
     const EXPLORER_Element = document.getElementById('EXPLORER');
     if (!EXPLORER_Element) return;
 

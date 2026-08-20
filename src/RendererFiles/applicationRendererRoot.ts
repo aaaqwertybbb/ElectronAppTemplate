@@ -1,5 +1,5 @@
 import { DIALOG_show_async } from './dialogGlobal';
-import { EXPLORER_firstSpanWidth_SETTER, EXPLORER_firstSpanWidthValue, EXPLORER_firstSpanWidthValue_SETTER } from './explorerGlobal';
+import { EXPLORER_firstSpanWidth_SETTER, EXPLORER_firstSpanWidthValue, EXPLORER_firstSpanWidthValue_SETTER, EXPLORER_setShow } from './explorerGlobal';
 
 /**
  * This value ought to be an int (no decimal places) due to its high frequency usage in drawing UI,
@@ -163,6 +163,9 @@ async function documentBody_onKeyDown(event) {
             if (event.altKey) {
                 EXPLORER_setShow(true);
                 const EXPLORER_Element = document.getElementById('EXPLORER');
+                if (!EXPLORER_Element) {
+                    return;
+                }
                 if (EXPLORER_Element.children.length === 1) {
                     EXPLORER_Element.children[0].focus();
                 }

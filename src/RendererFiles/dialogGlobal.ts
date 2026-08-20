@@ -1,12 +1,21 @@
 import { DIALOG_Settings_Create_async, DIALOG_Settings_Delete_async } from "./dialogImplementationsGlobal"
 
-const get_DialogKind_None = () => "None";
-const get_DialogKind_FindAll = () => "FindAll";
-const get_DialogKind_Settings = () => "Settings";
-const get_DialogKind_DocumentSymbol = () => "DocumentSymbol";
-const get_DialogKind_Debug = () => "Debug";
 
-let DIALOG_currentDialogKind = get_DialogKind_None();
+
+
+export const DialogKind = {
+    None: "None",
+    FindAll: "FindAll",
+    Settings: "Settings",
+    DocumentSymbol: "DocumentSymbol",
+    Debug: "Debug",
+} as const;
+// Derive the type union from the object values
+export type DialogKind = typeof DialogKind[keyof typeof DialogKind];
+
+
+
+let DIALOG_currentDialogKind: DialogKind = DialogKind.None;
 
 /** A delegate of the form: () => {} */
 let DIALOG_onResizeAction: (() => void) | null = null;
@@ -18,7 +27,7 @@ let DIALOG_windowExists = false;
 let DIALOG_hasBeenMeaasured = false;
 
 let DIALOG_SHOW_restoreFocusToElement: HTMLElement | null = null;
-let DIALOG_SHOW_currentDialogKind: string = get_DialogKind_None();
+let DIALOG_SHOW_currentDialogKind: DialogKind = DialogKind.None;
 let DIALOG_SHOW_onResizeAction: (() => void) | null = null;
 
 /**
@@ -50,10 +59,21 @@ let DIALOG_Settings_editorDebugShowAdjacentCharacters = false;
 let DIALOG_renderKindArray: number[] = [];
 let DIALOG_isRenderPending = false;
 
-const get_DIALOGrenderKind_None = () => 0;
-const get_DIALOGrenderKind_Show = () => 1;
-const get_DIALOGrenderKind_Hide = () => 2;
-const get_DIALOGrenderKind_DimensionsChanged = () => 3;
+
+
+
+
+export const Dialog_RenderKind = {
+    None: 0,
+    Show: 1,
+    Hide: 2,
+    DimensionsChanged: 3,
+} as const;
+// Derive the type union from the object values
+export type Dialog_RenderKind = typeof Dialog_RenderKind[keyof typeof Dialog_RenderKind];
+
+
+
 
 const DIALOG_minTop = 8;
 const DIALOG_minLeft = 8;
@@ -80,13 +100,13 @@ function DIALOG_render_do() {
     
     while (renderKind = DIALOG_renderKindArray.shift()) {
         switch (renderKind) {
-            case get_DIALOGrenderKind_Show():
+            case Dialog_RenderKind.Show:
                 DIALOG_render_do_Show();
                 break;
-            case get_DIALOGrenderKind_Hide():
+            case Dialog_RenderKind.Hide:
                 DIALOG_render_do_Hide();
                 break;
-            case get_DIALOGrenderKind_DimensionsChanged():
+            case Dialog_RenderKind.DimensionsChanged:
                 DIALOG_render_do_DimensionsChanged();
                 break;
         }
@@ -119,7 +139,7 @@ function DIALOG_render_do_DimensionsChanged() {
 }
 
 async function DIALOG_render_do_Show() {
-    if (DIALOG_currentDialogKind !== get_DialogKind_None()) {
+    if (DIALOG_currentDialogKind !== DialogKind.None) {
         DIALOG_HIDE_shouldRestoreFocus = true;
         await DIALOG_render_do_Hide();
     }
@@ -138,12 +158,12 @@ async function DIALOG_render_do_Show() {
     DIALOG_createWindow();
 
     switch (DIALOG_currentDialogKind) {
-        case get_DialogKind_Settings():
+        case DialogKind.Settings:
             return DIALOG_Settings_Create_async();
     }
 }
 
-export async function DIALOG_show_async(dialogKind: string, onResizeAction: (() => void) | null) {
+export async function DIALOG_show_async(dialogKind: DialogKind, onResizeAction: (() => void) | null) {
     if (document.activeElement instanceof HTMLElement) {
         DIALOG_SHOW_restoreFocusToElement = document.activeElement;
     }
@@ -153,7 +173,7 @@ export async function DIALOG_show_async(dialogKind: string, onResizeAction: (() 
 
     DIALOG_SHOW_currentDialogKind = dialogKind;
     DIALOG_SHOW_onResizeAction = onResizeAction;
-    DIALOG_render_request(get_DIALOGrenderKind_Show());
+    DIALOG_render_request(Dialog_RenderKind.Show);
 }
 
 async function DIALOG_render_do_Hide() {
@@ -161,7 +181,7 @@ async function DIALOG_render_do_Hide() {
     if (!DIALOG_element) return;
 
     switch (DIALOG_currentDialogKind) {
-        case get_DialogKind_Settings():
+        case DialogKind.Settings:
             await DIALOG_Settings_Delete_async();
             break;
     }
@@ -170,7 +190,7 @@ async function DIALOG_render_do_Hide() {
 
     DIALOG_onResizeAction = null;
     DIALOG_element.remove();
-    DIALOG_currentDialogKind = get_DialogKind_None();
+    DIALOG_currentDialogKind = DialogKind.None;
     if (DIALOG_HIDE_shouldRestoreFocus) {
         if (DIALOG_restoreFocusToElement) {
             DIALOG_restoreFocusToElement.focus();
@@ -181,7 +201,7 @@ async function DIALOG_render_do_Hide() {
 
 function DIALOG_hide_request(shouldRestoreFocus: boolean) {
     DIALOG_HIDE_shouldRestoreFocus = shouldRestoreFocus;
-    DIALOG_render_request(get_DIALOGrenderKind_Hide());
+    DIALOG_render_request(Dialog_RenderKind.Hide);
 }
 
 function DIALOG_closeButton_onclick() {
@@ -421,7 +441,7 @@ function DIALOG_resize_body_onmousemove(event: MouseEvent) {
             return;
     }
 
-    DIALOG_render_request(get_DIALOGrenderKind_DimensionsChanged());
+    DIALOG_render_request(Dialog_RenderKind.DimensionsChanged);
 }
 
 function DIALOG_resize_setCursor(event: MouseEvent, dialogBoundingClientRect: DOMRect, resize: HTMLElement) {
@@ -543,12 +563,12 @@ function DIALOG_toolbar_body_onmousemove(event: MouseEvent) {
 
             DIALOG_left -= absdiff_X;
             DIALOG_before_X = clientX;
-            DIALOG_render_request(get_DIALOGrenderKind_DimensionsChanged());
+            DIALOG_render_request(Dialog_RenderKind.DimensionsChanged);
         }
         else {
             DIALOG_left -= absdiff_X;
             DIALOG_before_X = clientX;
-            DIALOG_render_request(get_DIALOGrenderKind_DimensionsChanged());
+            DIALOG_render_request(Dialog_RenderKind.DimensionsChanged);
         }
     }
     else if (diff_X > 0) {
@@ -563,12 +583,12 @@ function DIALOG_toolbar_body_onmousemove(event: MouseEvent) {
 
             DIALOG_left += absdiff_X;
             DIALOG_before_X = clientX;
-            DIALOG_render_request(get_DIALOGrenderKind_DimensionsChanged());
+            DIALOG_render_request(Dialog_RenderKind.DimensionsChanged);
         }
         else {
             DIALOG_left += absdiff_X;
             DIALOG_before_X = clientX;
-            DIALOG_render_request(get_DIALOGrenderKind_DimensionsChanged());
+            DIALOG_render_request(Dialog_RenderKind.DimensionsChanged);
         }
     }
 
@@ -583,12 +603,12 @@ function DIALOG_toolbar_body_onmousemove(event: MouseEvent) {
             
             DIALOG_top -= absdiff_Y;
             DIALOG_before_Y = clientY;
-            DIALOG_render_request(get_DIALOGrenderKind_DimensionsChanged());
+            DIALOG_render_request(Dialog_RenderKind.DimensionsChanged);
         }
         else {
             DIALOG_top -= absdiff_Y;
             DIALOG_before_Y = clientY;
-            DIALOG_render_request(get_DIALOGrenderKind_DimensionsChanged());
+            DIALOG_render_request(Dialog_RenderKind.DimensionsChanged);
         }
     }
     else if (diff_Y > 0) {
@@ -603,12 +623,12 @@ function DIALOG_toolbar_body_onmousemove(event: MouseEvent) {
             
             DIALOG_top += absdiff_Y;
             DIALOG_before_Y = clientY;
-            DIALOG_render_request(get_DIALOGrenderKind_DimensionsChanged());
+            DIALOG_render_request(Dialog_RenderKind.DimensionsChanged);
         }
         else {
             DIALOG_top += absdiff_Y;
             DIALOG_before_Y = clientY;
-            DIALOG_render_request(get_DIALOGrenderKind_DimensionsChanged());
+            DIALOG_render_request(Dialog_RenderKind.DimensionsChanged);
         }
     }
 }
