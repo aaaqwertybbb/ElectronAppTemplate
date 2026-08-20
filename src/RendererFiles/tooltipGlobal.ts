@@ -1,16 +1,19 @@
 let TOOLTIP_exists = false;
 
-let TOOLTIP_pending_textContent = null;
+let TOOLTIP_pending_textContent: string | null = null;
 
-/**
- * 0 => None
- * 1 => Show
- * 2 => Hide
- */
-let TOOLTIP_pending_renderKind = 0;
+export const Tooltip_RenderKind = {
+    None: 0,
+    Show: 1,
+    Hide: 2,
+} as const;
+// Derive the type union from the object values
+export type Tooltip_RenderKind = typeof Tooltip_RenderKind[keyof typeof Tooltip_RenderKind];
+
+let TOOLTIP_pending_renderKind: Tooltip_RenderKind = Tooltip_RenderKind.None;
 let TOOLTIP_isRenderPending = false;
 
-function TOOLTIP_render_request(renderKind) {
+function TOOLTIP_render_request(renderKind: Tooltip_RenderKind) {
     TOOLTIP_pending_renderKind = renderKind;
     
     if (!TOOLTIP_isRenderPending) {
@@ -21,7 +24,7 @@ function TOOLTIP_render_request(renderKind) {
 
 function TOOLTIP_renderDo() {
     let renderKind = TOOLTIP_pending_renderKind;
-    TOOLTIP_pending_renderKind = 0;
+    TOOLTIP_pending_renderKind = Tooltip_RenderKind.None;
 
     if (renderKind === 1) {
         TOOLTIP_render_do_show();
@@ -37,8 +40,6 @@ function TOOLTIP_renderDo() {
 };
 
 function TOOLTIP_render_do_show() {
-    TOOLTIP_render_request(1);
-
     let tooltipElement;
 
     if (TOOLTIP_exists) {
@@ -50,7 +51,7 @@ function TOOLTIP_render_do_show() {
         // I take on the state corruption risk, otherwise I just defensively handle it.
         if (!tooltipElement) {
             TOOLTIP_exists = false;
-            TOOLTIP_show(textContent);
+            TOOLTIP_render_do_show();
             return;
         }
     }
@@ -71,9 +72,9 @@ function TOOLTIP_render_do_show() {
     TOOLTIP_exists = true;
 }
 
-function TOOLTIP_show(textContent) {
+function TOOLTIP_show(textContent: string) {
     TOOLTIP_pending_textContent = textContent;
-    TOOLTIP_render_request(1);
+    TOOLTIP_render_request(Tooltip_RenderKind.Show);
 }
 
 function TOOLTIP_render_do_hide() {
@@ -87,5 +88,5 @@ function TOOLTIP_render_do_hide() {
 
 function TOOLTIP_hide() {
     TOOLTIP_pending_textContent = null;
-    TOOLTIP_render_request(2);
+    TOOLTIP_render_request(Tooltip_RenderKind.Hide);
 }
