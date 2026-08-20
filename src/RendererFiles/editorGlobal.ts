@@ -221,6 +221,10 @@ let didChangeTextDocument_version = 0;
 let longestLine_indexLine = 0;
 let longestLine_length = 0;
 
+let drawn_count_of_digits_longest_line_number = 0;
+
+let set_EDITOR_gutterWidthStyleValue;
+
 class EDITOR_Cursor {
 
     static STATIC_CURSOR_ID = 1;
@@ -1414,7 +1418,7 @@ function EDITOR_state_setText(text, fileStartsWithBom, textSourceIdentifier, FOR
     for (var sourceI = 0; sourceI < text.length; sourceI++) {
         switch (text[sourceI]) {
             case '\r':
-                if (sourceI < text.length - 1 & text[sourceI + 1] === '\n') {
+                if (sourceI < text.length - 1 && text[sourceI + 1] === '\n') {
                     if (!EDITOR_lineEndString) {
                         EDITOR_lineEndString = '\r\n';
                     }
@@ -1510,7 +1514,7 @@ export function EDITOR_setText(text: string, fileStartsWithBom: boolean, textSou
  * Thus this function takes a 'lineCount' which defaults to EDITOR_lineEndPositionList.count if falsey.
  * @param {number | null | undefined} lineCount In order to permit arbitrarily updating the vertical virtualization boundary, this takes a lineCount. If falsey, then EDITOR_lineEndPositionList.count is used.
  */
-function update_verticalVirtualizationBoundary(lineCount: number) {
+function update_verticalVirtualizationBoundary(lineCount?: number) {
     if (!lineCount) lineCount = EDITOR_lineEndPositionList.count;
     cached_EDITOR_virtualization_vertical.style.height = ((lineCount + virtualCount - 1) * lineHeight) + 'px';
 }
@@ -1534,12 +1538,12 @@ function update_virtualCount() {
 }
 
 /**
- * If the 'get_EDITOR_drawn_count_of_digits_longest_line_number() === positiveNumbersOnly_countDigitsLoop(EDITOR_lineEndPositionList.count)'
+ * If the 'drawn_count_of_digits_longest_line_number === positiveNumbersOnly_countDigitsLoop(EDITOR_lineEndPositionList.count)'
  * then the function does nothing.
  * 
  * TODO: Track the min and max until length changes and then only 2 operations at worst case than while
  * 
- * @returns a bool indicating whether the gutter was drawn (if 'get_EDITOR_drawn_count_of_digits_longest_line_number()' has not changed then false is returned because the gutter didn't need to be "re-" drawn)
+ * @returns a bool indicating whether the gutter was drawn (if 'drawn_count_of_digits_longest_line_number' has not changed then false is returned because the gutter didn't need to be "re-" drawn)
  * 
  * Dependent UI: EDITOR_draw_all_cursors(); EDITOR_drawHorizontalScrollbar();
  * 
@@ -1554,9 +1558,9 @@ function EDITOR_drawGutter_Width() {
         count += 1;
     }
     let digitCountOfLargestLineNumber = positiveNumbersOnly_countDigitsLoop(count);
-    if (get_EDITOR_drawn_count_of_digits_longest_line_number() === digitCountOfLargestLineNumber) return false;
+    if (drawn_count_of_digits_longest_line_number === digitCountOfLargestLineNumber) return false;
 
-    set_EDITOR_drawn_count_of_digits_longest_line_number(digitCountOfLargestLineNumber);
+    drawn_count_of_digits_longest_line_number = digitCountOfLargestLineNumber;
 
     set_EDITOR_gutterWidthStyleValue(Math.ceil(digitCountOfLargestLineNumber * EDITOR_characterWidth));
     set_EDITOR_gutterWidthTotal(get_EDITOR_gutterWidthStyleValue() + get_EDITOR_gutterPaddingLeft() + get_EDITOR_gutterPaddingRight());
