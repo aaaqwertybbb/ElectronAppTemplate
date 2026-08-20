@@ -1477,7 +1477,7 @@ function EDITOR_state_setText(text, fileStartsWithBom, textSourceIdentifier, FOR
  * @param {string} textSourceIdentifier I intend to have this be an absolute path. Then when the app saves a file, it can verify against the database that this absolute path is "safe" and then write to the file.
  * @param {string} lineEndString pass null (or do not include the parameter) to have line endings set to the first encountered kind in the text. Otherwise specify here. The string is used EXACTLY AS PROVIDED if non-falsey.
  */
-function EDITOR_setText(text, fileStartsWithBom, textSourceIdentifier, FORMATTED_textSourceIdentifier, extensionKind, lineEndString) {
+export function EDITOR_setText(text: string, fileStartsWithBom: boolean, textSourceIdentifier: string, FORMATTED_textSourceIdentifier: string, extensionKind, lineEndString: string | null) {
     EDITOR_state_setText(text, fileStartsWithBom, textSourceIdentifier, FORMATTED_textSourceIdentifier, extensionKind, lineEndString);
     EDITOR_render_request(RenderKind.SetText);
 }
@@ -8674,7 +8674,7 @@ function EDITOR_decode_textonly(start, length) {
 	return EDITOR_decode_pooled_stringBuilder_array.join('');
 }
 
-function EDITOR_toExtensionKind(extensionWithPeriod) {
+export function EDITOR_toExtensionKind(extensionWithPeriod) {
     switch (extensionWithPeriod) {
         case '.js':
         case '.cjs':

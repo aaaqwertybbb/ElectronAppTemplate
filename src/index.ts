@@ -43,6 +43,7 @@ const createWindow = (): void => {
 	ipcMain.handle('choose-workspace', chooseWorkspace);
 	ipcMain.handle('get-filesystem-entries', getFilesystemEntries);
 	ipcMain.handle('get-filesystem-entry-by-id-array', getFilesystemEntryById_ARRAY);
+	ipcMain.handle('editor-read-all-text', editorReadAllText);
 };
 
 // This method will be called when Electron has finished
@@ -72,6 +73,14 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+/**
+ * TODO: Store the path more optimally to avoid doing this each time?
+ * TODO: capital 'c' or lowercase, encoded ':' and etc... or not?
+ */
+function formatAbsolutePath(absolutePath: string) {
+	return 'file:///' + absolutePath.replaceAll('\\', '/');
+}
 
 /**
  * @param {*} absolutePath 
@@ -268,5 +277,111 @@ async function getFilesystemEntryById_ARRAY(event: any, arrayKeys: number[]) {
 	catch (err) {
 		console.error("Error during get-filesystem-entry-by-id:", err);
 		return [];
+	}
+}
+
+type hasBOM_result = {
+    text: string,
+    fileStartsWithBom: boolean,
+    formattedAbsolutePath?: string,
+    extension?: string,
+};
+
+/**
+ * started off with code snippet from Google AI Overview for "node fs determine if file has bom":
+ */
+function hasBOM(filePath: string): hasBOM_result {
+	// Use a small buffer to read just the first 3-4 bytes
+	const buffer = Buffer.alloc(4);
+	const fd = fs.openSync(filePath, 'r');
+	fs.readSync(fd, buffer, 0, 4, 0);
+
+	let stat = fs.statSync(filePath);
+
+	// Check for common BOM signatures
+	// UTF-8: EF BB BF
+	if (buffer[0] === 0xEF && buffer[1] === 0xBB && buffer[2] === 0xBF) {
+		const bufferaaa = Buffer.alloc(stat.size - 4);
+		fs.readSync(fd, bufferaaa, 0, bufferaaa.length, 3);
+		fs.closeSync(fd);
+		return {
+			text: bufferaaa.toString(),
+			fileStartsWithBom: true
+		};
+	}
+	else {
+		const bufferaaa = Buffer.alloc(stat.size);
+		fs.readSync(fd, bufferaaa, 0, bufferaaa.length, 0);
+		fs.closeSync(fd);
+		return {
+			text: bufferaaa.toString(),
+			fileStartsWithBom: false
+		};
+	}
+
+	/*
+	// UTF-16 Little Endian: FF FE
+	if (buffer[0] === 0xFF && buffer[1] === 0xFE) {
+		return 'UTF-16LE';
+	}
+	// UTF-16 Big Endian: FE FF
+	if (buffer[0] === 0xFE && buffer[1] === 0xFF) {
+		return 'UTF-16BE';
+	}
+	*/
+}
+
+async function editorReadAllText(event: any, absolutePath: string) {
+	if(!isValidAbsolutePath(absolutePath)) return;
+
+	try {
+		let basename = path.basename(absolutePath);
+		let extension = path.extname(absolutePath);
+
+		let itHasBom = hasBOM(absolutePath);
+
+		absolutePath = formatAbsolutePath(absolutePath);
+		itHasBom.formattedAbsolutePath = absolutePath;
+		itHasBom.extension = extension;
+
+		let pathId = database.addAbsolutePath(itHasBom.formattedAbsolutePath, basename);
+
+		//if (openedDocumentUri) {
+		//	let tdIdentifier = lspTypes.MAIN_message_construct_textDocumentIdentifier(absolutePath);
+		//	if (languageServerHandshakeSuccess && languageServer) {
+		//		languageServer.stdin.write(
+		//			MAIN_encodeMessageObject(lspTypes.MAIN_message_construct_didCloseTextDocumentNotification(tdIdentifier)));
+		//	}
+		//	openedDocumentUri = null; // Should be set null regardless of language server existence to ensure it gets cleared if language server was running then stopped
+		//}
+//
+		//let tdi = lspTypes.MAIN_message_construct_textDocumentItem(
+		//	absolutePath,   // uri
+		//	'javascript',   // languageId
+		//	0,              // version
+		//	itHasBom.text); // text
+		//let messageObject = lspTypes.MAIN_message_construct_didOpenTextDocumentNotification(tdi);
+		//let messageJson = MAIN_encodeMessageObject(messageObject);
+		//if (languageServerHandshakeSuccess && languageServer) {
+		//	languageServer.stdin.write(messageJson);
+		//	openedDocumentUri = absolutePath;
+//
+		//	// TODO: Somewhat nonsensical to check 'openedDocumentUri' but I'm not sure if it was ever validated and I don't wanna deal with it right now...
+		//	// ...
+		//	// More so, I don't want this new logic to ever have a possibility of crashing the old logic (which simply wanted to read the text.)
+		//	// So until I guarantee that 'openedDocumentUri' is validated, I don't want to take any risks with it. (and maybe it is validated I just don't know either which way)
+		//	//
+		//	if (openedDocumentUri) {
+		//		let tdIdentifier = lspTypes.MAIN_message_construct_textDocumentIdentifier(openedDocumentUri);
+		//		let customFullFileLexRequest = lspTypes.MAIN_message_construct_CustomFullFileLexRequest(tdIdentifier);
+		//		mostRecentRequest = customFullFileLexRequest;
+		//		languageServer.stdin.write(MAIN_encodeMessageObject(customFullFileLexRequest));
+		//	}
+		//}
+		
+		return itHasBom;
+	}
+	catch (err) {
+		return null;
 	}
 }

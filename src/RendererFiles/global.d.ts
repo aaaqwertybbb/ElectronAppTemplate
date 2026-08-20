@@ -13,6 +13,7 @@ export interface MyAPI {
   chooseWorkspace: () => Promise<myAPI_chooseWorkspace_result>;
   onMessage: (callback) => Promise<any>;
   editorCompletionRequest_slice: (indexStart: number, indexEnd: number) => Promise<any>;
+  editorReadAllText: (absoluteFilePath: string) => Promise<any>;
 }
 
 declare global {
