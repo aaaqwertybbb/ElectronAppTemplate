@@ -9027,4 +9027,9 @@ Immediately problematic:
 
 - [ ] Parse variables progress by end of day
 
+"keep going what if you get this done by 5:00 PM that'd be siiiick brooooo"
+
+uhhh I think I believe these days that even if I did it isn't worth it I need to eat something
+and what not
+
 */
