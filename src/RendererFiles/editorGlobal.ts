@@ -305,7 +305,14 @@ let EDITOR_onResize_hasTrailingCall = false;
 
 let EDITOR_offsetWithinSpan_withRespectToThisSpan = null;
 
-let EDITOR_pooledTrackedSyntax_trackedSyntaxKind = TrackedSyntaxKind.None;
+export let EDITOR_pooledTrackedSyntax_trackedSyntaxKind: TrackedSyntaxKind = TrackedSyntaxKind.None;
+export function EDITOR_pooledTrackedSyntax_trackedSyntaxKind_SETTER(value: TrackedSyntaxKind) { EDITOR_pooledTrackedSyntax_trackedSyntaxKind = value; }
+
+export let EDITOR_pooledTrackedSyntax_start = 0;
+export function EDITOR_pooledTrackedSyntax_start_SETTER(value: number) { EDITOR_pooledTrackedSyntax_start = value; }
+
+export let EDITOR_pooledTrackedSyntax_length = 0;
+export function EDITOR_pooledTrackedSyntax_length_SETTER(value: number) { EDITOR_pooledTrackedSyntax_length = value; }
 
 let EDITOR_characterWidth = 8;
 let EDITOR_horizontal_scrollbar_widthValue = 0;

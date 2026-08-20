@@ -1,3 +1,4 @@
+import { EDITOR_pooledTrackedSyntax_trackedSyntaxKind_SETTER, EDITOR_pooledTrackedSyntax_start_SETTER, EDITOR_pooledTrackedSyntax_length_SETTER } from "./editorGlobal";
 
 export const TrackedSyntaxKind = {
     None: 0,
@@ -32,7 +33,7 @@ class TrackedSyntaxList {
      * 
      * If 'sourceUint32Array' is falsey, then a new Uint32Array is made determined by the 'initialCapacity_abstract'.
      */
-    constructor(initialCapacity_abstract, sourceUint32Array) {
+    constructor(initialCapacity_abstract: number, sourceUint32Array: Uint32Array) {
         if (sourceUint32Array) {
 
             if (sourceUint32Array.length % this.field_count !== 0) {
@@ -74,14 +75,14 @@ class TrackedSyntaxList {
      * @param {TrackedSyntax} trackedSyntax a place to read the data into, since it is stored as just int32 data (not the class)
      * @returns {TrackedSyntax}
      */
-    getElementAt(index_abstract) {
+    getElementAt(index_abstract: number) {
         let index_literal = index_abstract * this.field_count;
-        EDITOR_pooledTrackedSyntax_trackedSyntaxKind = this.data_literal[index_literal + this.trackedSyntaxKind_offset];
-        set_EDITOR_pooledTrackedSyntax_start(this.data_literal[index_literal + this.start_offset]);
-        set_EDITOR_pooledTrackedSyntax_length(this.data_literal[index_literal + this.length_offset]);
+        EDITOR_pooledTrackedSyntax_trackedSyntaxKind_SETTER(this.data_literal[index_literal + this.trackedSyntaxKind_offset] as TrackedSyntaxKind);
+        EDITOR_pooledTrackedSyntax_start_SETTER(this.data_literal[index_literal + this.start_offset]);
+        EDITOR_pooledTrackedSyntax_length_SETTER(this.data_literal[index_literal + this.length_offset]);
     }
 
-    getStart(index_abstract) {
+    getStart(index_abstract: number) {
         return this.data_literal[(index_abstract * this.field_count) + this.start_offset];
     }
 
@@ -92,11 +93,11 @@ class TrackedSyntaxList {
      * @param {number} index_abstract 
      * @param {number} value 
      */
-    setStart(index_abstract, value) {
+    setStart(index_abstract: number, value: number) {
         this.data_literal[(index_abstract * this.field_count) + this.start_offset] = value;
     }
     
-    getLength(index_abstract) {
+    getLength(index_abstract: number) {
         return this.data_literal[(index_abstract * this.field_count) + this.length_offset];
     }
     
@@ -107,7 +108,7 @@ class TrackedSyntaxList {
      * @param {number} index_abstract 
      * @param {number} value 
      */
-    setLength(index_abstract, value) {
+    setLength(index_abstract: number, value: number) {
         this.data_literal[(index_abstract * this.field_count) + this.length_offset] = value;
     }
     
@@ -118,14 +119,14 @@ class TrackedSyntaxList {
      * @param {number} index_abstract 
      * @param {number} value 
      */
-    setTrackedSyntaxKind(index_abstract, value) {
+    setTrackedSyntaxKind(index_abstract: number, value: TrackedSyntaxKind) {
         this.data_literal[(index_abstract * this.field_count) + this.trackedSyntaxKind_offset] = value;
     }
 
     /**
      * TODO: ensure all the parameters are encoded, especially because I'm noticing myself forgetting.
      */
-    insert(index_abstract, trackedSyntaxKind, start, length) {
+    insert(index_abstract: number, trackedSyntaxKind: TrackedSyntaxKind, start: number, length: number) {
         this.ensureCapacityForInsertion(index_abstract, 1);
 
         let index_literal = index_abstract * this.field_count;
@@ -146,7 +147,7 @@ class TrackedSyntaxList {
      * 
      * count === 0 immediately returns
      */
-    removeAt(index_abstract, count_abstract) {
+    removeAt(index_abstract: number, count_abstract: number) {
 
         if (index_abstract > this.count_abstract) { throw new Error('removeAt(...): index_abstract > this.count_abstract'); }
         if (index_abstract + count_abstract > this.count_abstract) { throw new Error('removeAt(...): index_abstract + count_abstract > this.count_abstract'); }
@@ -183,7 +184,7 @@ class TrackedSyntaxList {
      *         Since this ought to be a negligible check for this method to perform.
      *         And failure to catch that case if it happens is an infinite loop.
      */
-    ensureCapacityForInsertion(index_abstract, count_abstract) {
+    ensureCapacityForInsertion(index_abstract: number, count_abstract: number) {
         let capacityPrevious_abstract = this.capacity_abstract;
         while (true) {
             if (this.count_abstract + count_abstract > this.capacity_abstract) {
@@ -219,7 +220,7 @@ class TrackedSyntaxList {
     /**
      * inclusive/exclusive
      */
-    copyTo(dataSource_literal, sourceStart_abstract, dataDestination_literal, destinationStart_abstract, length_abstract) {
+    copyTo(dataSource_literal: Uint32Array, sourceStart_abstract: number, dataDestination_literal: Uint32Array, destinationStart_abstract: number, length_abstract: number) {
 
         if (dataSource_literal === dataDestination_literal) {
             if (dataSource_literal !== this.data_literal) {
