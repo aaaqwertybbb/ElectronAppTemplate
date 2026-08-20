@@ -1,3 +1,4 @@
+import { TreeViewComponent, TreeViewNodeList, TreeView_NodeKind, TreeView_pooledNode_key, TreeView_pooledNode_depth, TreeView_pooledNode_nodeKind } from './treeViewComponent';
 
 /**
  * Need to track the largest width line that comes into view,
@@ -30,9 +31,25 @@
   * you go around looking at const numbers and start trippin bout it like a fool.
   * I mean maybe it does have a non zero overhead a const number. But like cmon dude.
  */
-class EXPLORER_TreeViewDirector {
+class EXPLORER_TreeViewComponent extends TreeViewComponent {
+    chosenDirectory: string | null;
+    nodeList: any;
+    scrollIsFetchingData: boolean;
+    scrollFetchData_virtualIndex: number;
+    scrollFetchData_virtualCount: number;
+    scrollFetchData_beltIndexZero: number;
+    pullData_result: Uint32Array<ArrayBuffer>;
+    pullData_result_count: number;
+    arrayEntries: null;
+    KEY_BITS: number;
+    KEY_MASK: number;
+    chosenDirectoryAbsolutePathId: number = 0;
+    chosenWorkspace: any;
+    isCheckingTrailingEdge: boolean;
 
     constructor() {
+        super();
+        
         /** @type {string} */
         this.chosenDirectory = null;
 
@@ -40,7 +57,6 @@ class EXPLORER_TreeViewDirector {
          * @type {TreeViewNodeList}
          * */
         this.nodeList = new TreeViewNodeList(32);
-        this.component = new TreeViewComponent();
 
         this.scrollEndDeadline = 0;
         this.scrollIsFetchingData = false;
@@ -63,8 +79,8 @@ class EXPLORER_TreeViewDirector {
         this.KEY_MASK = (1 << this.KEY_BITS) - 1; // Binary: 00000000000000000000111111111111 (0xFFF)
     }
 
-    /** // Invoke this?: 'this.component.draw_render_fullReset_request();' */
-    setChosenDirectory(chosenDirectory, chosenDirectoryAbsolutePathId) {
+    /** // Invoke this?: 'this.draw_render_fullReset_request();' */
+    setChosenDirectory(chosenDirectory: string, chosenDirectoryAbsolutePathId: number) {
         this.chosenDirectory = chosenDirectory;
         this.chosenDirectoryAbsolutePathId = chosenDirectoryAbsolutePathId;
 
@@ -74,12 +90,12 @@ class EXPLORER_TreeViewDirector {
 
         let nodeKind = TreeView_NodeKind.isExpandable_NOTisExpanded;
         this.nodeList.insert(this.nodeList.count_abstract, nodeKind, this.chosenDirectoryAbsolutePathId, 0);
-        this.component.itemHeightTotal = this.tvd_getTotalCount() * this.component.itemHeightNumber;
-        this.component.virtualizationElement.style.height = this.component.itemHeightTotal + 'px';
+        this.itemHeightTotal = this.tvd_getTotalCount() * this.itemHeightNumber;
+        this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
     }
     
-    /** // Invoke this?: 'this.component.draw_render_fullReset_request();' */
-    setChosenWorkspace(chooseWorkspaceResult) {
+    /** // Invoke this?: 'this.draw_render_fullReset_request();' */
+    setChosenWorkspace(chooseWorkspaceResult: any) {
         this.chosenWorkspace = chooseWorkspaceResult.workspaceFileAbsolutePath;
 
         this.nodeList.clear();
@@ -92,11 +108,11 @@ class EXPLORER_TreeViewDirector {
             this.nodeList.insert(this.nodeList.count_abstract, nodeKind, directory.id, 0);
         }
 
-        this.component.itemHeightTotal = this.tvd_getTotalCount() * this.component.itemHeightNumber;
-        this.component.virtualizationElement.style.height = this.component.itemHeightTotal + 'px';
+        this.itemHeightTotal = this.tvd_getTotalCount() * this.itemHeightNumber;
+        this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
     }
 
-    TREEVIEW_render_do_ScrollTrailingEdgeCheck = (timestamp) => {
+    TREEVIEW_render_do_ScrollTrailingEdgeCheck = (timestamp: number) => {
         // If the scroll deadline hasn't been met yet, keep checking on the next frame
         if (timestamp < this.scrollEndDeadline) {
             requestAnimationFrame(this.TREEVIEW_render_do_ScrollTrailingEdgeCheck);
@@ -116,9 +132,9 @@ class EXPLORER_TreeViewDirector {
     };
 
     /** 
-     * @param {number} caseThreeOrigin if left undefined or (falsey but not 0), this will default to 'this.component.beltIndexZero'
+     * @param {number} caseThreeOrigin if left undefined or (falsey but not 0), this will default to 'this.beltIndexZero'
      */
-    tvd_drawItem_BATCH(start, length, onePositiveDiff_twoNegativeDiff_orThreeFullScreen, caseThreeOrigin, timestamp) {
+    tvd_drawItem_BATCH(start: number, length: number, onePositiveDiff_twoNegativeDiff_orThreeFullScreen: number, caseThreeOrigin: number, timestamp: number) {
 
         // TODO: I'm putting this in treeViewComponent.js as well for now when diff === 0:
         this.scrollEndDeadline = timestamp + 300;
@@ -132,18 +148,18 @@ class EXPLORER_TreeViewDirector {
         let totalCount = this.nodeList.count_abstract;
         let loopCounter = 0;
 
-        let lastIndex = (this.component.beltIndexZero - 1 + this.component.virtualCount) % this.component.virtualCount; // TODO: 'this.component.virtualCount' or 'this.component.TREEVIEW_ArrayFrom_itemListElement_children.length'
+        let lastIndex = (this.beltIndexZero - 1 + this.virtualCount) % this.virtualCount; // TODO: 'this.virtualCount' or 'this.TREEVIEW_ArrayFrom_itemListElement_children.length'
 
         let loopTotalIterations = upperBound - start;
 
-        let caseTwoDivIndex = (lastIndex - (loopTotalIterations - 1) + this.component.TREEVIEW_ArrayFrom_itemListElement_children_length) % this.component.TREEVIEW_ArrayFrom_itemListElement_children_length;
+        let caseTwoDivIndex = (lastIndex - (loopTotalIterations - 1) + this.TREEVIEW_ArrayFrom_itemListElement_children_length) % this.TREEVIEW_ArrayFrom_itemListElement_children_length;
 
-        let verticalStyleNumber = start * this.component.itemHeightNumber;
+        let verticalStyleNumber = start * this.itemHeightNumber;
 
         if (!caseThreeOrigin && caseThreeOrigin !== 0) {
-            caseThreeOrigin = this.component.beltIndexZero;
+            caseThreeOrigin = this.beltIndexZero;
         }
-        if (caseThreeOrigin < 0 || caseThreeOrigin >= this.component.TREEVIEW_ArrayFrom_itemListElement_children_length) {
+        if (caseThreeOrigin < 0 || caseThreeOrigin >= this.TREEVIEW_ArrayFrom_itemListElement_children_length) {
             throw new RangeError();
         }
 
@@ -152,26 +168,30 @@ class EXPLORER_TreeViewDirector {
             let depth = 0;
             let nodeKind = TreeView_NodeKind.NOTisExpandable_NOTisExpanded;
 
-            let divItem;
-            let divIndex;
+            let divItem: HTMLElement;
+            let divIndex: number;
 
             switch (onePositiveDiff_twoNegativeDiff_orThreeFullScreen) {
                 case 1:
-                    divIndex = (this.component.beltIndexZero + loopCounter) % this.component.TREEVIEW_ArrayFrom_itemListElement_children_length;
+                    divIndex = (this.beltIndexZero + loopCounter) % this.TREEVIEW_ArrayFrom_itemListElement_children_length;
                     break;
                 case 2:
-                    divIndex = (caseTwoDivIndex++) % this.component.TREEVIEW_ArrayFrom_itemListElement_children_length;
+                    divIndex = (caseTwoDivIndex++) % this.TREEVIEW_ArrayFrom_itemListElement_children_length;
                     break;
                 case 3:
-                    divIndex = (caseThreeOrigin + loopCounter) % this.component.TREEVIEW_ArrayFrom_itemListElement_children_length;
+                    divIndex = (caseThreeOrigin + loopCounter) % this.TREEVIEW_ArrayFrom_itemListElement_children_length;
                     break;
+                default:
+                    throw new Error(`the onePositiveDiff_twoNegativeDiff_orThreeFullScreen: '${onePositiveDiff_twoNegativeDiff_orThreeFullScreen}' is not supported.`);
             }
-            divItem = this.component.TREEVIEW_ArrayFrom_itemListElement_children[divIndex];
+            divItem = this.TREEVIEW_ArrayFrom_itemListElement_children[divIndex];
 
             if (indexItem >= totalCount) {
-                // TODO: Will the user agent remove a text node that has an "empty" nodeValue?
-                divItem.lastChild.nodeValue = '~';
-                divItem.lastChild.title = '';
+                if (divItem.lastElementChild) {
+                    // TODO: Will the user agent remove a text node that has an "empty" nodeValue?
+                    (divItem.lastElementChild as HTMLElement).nodeValue = '~';
+                    (divItem.lastElementChild as HTMLElement).title = '';
+                }
             }
             else {
                 this.nodeList.getElementAt(indexItem);
@@ -211,21 +231,21 @@ class EXPLORER_TreeViewDirector {
             }
 
             // TODO: predict this when expanding/collapsing?????
-            if (depth > this.component.LARGEST_DEPTH_SEEN_NOT_THE_CSS_JUST_THE_DEPTH) {
-                this.component.LARGEST_DEPTH_SEEN_NOT_THE_CSS_JUST_THE_DEPTH = depth;
+            if (depth > this.LARGEST_DEPTH_SEEN_NOT_THE_CSS_JUST_THE_DEPTH) {
+                this.LARGEST_DEPTH_SEEN_NOT_THE_CSS_JUST_THE_DEPTH = depth;
             }
 
             divItem.style.transform = `translate(${EXPLORER_offsetPerDepth * depth}px, ${verticalStyleNumber}px)`;
-            verticalStyleNumber += this.component.itemHeightNumber;
+            verticalStyleNumber += this.itemHeightNumber;
 
             loopCounter++;
         }
 
         if (onePositiveDiff_twoNegativeDiff_orThreeFullScreen === 1) {
-            this.component.beltIndexZero = (this.component.beltIndexZero + loopCounter) % this.component.TREEVIEW_ArrayFrom_itemListElement_children_length;
+            this.beltIndexZero = (this.beltIndexZero + loopCounter) % this.TREEVIEW_ArrayFrom_itemListElement_children_length;
         }
         else if (onePositiveDiff_twoNegativeDiff_orThreeFullScreen === 2) {
-            this.component.beltIndexZero = (lastIndex - (loopTotalIterations - 1) + this.component.TREEVIEW_ArrayFrom_itemListElement_children_length) % this.component.TREEVIEW_ArrayFrom_itemListElement_children_length;
+            this.beltIndexZero = (lastIndex - (loopTotalIterations - 1) + this.TREEVIEW_ArrayFrom_itemListElement_children_length) % this.TREEVIEW_ArrayFrom_itemListElement_children_length;
         }
     }
 
@@ -304,31 +324,31 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
         < You are 100% correct to worry about this. Never make your requestAnimationFrame loop async or use await inside it.
         < ...
         */
-        this.scrollFetchData_virtualIndex = this.component._ONSCROLLvirtualIndex;
-        this.scrollFetchData_virtualCount = this.component._ONSCROLLvirtualCount;
-        this.scrollFetchData_beltIndexZero = this.component.beltIndexZero;
+        this.scrollFetchData_virtualIndex = this._ONSCROLLvirtualIndex;
+        this.scrollFetchData_virtualCount = this._ONSCROLLvirtualCount;
+        this.scrollFetchData_beltIndexZero = this.beltIndexZero;
 
         // This isn't the most optimal way of doing things.
         //
-        let itemListElement_children = this.component.TREEVIEW_ArrayFrom_itemListElement_children;
-        let itemListElement_childrenLength = this.component.TREEVIEW_ArrayFrom_itemListElement_children_length;
+        let itemListElement_children = this.TREEVIEW_ArrayFrom_itemListElement_children;
+        let itemListElement_childrenLength = this.TREEVIEW_ArrayFrom_itemListElement_children_length;
 
         this.pullData_array_count = 0;
 
-        // TODO: This is an awkward explicit inlining of 'this.component.indexItemTo_beltIndexItem'...
+        // TODO: This is an awkward explicit inlining of 'this.indexItemTo_beltIndexItem'...
         // ...the initial declaration of 'let beltIndexLine' is assigned what I refer to as the "virtualIndex"
         // but 'beltIndexLine' is the output of the function, and a 'virtualIndex' variable is only needed temporarily
         // for the calculation. So by storing the 'virtualIndex' in 'beltIndexLine' at the start I skip a variable declaration.
-        let beltIndex_current = ((this.scrollFetchData_virtualIndex)) - this.component.virtualIndex_ofScrollTop;
-        if (beltIndex_current >= this.component.TREEVIEW_ArrayFrom_itemListElement_children_length || beltIndex_current < 0) beltIndex_current = -1;
-        else beltIndex_current = (beltIndex_current + this.component.beltIndexZero) % this.component.virtualCount;
+        let beltIndex_current = ((this.scrollFetchData_virtualIndex)) - this.virtualIndex_ofScrollTop;
+        if (beltIndex_current >= this.TREEVIEW_ArrayFrom_itemListElement_children_length || beltIndex_current < 0) beltIndex_current = -1;
+        else beltIndex_current = (beltIndex_current + this.beltIndexZero) % this.virtualCount;
 
         for (let i = 0; i < itemListElement_childrenLength; i++) {
 
             if (itemListElement_children[beltIndex_current].className === 'eN') {
                 let indexItem = this.scrollFetchData_virtualIndex + i;
                 
-                // The index of the actual dom element within this.component.itemListElement.children
+                // The index of the actual dom element within this.itemListElement.children
                 // that is displaying the UI representation of what 'indexItem' points to.
                 let indexBelt = beltIndex_current;
 
@@ -345,20 +365,20 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
 
         this.scrollIsFetchingData = false; // TODO: try/catch/finally; put this in the finally.
 
-        this.component.TREEVIEW_render_request(TreeView_RenderKind.Scroll_PullDataDrawResult);
+        this.TREEVIEW_render_request(TreeView_RenderKind.Scroll_PullDataDrawResult);
     };
 
     tvd_drawItem_BATCH_PullDataDrawResult () {
-        if (this.scrollFetchData_virtualIndex === this.component._ONSCROLLvirtualIndex &&
-           this.scrollFetchData_virtualCount === this.component._ONSCROLLvirtualCount &&
-           this.scrollFetchData_beltIndexZero === this.component.beltIndexZero) {
+        if (this.scrollFetchData_virtualIndex === this._ONSCROLLvirtualIndex &&
+           this.scrollFetchData_virtualCount === this._ONSCROLLvirtualCount &&
+           this.scrollFetchData_beltIndexZero === this.beltIndexZero) {
 
             // This isn't the most optimal way of doing things.
             //
-            let itemListElement_children = this.component.TREEVIEW_ArrayFrom_itemListElement_children;
-            let itemListElement_childrenLength = this.component.TREEVIEW_ArrayFrom_itemListElement_children_length;
+            let itemListElement_children = this.TREEVIEW_ArrayFrom_itemListElement_children;
+            let itemListElement_childrenLength = this.TREEVIEW_ArrayFrom_itemListElement_children_length;
 
-            let currentWIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING = this.component.WIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING;
+            let currentWIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING = this.WIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING;
             let NEXT_WIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING = currentWIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING;
 
             for (let i = 0; i < this.pullData_result_count; i++) {
@@ -380,8 +400,8 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
             }
 
             if (NEXT_WIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING > currentWIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING) {
-                this.component.WIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING = NEXT_WIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING;
-                let widthAttributeValueNumber = Math.ceil(((this.component.WIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING + 2/*padding*/) * EXPLORER_firstSpanWidthValue) + EXPLORER_offsetPerDepth * this.component.LARGEST_DEPTH_SEEN_NOT_THE_CSS_JUST_THE_DEPTH);
+                this.WIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING = NEXT_WIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING;
+                let widthAttributeValueNumber = Math.ceil(((this.WIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING + 2/*padding*/) * EXPLORER_firstSpanWidthValue) + EXPLORER_offsetPerDepth * this.LARGEST_DEPTH_SEEN_NOT_THE_CSS_JUST_THE_DEPTH);
 
                 // This is actually more complicated you have to track whether you go above the minimum requirement lest you add 1 character over and over in width just to keep redrawing widths.
                 //if (widthAttributeValueNumber < this.lastReadNumber_offsetWidth) {
@@ -389,7 +409,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
                 //}
                 //this.WIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING
                 let widthAttributeValueString = widthAttributeValueNumber + 'px';
-                this.component.cursorElement.style.width = widthAttributeValueString;
+                this.cursorElement.style.width = widthAttributeValueString;
                 for (let i = 0; i < itemListElement_childrenLength; i++) {
                     itemListElement_children[i].style.width = widthAttributeValueString;
                 }
@@ -454,8 +474,8 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
             new MenuOption(get_CommandKind_CopyAbsolutePath(), 'Copy Absolute Path', null),
         ];
 
-        this.component.ensure_boundingClientRect();
-        let nodeListBoundingClientRect = this.component.boundingClientRect;
+        this.ensure_boundingClientRect();
+        let nodeListBoundingClientRect = this.boundingClientRect;
 
         // TODO: !!!! You might need to be careful with async and the TreeView_pooledNode; I'm not certain whether you do or don't have to be careful, and I don't feel like looking into it at the moment.
         this.nodeList.getElementAt(indexItem);
@@ -476,7 +496,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
             await menuSet('EXPLORER', target, optionList, menuOptionX=event.clientX, menuOptionY=event.clientY);
         } else {
             this.addSpecificMenuOptionsForTarget(optionList, divItem, target);
-            await menuSet('EXPLORER', target, optionList, menuOptionX=nodeListBoundingClientRect.left, menuOptionY=(nodeListBoundingClientRect.top + ((this.component.cursorIndex + 1) * this.component.itemHeightNumber) - this.component.rootElement.scrollTop));
+            await menuSet('EXPLORER', target, optionList, menuOptionX=nodeListBoundingClientRect.left, menuOptionY=(nodeListBoundingClientRect.top + ((this.cursorIndex + 1) * this.itemHeightNumber) - this.rootElement.scrollTop));
         }
     }
 
@@ -511,11 +531,11 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
                 }
                 // TODO: Insert range, or at the least 'pre-emptively' resize the list so that it fits each insertion without resizing per insertion.
                 this.nodeList.insert(indexItem + 1 + i, nodeKind, entry.id, depth + 1);
-                this.component.itemHeightTotal = this.tvd_getTotalCount() * this.component.itemHeightNumber;
-                this.component.virtualizationElement.style.height = this.component.itemHeightTotal + 'px';
+                this.itemHeightTotal = this.tvd_getTotalCount() * this.itemHeightNumber;
+                this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
             }
 
-            this.component.draw_render_fullReset_request();
+            this.draw_render_fullReset_request();
         }
         else if (nodeKind === TreeView_NodeKind.isExpandable_isExpanded) {
 
@@ -534,9 +554,9 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
             }
             if (countChildren > 0) { // TODO: is this check necessary?
                 this.nodeList.removeAt(indexItem + 1, countChildren);
-                this.component.itemHeightTotal = this.tvd_getTotalCount() * this.component.itemHeightNumber;
-                this.component.virtualizationElement.style.height = this.component.itemHeightTotal + 'px';
-                this.component.draw_render_fullReset_request();
+                this.itemHeightTotal = this.tvd_getTotalCount() * this.itemHeightNumber;
+                this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
+                this.draw_render_fullReset_request();
             }
         }
     }
@@ -551,8 +571,8 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
         if (nodeKind === TreeView_NodeKind.isExpandable_isExpanded) {
             if (indexItem + 1 < this.nodeList.count_abstract) {
                 if (this.nodeList.getDepth(indexItem + 1) > depth) {
-                    this.component.state_cursor_setIndex(this.component.state_cursor_validateIndex(
-        		        this.component.cursorIndex + 1));
+                    this.state_cursor_setIndex(this.state_cursor_validateIndex(
+        		        this.cursorIndex + 1));
                 }
             }
     	}
@@ -584,7 +604,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
                 }
             }
             if (distanceToParent > 0) {
-            	this.component.state_cursor_setIndex(this.component.state_cursor_validateIndex(
+            	this.state_cursor_setIndex(this.state_cursor_validateIndex(
         			indexItem - distanceToParent));
             }
         }
@@ -629,8 +649,8 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
         }
 
         this.nodeList.removeAt(indexItem, 1 + countChildren);
-        this.component.itemHeightTotal = this.tvd_getTotalCount() * this.component.itemHeightNumber;
-        this.component.virtualizationElement.style.height = this.component.itemHeightTotal + 'px';
+        this.itemHeightTotal = this.tvd_getTotalCount() * this.itemHeightNumber;
+        this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
         return 1 + countChildren;
     }
 

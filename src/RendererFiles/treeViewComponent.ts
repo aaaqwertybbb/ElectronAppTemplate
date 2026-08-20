@@ -121,7 +121,7 @@ const TreeView_RenderKind = {
 type TreeView_RenderKind = typeof TreeView_RenderKind[keyof typeof TreeView_RenderKind];
 
 
-const TreeView_NodeKind = {
+export const TreeView_NodeKind = {
     None: 0,
     isExpandable_isExpanded: 1,
     isExpandable_NOTisExpanded: 2,
@@ -132,9 +132,9 @@ const TreeView_NodeKind = {
 type TreeView_NodeKind = typeof TreeView_NodeKind[keyof typeof TreeView_NodeKind];
 
 
-let TreeView_pooledNode_nodeKind: TreeView_NodeKind = TreeView_NodeKind.None;
-let TreeView_pooledNode_key = 0;
-let TreeView_pooledNode_depth = 0;
+export let TreeView_pooledNode_nodeKind: TreeView_NodeKind = TreeView_NodeKind.None;
+export let TreeView_pooledNode_key = 0;
+export let TreeView_pooledNode_depth = 0;
 
 /**
  * The director maintains a flat optimized list of every element i.e.: represent each element in a uint8array and each one is a byte that maps to the actual.
@@ -143,7 +143,7 @@ let TreeView_pooledNode_depth = 0;
  * 
  * You just keep flattening it into a byte array and map back and forth.
  */
-abstract class TreeViewComponent implements EventListenerObject {
+export abstract class TreeViewComponent implements EventListenerObject {
     rootElement: HTMLDivElement;
     virtualizationElement: HTMLDivElement;
     cursorElement: HTMLDivElement;
@@ -918,7 +918,7 @@ abstract class TreeViewComponent implements EventListenerObject {
     */
 }
 
-class TreeViewNodeList {
+export class TreeViewNodeList {
     data_literal;
     capacity_literal;
 
