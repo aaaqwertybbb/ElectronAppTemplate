@@ -36,6 +36,19 @@ export type myAPI_languageServer_SLICEresponse = {
     totalLength: number,
 };
 
+export type myAPI_chooseWorkspace_directory = {
+    basename: string,
+    absolutePath: string,
+    id: number,
+};
+
+export type myAPI_chooseWorkspace_result = {
+    workspaceFileAbsolutePath: string,
+    workspaceFileNameWithoutExtension: string,
+    directories: myAPI_chooseWorkspace_directory[],
+    canceled: boolean
+};
+
 init();
 
 function init() {

@@ -26,10 +26,10 @@ function TOOLTIP_renderDo() {
     let renderKind = TOOLTIP_pending_renderKind;
     TOOLTIP_pending_renderKind = Tooltip_RenderKind.None;
 
-    if (renderKind === 1) {
+    if (renderKind === Tooltip_RenderKind.Show) {
         TOOLTIP_render_do_show();
     }
-    else if (renderKind === 2) {
+    else if (renderKind === Tooltip_RenderKind.Hide) {
         TOOLTIP_render_do_hide();
     }
     else {
