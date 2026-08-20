@@ -9,7 +9,7 @@ import { EXPLORER_firstSpanWidth_SETTER, EXPLORER_firstSpanWidthValue, EXPLORER_
  * */
 export let APP_lineHeight = 20;
 
-type myAPI_languageServer_response = { method: string; value: any };
+export type myAPI_languageServer_response = { method: string; value: any };
 
 init();
 

@@ -176,7 +176,7 @@ function AUTOCOMPLETE_render_RESET_lines(AUTOCOMPLETE_itemList) {
     }
 }
 
-function AUTOCOMPLETE_render_do_show(timestamp) {
+function AUTOCOMPLETE_render_do_show(timestamp: number) {
 
     // TODO: The code as is already isn't guaranteed to not race condition with the lsp requests
     // so this continues failing to avoid race condition, but now if the lsp throws an error you don't get locked out forever.
