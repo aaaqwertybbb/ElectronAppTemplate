@@ -66,9 +66,9 @@ let EDITOR_trackedSyntaxList = new TrackedSyntaxList(32);
  */
 let EDITOR_findOverlay_searchResultPositionList;
 
-let EDITOR_textByteList = new ByteList(1024);
+export let EDITOR_textByteList = new ByteList(1024);
 const EDITOR_encoder = new TextEncoder();
-const EDITOR_decoder = new TextDecoder();
+export const EDITOR_decoder = new TextDecoder();
 
 class EDITOR_Cursor {
 
