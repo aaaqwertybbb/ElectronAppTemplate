@@ -726,7 +726,7 @@ let menuOptionY = 0;
 
 let EXPLORER_menuOptionCut_object: any = null;
 
-let EXPLORER_director = new EXPLORER_TreeViewComponent();
+export let EXPLORER_director = new EXPLORER_TreeViewComponent();
 
 export function EXPLORER_init() {
     const EXPLORER_pickFolderOrWorkspaceButton = document.getElementById('EXPLORER_folderOrWorkspaceButtons');

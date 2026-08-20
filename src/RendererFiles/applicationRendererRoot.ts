@@ -1,5 +1,5 @@
 import { DIALOG_show_async } from './dialogGlobal';
-import { EXPLORER_firstSpanWidth_SETTER, EXPLORER_firstSpanWidthValue, EXPLORER_firstSpanWidthValue_SETTER, EXPLORER_setShow, EXPLORER_init } from './explorerGlobal';
+import { EXPLORER_firstSpanWidth_SETTER, EXPLORER_firstSpanWidthValue, EXPLORER_firstSpanWidthValue_SETTER, EXPLORER_setShow, EXPLORER_init, EXPLORER_director } from './explorerGlobal';
 
 /**
  * This value ought to be an int (no decimal places) due to its high frequency usage in drawing UI,
@@ -155,6 +155,9 @@ function APP_measureLineHeightAndCharacterWidth() {
     if (computedStyles.getPropertyValue(propertyName) !== appLineHeight) {
         root.style.setProperty(propertyName, appLineHeight);
     }
+
+    EXPLORER_director.itemHeightNumber = APP_lineHeight;
+    EXPLORER_director.itemHeightStyleAttributeValueString = appLineHeight;
 }
 
 async function window_myAPI_onMessage(data: myAPI_languageServer_response) {

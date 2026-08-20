@@ -172,13 +172,18 @@ export abstract class TreeViewComponent implements EventListenerObject {
     SET_ITEMS_itemHeightStyleAttributeValueString: string;
     WIDTH_NODE_DRAWN_NUMBER_IN_CH_UNITS_NO_PADDING: number;
     LARGEST_DEPTH_SEEN_NOT_THE_CSS_JUST_THE_DEPTH: number;
-    itemHeightNumber: number = 0;
-    itemHeightStyleAttributeValueString: string = '0px';
+    
+    /** TODO: what height should this start at? applicationRendererRoot.ts will eventually run initialization logic that actually does the measuring. */
+    itemHeightNumber: number = 20;
+    /** TODO: what height should this start at? applicationRendererRoot.ts will eventually run initialization logic that actually does the measuring. */
+    itemHeightStyleAttributeValueString: string = '20px';
+
     boundingClientRect_height: number = 0;
     boundingClientRect_left: number = 0;
     boundingClientRect_top: number = 0;
     boundingClientRect_measurementsAreValid: boolean = false;
-    virtualCount: number = 0;
+    /** Hacky: Must initialize to a number other than 0 or else nothing renders. */
+    virtualCount: number = 1;
     virtualIndex_ofScrollTop: number = 0;
     cursorTranslateYNumber: number = 0;
     lastReadNumber_offsetWidth: number = 0;
