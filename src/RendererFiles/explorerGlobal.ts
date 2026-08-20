@@ -94,7 +94,7 @@ class EXPLORER_TreeViewComponent extends TreeViewComponent {
 
         let nodeKind: TreeView_NodeKind = TreeView_NodeKind.isExpandable_NOTisExpanded;
         this.nodeList.insert(this.nodeList.count_abstract, nodeKind, this.chosenDirectoryAbsolutePathId, 0);
-        this.itemHeightTotal = this.tvd_getTotalCount() * this.itemHeightNumber;
+        this.itemHeightTotal = this.getTotalCount() * this.itemHeightNumber;
         this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
     }
     
@@ -112,7 +112,7 @@ class EXPLORER_TreeViewComponent extends TreeViewComponent {
             this.nodeList.insert(this.nodeList.count_abstract, nodeKind, directory.id, 0);
         }
 
-        this.itemHeightTotal = this.tvd_getTotalCount() * this.itemHeightNumber;
+        this.itemHeightTotal = this.getTotalCount() * this.itemHeightNumber;
         this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
     }
 
@@ -138,7 +138,7 @@ class EXPLORER_TreeViewComponent extends TreeViewComponent {
     /** 
      * @param {number} caseThreeOrigin if left undefined or (falsey but not 0), this will default to 'this.beltIndexZero'
      */
-    tvd_drawItem_BATCH(start: number, length: number, onePositiveDiff_twoNegativeDiff_orThreeFullScreen: number, caseThreeOrigin: number, timestamp: number) {
+    drawItem_BATCH(start: number, length: number, onePositiveDiff_twoNegativeDiff_orThreeFullScreen: number, caseThreeOrigin: number, timestamp: number) {
 
         // TODO: I'm putting this in treeViewComponent.js as well for now when diff === 0:
         this.scrollEndDeadline = timestamp + 300;
@@ -380,7 +380,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
         this.TREEVIEW_render_request(TreeView_RenderKind.Scroll_PullDataDrawResult);
     };
 
-    tvd_drawItem_BATCH_PullDataDrawResult () {
+    drawItem_BATCH_PullDataDrawResult () {
 
         if (!this.arrayEntries) {
             throw new Error('if (!this.arrayEntries)');
@@ -553,7 +553,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
                 }
                 // TODO: Insert range, or at the least 'pre-emptively' resize the list so that it fits each insertion without resizing per insertion.
                 this.nodeList.insert(indexItem + 1 + i, nodeKind, entry.id, depth + 1);
-                this.itemHeightTotal = this.tvd_getTotalCount() * this.itemHeightNumber;
+                this.itemHeightTotal = this.getTotalCount() * this.itemHeightNumber;
                 this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
             }
 
@@ -576,7 +576,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
             }
             if (countChildren > 0) { // TODO: is this check necessary?
                 this.nodeList.removeAt(indexItem + 1, countChildren);
-                this.itemHeightTotal = this.tvd_getTotalCount() * this.itemHeightNumber;
+                this.itemHeightTotal = this.getTotalCount() * this.itemHeightNumber;
                 this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
                 this.draw_render_fullReset_request();
             }
@@ -632,7 +632,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
         }
     }
 
-    tvd_getTotalCount() {
+    getTotalCount() {
         return this.nodeList.count_abstract;
     }
 
@@ -653,7 +653,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
 
         if (nodeKind === TreeView_NodeKind.NOTisExpandable_isExpanded) {
             alert("TODO: if (nodeKind === TreeView_NodeKind.NOTisExpandable_isExpanded)");
-            return;
+            return undefined;
         }
 
         let countChildren = 0;
@@ -671,7 +671,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
         }
 
         this.nodeList.removeAt(indexItem, 1 + countChildren);
-        this.itemHeightTotal = this.tvd_getTotalCount() * this.itemHeightNumber;
+        this.itemHeightTotal = this.getTotalCount() * this.itemHeightNumber;
         this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
         return 1 + countChildren;
     }
@@ -989,7 +989,7 @@ export async function EXPLORER_MenuOnClick(indexClicked: number, elementClicked:
                                 someIndex++;
 
                                 if (!isCollapsed) {
-                                    while (someIndex < EXPLORER_director.tvd_getTotalCount()) {
+                                    while (someIndex < EXPLORER_director.getTotalCount()) {
                                         let d_of_perhaps_too_large_depth = EXPLORER_director.nodeList.getDepth(someIndex);
                                         if (d_of_perhaps_too_large_depth > targetDepth) {
                                             someIndex++;
@@ -1011,7 +1011,7 @@ export async function EXPLORER_MenuOnClick(indexClicked: number, elementClicked:
                                 if (someIndex >= EXPLORER_director.virtualIndex_ofScrollTop && someIndex <= largestIndexItemBeingShown) {
                                     let finalDiv = EXPLORER_director.itemListElement.children[EXPLORER_director.itemListElement.children.length - 1];
 
-                                    EXPLORER_director.itemHeightTotal = EXPLORER_director.tvd_getTotalCount() * EXPLORER_director.itemHeightNumber;
+                                    EXPLORER_director.itemHeightTotal = EXPLORER_director.getTotalCount() * EXPLORER_director.itemHeightNumber;
                                     EXPLORER_director.virtualizationElement.style.height = EXPLORER_director.itemHeightTotal + 'px';
 
                                     // TODO: Check that the node you're pasting into is expanded.
@@ -1038,19 +1038,22 @@ export async function EXPLORER_MenuOnClick(indexClicked: number, elementClicked:
         
                                     if (divRelativeIndex <= largestIndexItemBeingShown) {
 
-                                        let countOfMoreEntriesToShow = EXPLORER_director.tvd_getTotalCount() - (EXPLORER_director.virtualIndex_ofScrollTop + EXPLORER_director.virtualCount);
+                                        let countOfMoreEntriesToShow = EXPLORER_director.getTotalCount() - (EXPLORER_director.virtualIndex_ofScrollTop + EXPLORER_director.virtualCount);
 
                                         let countChanges;
                                         
                                         if (pasteResult.isDirectory) {
                                             countChanges = await EXPLORER_director.removeFromNodeList_async(indexItem);
+                                            if (countChanges === undefined) {
+                                                return;
+                                            }
                                         }
                                         else {
                                             EXPLORER_director.nodeList.removeAt(indexItem, 1);
                                             countChanges = 1;
                                         }
 
-                                        EXPLORER_director.itemHeightTotal = EXPLORER_director.tvd_getTotalCount() * EXPLORER_director.itemHeightNumber;
+                                        EXPLORER_director.itemHeightTotal = EXPLORER_director.getTotalCount() * EXPLORER_director.itemHeightNumber;
                                         EXPLORER_director.virtualizationElement.style.height = EXPLORER_director.itemHeightTotal + 'px';
 
                                         let remainingChangesToRender = countChanges < EXPLORER_director.virtualCount ? countChanges : EXPLORER_director.virtualCount - divRelativeIndex;
@@ -1217,7 +1220,7 @@ async function get_CommandKind_NewFile_Directory_WIDGET_InputText_callback(resul
                 someIndex++;
 
                 if (!isCollapsed) {
-                    while (someIndex < EXPLORER_director.tvd_getTotalCount()) {
+                    while (someIndex < EXPLORER_director.getTotalCount()) {
                         let d_of_perhaps_too_large_depth = EXPLORER_director.nodeList.getDepth(someIndex);
                         if (d_of_perhaps_too_large_depth > targetDepth) {
                             someIndex++;
@@ -1239,7 +1242,7 @@ async function get_CommandKind_NewFile_Directory_WIDGET_InputText_callback(resul
                 if (someIndex >= EXPLORER_director.virtualIndex_ofScrollTop && someIndex <= largestIndexItemBeingShown) {
                     //let finalDiv = EXPLORER_director.itemListElement.children[EXPLORER_director.itemListElement.children.length - 1];
 
-                    EXPLORER_director.itemHeightTotal = EXPLORER_director.tvd_getTotalCount() * EXPLORER_director.itemHeightNumber;
+                    EXPLORER_director.itemHeightTotal = EXPLORER_director.getTotalCount() * EXPLORER_director.itemHeightNumber;
                     EXPLORER_director.virtualizationElement.style.height = EXPLORER_director.itemHeightTotal + 'px';
 
                     //await EXPLORER_director.tvd_drawItem_async(finalDiv, someIndex, /*isNull*/ false);
@@ -1299,7 +1302,7 @@ async function get_CommandKind_NewFile_File_WIDGET_InputText_callback(result: Wi
                 someIndex++;
 
                 if (!isCollapsed) {
-                    while (someIndex < EXPLORER_director.tvd_getTotalCount()) {
+                    while (someIndex < EXPLORER_director.getTotalCount()) {
                         let d_of_perhaps_too_large_depth = EXPLORER_director.nodeList.getDepth(someIndex);
                         if (d_of_perhaps_too_large_depth > targetDepth) {
                             someIndex++;
@@ -1321,7 +1324,7 @@ async function get_CommandKind_NewFile_File_WIDGET_InputText_callback(result: Wi
                 if (someIndex >= EXPLORER_director.virtualIndex_ofScrollTop && someIndex <= largestIndexItemBeingShown) {
                     //let finalDiv = EXPLORER_director.itemListElement.children[EXPLORER_director.itemListElement.children.length - 1];
     
-                    EXPLORER_director.itemHeightTotal = EXPLORER_director.tvd_getTotalCount() * EXPLORER_director.itemHeightNumber;
+                    EXPLORER_director.itemHeightTotal = EXPLORER_director.getTotalCount() * EXPLORER_director.itemHeightNumber;
                     EXPLORER_director.virtualizationElement.style.height = EXPLORER_director.itemHeightTotal + 'px';
     
                     //await EXPLORER_director.tvd_drawItem_async(finalDiv, someIndex, /*isNull*/ false);
@@ -1344,11 +1347,14 @@ async function get_CommandKind_DeleteFile_Directory_YesCancel_callback(result: W
     let entry = WIDGET_SHOW_value;
     let deleteFileResult = await window.myAPI.deleteFile(entry.absolutePath, /*isDirectory*/ true);
     if (deleteFileResult) {
-        let countOfMoreEntriesToShow = EXPLORER_director.tvd_getTotalCount() - (EXPLORER_director.virtualIndex_ofScrollTop + EXPLORER_director.virtualCount);
+        let countOfMoreEntriesToShow = EXPLORER_director.getTotalCount() - (EXPLORER_director.virtualIndex_ofScrollTop + EXPLORER_director.virtualCount);
 
         let countChanges = await EXPLORER_director.removeFromNodeList_async(WIDGET_target.indexItem);
+        if (countChanges === undefined) {
+            return;
+        }
 
-        EXPLORER_director.itemHeightTotal = EXPLORER_director.tvd_getTotalCount() * EXPLORER_director.itemHeightNumber;
+        EXPLORER_director.itemHeightTotal = EXPLORER_director.getTotalCount() * EXPLORER_director.itemHeightNumber;
         EXPLORER_director.virtualizationElement.style.height = EXPLORER_director.itemHeightTotal + 'px';
 
         let remainingChangesToRender = countChanges < EXPLORER_director.virtualCount ? countChanges : EXPLORER_director.virtualCount - WIDGET_target.divRelativeIndex;
@@ -1386,14 +1392,14 @@ async function get_CommandKind_DeleteFile_File_YesCancel_callback(result: Widget
     let entry = WIDGET_SHOW_value;
     let deleteFileResult = await window.myAPI.deleteFile(entry.absolutePath, /*isDirectory*/ false);
     if (deleteFileResult) {
-        let noMoreEntriesToShow = EXPLORER_director.virtualIndex_ofScrollTop + EXPLORER_director.virtualCount >= EXPLORER_director.tvd_getTotalCount();
+        let noMoreEntriesToShow = EXPLORER_director.virtualIndex_ofScrollTop + EXPLORER_director.virtualCount >= EXPLORER_director.getTotalCount();
 
         EXPLORER_director.nodeList.removeAt(WIDGET_target.indexItem, 1);
 
         if (EXPLORER_director.virtualCount > 0) {
             //let divItem = EXPLORER_director.itemListElement.children[WIDGET_target.divRelativeIndex];
 
-            EXPLORER_director.itemHeightTotal = EXPLORER_director.tvd_getTotalCount() * EXPLORER_director.itemHeightNumber;
+            EXPLORER_director.itemHeightTotal = EXPLORER_director.getTotalCount() * EXPLORER_director.itemHeightNumber;
             EXPLORER_director.virtualizationElement.style.height = EXPLORER_director.itemHeightTotal + 'px';
 
             //EXPLORER_director.itemListElement.insertBefore(divItem, undefined);

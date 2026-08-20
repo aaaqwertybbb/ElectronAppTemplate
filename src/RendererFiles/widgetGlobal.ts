@@ -59,7 +59,7 @@ let WIDGET_value = null;
 export let WIDGET_target: any | null = null;
 export function WIDGET_target_SETTER(value: any | null) { WIDGET_target = value; }
 
-export let WIDGET_SHOW_value = null;
+export let WIDGET_SHOW_value: any | null = null;
 
 // Instead of passing the data around in a way that even still is prone to timing errors
 // you should tag the UI with an id and each set increments this id you then verify that the id is matching upon
