@@ -907,4 +907,6 @@ They've dedicated time to figure it out and I'm suffice with this for now.
 I started playing dead cells yesterday
 
 "dead cells ain't gonna play itself I don't got time to change the colors"
+
+I'm all for having the ability to customize things, I'm just saying I personally in my setup gave a few months ago
 */
