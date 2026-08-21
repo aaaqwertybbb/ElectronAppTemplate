@@ -1,8 +1,13 @@
-const get_LISTrenderKind_None = () => 0;
-const get_LISTrenderKind_Cursor = () => 1;
 
-class ListComponent {
-    rootElement: any;
+export const List_RenderKind = {
+    None: 0,
+    Cursor: 1,
+} as const;
+// Derive the type union from the object values
+export type List_RenderKind = typeof List_RenderKind[keyof typeof List_RenderKind];
+
+export abstract class ListComponent implements EventListenerObject {
+    rootElement: HTMLElement;
     virtualizationElement: HTMLDivElement;
     cursorElement: HTMLDivElement;
     itemListElement: HTMLDivElement;
@@ -15,9 +20,13 @@ class ListComponent {
     hasTrailingCall: boolean;
     rAFTimer: null;
     beltIndexZero: number;
-    LIST_renderKindArray: never[];
+    LIST_renderKindArray: List_RenderKind[];
     LIST_isRenderPending: boolean;
-    LIST_ArrayFrom_menuOptionList_children: never[];
+    LIST_ArrayFrom_menuOptionList_children: HTMLElement[];
+    itemHeightNumber: number;
+    itemHeightStyleAttributeValueString: string;
+    boundingClientRect: null;
+
     constructor() {
         /** @type {HTMLDivElement} */
         this.rootElement = document.createElement('div');
@@ -69,7 +78,7 @@ class ListComponent {
         this.LIST_ArrayFrom_menuOptionList_children = [];
     }
 
-    LIST_render_request(renderKind) {
+    LIST_render_request(renderKind: List_RenderKind) {
         if (this.LIST_renderKindArray[this.LIST_renderKindArray.length - 1] !== renderKind) {
             this.LIST_renderKindArray.push(renderKind);
         }
@@ -86,7 +95,7 @@ class ListComponent {
         // Synchronously exhaust the item queue for this animation frame
         while (renderKind = this.LIST_renderKindArray.shift()) {
             switch (renderKind) {
-                case get_LISTrenderKind_Cursor():
+                case List_RenderKind.Cursor:
                     this.LIST_render_do_Cursor();
                     break;
             }
@@ -102,7 +111,7 @@ class ListComponent {
      * @param {*} onkeydownAction receives the div that represents the individual item in the list, the index of the item OR -1 to indicate there is no entry at that location.
      * @param {*} getItemsCountFunc returns the total count of items
      */
-    setItems(itemHeightNumber, itemHeightStyleAttributeValueString, drawItemAction, onkeydownAction, getItemsCountFunc) {
+    setItems(itemHeightNumber: number, itemHeightStyleAttributeValueString: string, drawItemAction, onkeydownAction, getItemsCountFunc) {
         this.itemListElement.innerHTML = '';
         this.virtualizationElement.style.height = 1 + 'px';
         this.state_cursor_setIndex(0);
@@ -128,7 +137,7 @@ class ListComponent {
      * @param {HTMLElement} parentElement 
      * @param {*} insertBeforeThisChild (if falsey, the list UI is appended to the parent element)
      */
-    draw_create(parentElement, insertBeforeThisChild) {
+    draw_create(parentElement: HTMLElement, insertBeforeThisChild: HTMLElement) {
         if (this.rootElement.parentElement) return;
         parentElement.insertBefore(this.rootElement, insertBeforeThisChild);
         this.draw_addEvents();
@@ -164,7 +173,7 @@ class ListComponent {
     }
 
     // The browser automatically looks for this exact method name
-    handleEvent(event) {
+    handleEvent(event: Event) {
         switch (event.type) {
             case 'click':
                 this.event_click(event);
@@ -460,4 +469,8 @@ class ListComponent {
         }
         return indexItem;
     }
+
+    protected abstract drawItemAction(): any;
+    protected abstract onkeydownAction(): any;
+    protected abstract getItemsCountFunc(): any;
 }
