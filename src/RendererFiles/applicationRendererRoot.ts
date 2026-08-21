@@ -1,7 +1,8 @@
 import { AUTOCOMPLETE_show, AUTOCOMPLETE_slice } from './autocompleteGlobal';
 import { DIALOG_show_async, DialogKind } from './dialogGlobal';
-import { EDITOR_documentSymbolResult, EDITOR_getFinalizedEditsAndRawSaveFileData, EDITOR_init, EDITOR_listComponent, EDITOR_mousemove_eventListener_isActive, EDITOR_moveCursor_indexLine_indexColumn, EDITOR_textSourceIdentifier } from './editorGlobal';
+import { EDITOR_documentSymbolResult, EDITOR_documentSymbolResult_SETTER, EDITOR_getFinalizedEditsAndRawSaveFileData, EDITOR_init, EDITOR_listComponent, EDITOR_listComponent_SETTER, EDITOR_mousemove_eventListener_isActive, EDITOR_moveCursor_indexLine_indexColumn, EDITOR_textSourceIdentifier } from './editorGlobal';
 import { EXPLORER_firstSpanWidth_SETTER, EXPLORER_firstSpanWidthValue, EXPLORER_firstSpanWidthValue_SETTER, EXPLORER_setShow, EXPLORER_init, EXPLORER_director } from './explorerGlobal';
+import { ListComponent } from './listComponent';
 import { TOOLTIP_show } from './tooltipGlobal';
 
 /**
@@ -12,7 +13,7 @@ import { TOOLTIP_show } from './tooltipGlobal';
  * */
 export let APP_lineHeight = 20;
 
-export type myAPI_languageServer_response = { method: string; value: any };
+export type myAPI_languageServer_response = { method: string; result: any };
 
 export type myAPI_languageServer_response_TextDocumentCompletionItem = {
     label: string,
@@ -81,6 +82,92 @@ export type myAPI_getFilesystemEntryById_result = {
     absolutePath: string | null,
     isDirectory: false
 };
+
+export type Position = {
+    /**
+     * Line position in a document (zero-based).
+     * 
+     * This is a comment from myself not the docs:
+     *     TODO: consider uint because the docs specifically said 'uinteger'
+     */
+    line: number,
+
+    /**
+     * Character offset on a line in a document (zero-based). The meaning of this
+     * offset is determined by the negotiated `PositionEncodingKind`.
+     *
+     * If the character value is greater than the line length it defaults back
+     * to the line length.
+     * 
+     * This is a comment from myself not the docs:
+     *     TODO: consider uint because the docs specifically said 'uinteger'
+     */
+    character: number,
+}
+
+export type Range = {
+    /**
+     * The range's start position.
+     */
+    start: Position,
+
+    /**
+     * The range's end position.
+     */
+    end: Position,
+}
+
+export type myAPI_documentSymbol = {
+    /**
+     * The name of this symbol. Will be displayed in the user interface and
+     * therefore must not be an empty string or a string only consisting of
+     * white spaces.
+     */
+    name: string,
+
+    /**
+     * More detail for this symbol, e.g the signature of a function.
+     */
+    detail: string,
+
+    /**
+     * The kind of this symbol.
+     */
+    kind: any //SymbolKind,
+
+    /**
+     * Tags for this document symbol.
+     *
+     * @since 3.16.0
+     */
+    tags: any //SymbolTag[]?
+
+    /**
+     * Indicates if this symbol is deprecated.
+     *
+     * @deprecated Use tags instead
+     */
+    deprecated: boolean,
+
+    /**
+     * The range enclosing this symbol not including leading/trailing whitespace
+     * but everything else like comments. This information is typically used to
+     * determine if the clients cursor is inside the symbol to reveal it  in the
+     * UI.
+     */
+    range: Range,
+
+    /**
+     * The range that should be selected and revealed when this symbol is being
+     * picked, e.g. the name of a function. Must be contained by the `range`.
+     */
+    selectionRange: Range,
+
+    /**
+     * Children of this symbol, e.g. properties of a class.
+     */
+    children: myAPI_documentSymbol[],
+}
 
 init();
 
@@ -173,9 +260,9 @@ async function window_myAPI_onMessage(data: myAPI_languageServer_response) {
     switch (data.method) {
         case 'textDocument/documentSymbol':
             {
-                EDITOR_documentSymbolResult = data.result;
+                EDITOR_documentSymbolResult_SETTER(data.result);
                 if (!EDITOR_listComponent) {
-                    EDITOR_listComponent = new ListComponent();
+                    EDITOR_listComponent_SETTER(new DocumentSymbolListComponent());
                 }
                 EDITOR_listComponent.setItems(APP_lineHeight, APP_lineHeight + 'px',
                     EDITOR_listComponent_drawItemAction,
@@ -329,37 +416,39 @@ async function window_myAPI_onMessage(data: myAPI_languageServer_response) {
     }
 }
 
-function EDITOR_listComponent_getItemsCountFunc() {
-    if (EDITOR_documentSymbolResult) {
-        return EDITOR_documentSymbolResult.length;
+class DocumentSymbolListComponent extends ListComponent {
+    override getItemsCountFunc() {
+        if (EDITOR_documentSymbolResult) {
+            return EDITOR_documentSymbolResult.length;
+        }
+        else {
+            return 0;
+        }
     }
-    else {
-        return 0;
-    }
-}
 
-function EDITOR_listComponent_onkeydownAction(div: HTMLElement, index: number) {
-    if (index === -1) {
-        // TODO: if (index === -1)
+    override onkeydownAction(div: HTMLElement, index: number) {
+        if (index === -1) {
+            // TODO: if (index === -1)
+        }
+        else {
+            // TODO: Ensure that json parsing the title like this is a safe way of doing things
+            const startPosition = JSON.parse(div.title);
+            EDITOR_moveCursor_indexLine_indexColumn(startPosition.line, startPosition.character);
+        }
     }
-    else {
-        // TODO: Ensure that json parsing the title like this is a safe way of doing things
-        const startPosition = JSON.parse(div.title);
-        EDITOR_moveCursor_indexLine_indexColumn(startPosition.line, startPosition.character);
-    }
-}
 
-function EDITOR_listComponent_drawItemAction(div: HTMLElement, index: number) {
-    if (index === -1) {
-        div.textContent = '';
-        div.title = '';
-        div.style.display = 'none';
-    }
-    else {
-        let item = EDITOR_documentSymbolResult[index];
-        div.textContent = item.name;
-        div.title = JSON.stringify(item.range.start);
-        div.style.display = '';
+    override drawItemAction(div: HTMLElement, index: number) {
+        if (index === -1 || !EDITOR_documentSymbolResult) {
+            div.textContent = '';
+            div.title = '';
+            div.style.display = 'none';
+        }
+        else {
+            let item = EDITOR_documentSymbolResult[index];
+            div.textContent = item.name;
+            div.title = JSON.stringify(item.range.start);
+            div.style.display = '';
+        }
     }
 }
 

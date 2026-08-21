@@ -4,6 +4,8 @@ import { DIALOG_Settings_editorDebugShowAdjacentCharacters } from './dialogGloba
 import { JS_line_lex, JS_line_lex_newVersion } from "./javascriptFeatures";
 import { MenuOption, Menu_CommandKind, menuSet } from "./menuGlobal";
 import { TOOLTIP_hide } from "./tooltipGlobal";
+import { ListComponent } from "./listComponent";
+import { myAPI_documentSymbol } from "./applicationRendererRoot";
 
 /*
 ###################################
@@ -573,11 +575,13 @@ let EDITOR_extensionKind: ExtensionKind = ExtensionKind.None;
 
 let EDITOR_lineEndString: string | null = null;
 
-export let EDITOR_documentSymbolResult;
+export let EDITOR_documentSymbolResult: myAPI_documentSymbol[] | null = null;
+export function EDITOR_documentSymbolResult_SETTER(value: myAPI_documentSymbol[] | null) { EDITOR_documentSymbolResult = value; }
 /**
  * @type {ListComponent}
  */
-export let EDITOR_listComponent = null;
+export let EDITOR_listComponent: ListComponent | null = null;
+export function EDITOR_listComponent_SETTER(value: ListComponent | null) { EDITOR_listComponent = value; }
 
 let EDITOR_onResize_timer: NodeJS.Timeout | null = null;
 let EDITOR_onResize_hasTrailingCall = false;
