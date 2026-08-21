@@ -566,7 +566,7 @@ let EDITOR_cursorList = [EDITOR_primaryCursor];
 
 export let EDITOR_textSourceIdentifier = '';
 let EDITOR_FORMATTED_textSourceIdentifier = '';
-let EDITOR_extensionKind = ExtensionKind.None;
+let EDITOR_extensionKind: ExtensionKind = ExtensionKind.None;
 
 let EDITOR_lineEndString: string | null = null;
 
@@ -867,7 +867,7 @@ function EDITOR_render_do_SetText(timestamp: number) {
 }
 
 /** All DOM manipulation needs to be done through this function. */
-function EDITOR_render_request(renderKind: RenderKind) {
+function EDITOR_render_request(renderKind: RenderKind | number) {
     if (EDITOR_renderKindArray[EDITOR_renderKindArray.length - 1] !== renderKind) {
         EDITOR_renderKindArray.push(renderKind);
     }
@@ -1815,9 +1815,9 @@ function EDITOR_finalizeEdit(cursor: EDITOR_Cursor) {
                     else beltIndexLine = (beltIndexLine + EDITOR_beltIndexZero) % virtualCount;
 
                     if (beltIndexLine >= 0) {
-                        let gutterLineElement = cached_EDITOR_gutter.children[beltIndexLine];
+                        let gutterLineElement = cached_EDITOR_gutter.children[beltIndexLine] as HTMLElement;
                         gutterLineElement.innerHTML = '';
-                        let textLineElement = cached_EDITOR_textElement.children[beltIndexLine];
+                        let textLineElement = cached_EDITOR_textElement.children[beltIndexLine] as HTMLElement;
                         textLineElement.innerHTML = '';
                         EDITOR_drawLine(indexLine_editOccurredOn, gutterLineElement, textLineElement);
                     }
@@ -1999,7 +1999,7 @@ function EDITOR_finalizeEdit_IndentMore(cursor: EDITOR_Cursor, indexLine_editOcc
         }
     }
 
-    startingLinePos_end = EDITOR_indentLess_startingLinePos_end;
+    let startingLinePos_end = EDITOR_indentLess_startingLinePos_end;
     EDITOR_indentLess_startingLinePos_end = 0;
 
     
@@ -2012,7 +2012,7 @@ function EDITOR_finalizeEdit_IndentMore(cursor: EDITOR_Cursor, indexLine_editOcc
 
     // # Update the 'START POSITIONS specifically' of the tracked syntax list by the total count of text that will be inserted.
     let trackedSyntaxReposition_i = EDITOR_trackedSyntaxReposition_find(startingLinePos_end + 1);
-    if (Number.isNaN(trackedSyntaxReposition_i) || trackedSyntaxReposition_i === -1) {
+    if (Number.isNaN(trackedSyntaxReposition_i) || trackedSyntaxReposition_i === -1 || trackedSyntaxReposition_i === undefined) {
         trackedSyntaxReposition_i = EDITOR_trackedSyntaxList.count_abstract;
     }
     for (var i = trackedSyntaxReposition_i; i < EDITOR_trackedSyntaxList.count_abstract; i++) {
@@ -2251,7 +2251,7 @@ function EDITOR_finalizeEdit_IndentLess(cursor: EDITOR_Cursor, indexLine_editOcc
     //}
 
     let trackedSyntaxReposition_i = EDITOR_trackedSyntaxReposition_find(EDITOR_indentLess_startingLinePos_end + 1);
-    if (Number.isNaN(trackedSyntaxReposition_i) || trackedSyntaxReposition_i === -1) {
+    if (Number.isNaN(trackedSyntaxReposition_i) || trackedSyntaxReposition_i === -1 || trackedSyntaxReposition_i === undefined) {
         trackedSyntaxReposition_i = EDITOR_trackedSyntaxList.count_abstract;
     }
     for (var i = trackedSyntaxReposition_i; i < EDITOR_trackedSyntaxList.count_abstract; i++) {
@@ -2348,6 +2348,9 @@ function EDITOR_finalizeEdit_Paste(cursor: EDITOR_Cursor, indexLine_editOccurred
     
     EDITOR_trackedSyntaxList_inefficientUpdateStartAndLength(cursor.editPosition, cursor.editLength);
     
+    if (!cursor.EDITOR_paste_clipboardContent) {
+        throw new Error();
+    }
     let content = cursor.EDITOR_paste_clipboardContent;
     cursor.EDITOR_paste_clipboardContent = null;
 
@@ -2657,7 +2660,7 @@ function EDITOR_readLineEndPositionList(indexLine: number) {
     // If you need to determine the text without finalizing an edit, you DO have to loop forwards right?
     for (var i = 0; i < EDITOR_cursorList.length; i++) {
         let cursor = EDITOR_cursorList[i];
-        if (cursor.editLength > 0 & cursor.editPosition <= lineEndPositionIndex) {
+        if (cursor.editLength > 0 && cursor.editPosition <= lineEndPositionIndex) {
             switch (cursor.editKind) {
                 case EditKind.InsertLtr:
                     lineEndPositionIndex += cursor.editLength;
@@ -2812,7 +2815,7 @@ function walkLineUntilIndexColumn(cursor: EDITOR_Cursor) {
     let indexColumn_Sum = 0;
 
     for (var indexSpan = 0; indexSpan < div.children.length; indexSpan++) {
-        let span = div.children[indexSpan];
+        let span = div.children[indexSpan] as HTMLElement;
         if (indexColumn_Goal <= indexColumn_Sum + span.textContent.length) {
             // '<=' because end-of-line text insertion (end of line but prior to the line ending itself).
             // The line ending isn't written to the span, it is represented by the encompassing div itself.
@@ -3154,12 +3157,12 @@ function EDITOR_createStyleForSelection(cursor: EDITOR_Cursor) {
             shouldExistSelectionDiv = true;
         }
 
-        let textSelectionDiv;
+        let textSelectionDiv: HTMLElement | null = null;
 
         if (cursor.selectionDivExists) {
             for (var i = 0; i < cached_EDITOR_presentation.children.length; i++) {
                 if (cached_EDITOR_presentation.children[i].id === cursor.htmlId) {
-                    textSelectionDiv = cached_EDITOR_presentation.children[i];
+                    textSelectionDiv = cached_EDITOR_presentation.children[i] as HTMLElement;
                     if (!shouldExistSelectionDiv) {
                         cached_EDITOR_presentation.removeChild(textSelectionDiv);
                         cursor.selectionDivExists = false;
@@ -3180,6 +3183,8 @@ function EDITOR_createStyleForSelection(cursor: EDITOR_Cursor) {
         }
 
         if (!cursor.selectionDivExists) return;
+
+        if (!textSelectionDiv) throw new Error();
 
         // TODO: only somewhat simple viewport based virtualization is implemented from what I remember. i.e.: I think the divs are re-used, but every div is redrawn for the viewport, rather than only recalculating the css for the divs that came or left the viewport.
 
@@ -3237,14 +3242,14 @@ function EDITOR_createStyleForSelection(cursor: EDITOR_Cursor) {
             }
         }
 
-        let lineSelectionDiv;
+        let lineSelectionDiv: HTMLElement;
         let childDivIndex = 0;
 
         // everything static-ly will "fall at a left of gutterWidthTotal_withPxUnits"...
         // ...but you cannot rely on that as it causes layout shifting, you need to make it clear to the renderering engine.
 
         if (startLine == INCLUSIVEendLine) {
-            lineSelectionDiv = textSelectionDiv.children[childDivIndex++];
+            lineSelectionDiv = textSelectionDiv.children[childDivIndex++] as HTMLElement;
             lineSelectionDiv.className = 'EDITOR_selection';
             lineSelectionDiv.style.left = gutterWidthTotal_withPxUnits;
             lineSelectionDiv.style.transform = `translate(${startColumn * EDITOR_characterWidth}px, ${lineHeight * startLine}px)`;
@@ -3252,7 +3257,7 @@ function EDITOR_createStyleForSelection(cursor: EDITOR_Cursor) {
         }
         else {
             // start line
-            lineSelectionDiv = textSelectionDiv.children[childDivIndex++];
+            lineSelectionDiv = textSelectionDiv.children[childDivIndex++] as HTMLElement;
             lineSelectionDiv.className = 'EDITOR_selection';
             lineSelectionDiv.style.left = gutterWidthTotal_withPxUnits;
             lineSelectionDiv.style.transform = `translate(${startColumn * EDITOR_characterWidth}px, ${lineHeight * startLine}px)`;
@@ -3262,7 +3267,7 @@ function EDITOR_createStyleForSelection(cursor: EDITOR_Cursor) {
 
             // between lines
             for (var lineI = startLine + 1; lineI < INCLUSIVEendLine; lineI++) {
-                lineSelectionDiv = textSelectionDiv.children[childDivIndex++];
+                lineSelectionDiv = textSelectionDiv.children[childDivIndex++] as HTMLElement;
                 lineSelectionDiv.className = 'EDITOR_selection';
                 lineSelectionDiv.style.left = gutterWidthTotal_withPxUnits;
                 lineSelectionDiv.style.transform = `translateY(${lineHeight * lineI}px)`;
@@ -3272,7 +3277,7 @@ function EDITOR_createStyleForSelection(cursor: EDITOR_Cursor) {
             }
 
             // end line
-            lineSelectionDiv = textSelectionDiv.children[childDivIndex++];
+            lineSelectionDiv = textSelectionDiv.children[childDivIndex++] as HTMLElement;
             lineSelectionDiv.className = 'EDITOR_selection';
             lineSelectionDiv.style.left = gutterWidthTotal_withPxUnits;
             lineSelectionDiv.style.transform = `translateY(${lineHeight * INCLUSIVEendLine}px)`;
@@ -3282,11 +3287,11 @@ function EDITOR_createStyleForSelection(cursor: EDITOR_Cursor) {
 }
 
 function EDITOR_createStyleForSelection_indentMore(cursor: EDITOR_Cursor) {
-    let textSelectionDiv;
+    let textSelectionDiv: HTMLElement | null = null;
     if (cursor.selectionDivExists) {
         for (var i = 0; i < cached_EDITOR_presentation.children.length; i++) {
             if (cached_EDITOR_presentation.children[i].id === cursor.htmlId) {
-                textSelectionDiv = cached_EDITOR_presentation.children[i];
+                textSelectionDiv = cached_EDITOR_presentation.children[i] as HTMLElement;
                 break;
             }
         }
@@ -3296,10 +3301,14 @@ function EDITOR_createStyleForSelection_indentMore(cursor: EDITOR_Cursor) {
         return;
     }
 
+    if (!textSelectionDiv) {
+        throw new Error();'
+    }
+
     let extraWidth = 4 * EDITOR_characterWidth;
     for (let i = 0; i < textSelectionDiv.children.length; i++) {
-        let lineSelectionDiv = textSelectionDiv.children[i];
-        let widthNumberValue = parseFloat(lineSelectionDiv.style.width, 10);
+        let lineSelectionDiv = textSelectionDiv.children[i] as HTMLElement;
+        let widthNumberValue = parseFloat(lineSelectionDiv.style.width);
         widthNumberValue += extraWidth;
         lineSelectionDiv.style.width = widthNumberValue + 'px';
     }
@@ -3510,7 +3519,7 @@ function EDITOR_onMouseMoveDetailRankOne(event: MouseEvent, indexLineClicked: nu
     cursor.selectionEnd = EDITOR_getPositionIndex(cursor);
 
     let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
-    EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
+    EDITOR_render_request((RenderKind.Cursor_n as number) + indexCursor);
 }
 
 function getCharacter_raw(positionIndex: number) {
@@ -3552,7 +3561,7 @@ function getCharacter(positionIndex: number) {
         let cursor = EDITOR_cursorList[i];
         switch (cursor.editKind) {
             case EditKind.InsertLtr:
-                if (positionIndex >= cursor.editPosition & positionIndex < cursor.editPosition + cursor.editLength) {
+                if (positionIndex >= cursor.editPosition && positionIndex < cursor.editPosition + cursor.editLength) {
                     // TODO: I hear fromCharCode is faster than 'String.fromCodePoint(...)' thus I'm seeing if it is sufficient for my current personal usage...
                     // ...long term it presumably fails for characters that I don't tend to type, but until then this is working so I'll just use fromCharCode.
                     //
@@ -3712,6 +3721,9 @@ function EDITOR_onMouseMoveDetailRankTwo(event: MouseEvent, indexLineClicked: nu
         }
         else {
             let largeLineAndColumnIndices = EDITOR_getLineAndColumnIndices(GLOBAL_detail_largePosition);
+            if (largeLineAndColumnIndices === undefined) {
+                throw new Error();
+            }
             cursor.indexLine = largeLineAndColumnIndices.indexLine;
             cursor.indexColumn = largeLineAndColumnIndices.indexColumn;
             cursor.selectionEnd = GLOBAL_detail_largePosition;
@@ -3728,6 +3740,9 @@ function EDITOR_onMouseMoveDetailRankThree(event: MouseEvent, indexLineClicked: 
     if (indexLineClicked === GLOBAL_detailRank3OriginLine) {
         if (cursor.positionIndex !== GLOBAL_detail_smallPosition) {
             let smallLineAndColumnPositionIndices = EDITOR_getLineAndColumnIndices(GLOBAL_detail_smallPosition);
+            if (smallLineAndColumnPositionIndices === undefined) {
+                throw new Error();
+            }
             cursor.indexLine = smallLineAndColumnPositionIndices.indexLine;
             cursor.indexColumn = smallLineAndColumnPositionIndices.indexColumn;
         }
@@ -3746,7 +3761,9 @@ function EDITOR_onMouseMoveDetailRankThree(event: MouseEvent, indexLineClicked: 
     else if (indexLineClicked < GLOBAL_detailRank3OriginLine) {
         if (cursor.selectionAnchor < cursor.selectionEnd) {
             let smallLineAndColumnPositionIndices = EDITOR_getLineAndColumnIndices(GLOBAL_detail_smallPosition);
-
+            if (smallLineAndColumnPositionIndices === undefined) {
+                throw new Error();
+            }
             cursor.indexLine = smallLineAndColumnPositionIndices.indexLine;
             cursor.indexColumn = smallLineAndColumnPositionIndices.indexColumn;
 
@@ -4249,7 +4266,7 @@ function EDITOR_createCursorAtNextMatchSelection(event: KeyboardEvent) {
     let postPosition = EDITOR_getPositionIndex(EDITOR_primaryCursor);
 
     if (prePosition != postPosition && postPosition != GLOBAL_findOverlay_isBeingShownDueToMultiCursorMatching_originMatchNumber) {
-        let input = document.getElementById('EDITOR_findOverlay_input_elementId');
+        let input = document.getElementById('EDITOR_findOverlay_input_elementId') as HTMLInputElement;
         if (!input || !input.value) return;
 
         let indexOfPrimaryCursor = -1;
@@ -4988,7 +5005,7 @@ function EDITOR_onKeyDown_ArrowLeft(event: KeyboardEvent) {
         }
         else {
             EDITOR_preKeyboardMovementSelectionLogic(cursor, event.shiftKey);
-            if (event.ctrlKey & cursor.indexColumn > 0) {
+            if (event.ctrlKey && cursor.indexColumn > 0) {
                 let line = EDITOR_getLineBoundaryPositions(cursor.indexLine);
                 let indexPosition = line.start + cursor.indexColumn;
                 let originalCharacterKind = EDITOR_getCharacterPrevious_KIND(cursor.indexColumn, indexPosition);
@@ -5129,7 +5146,7 @@ function EDITOR_onKeyDown_ArrowRight(event: KeyboardEvent) {
         else {
             EDITOR_preKeyboardMovementSelectionLogic(cursor, event.shiftKey);
             let lastValidIndexColumn = EDITOR_getLastValidIndexColumn(cursor.indexLine);
-            if (event.ctrlKey & cursor.indexColumn < lastValidIndexColumn) {
+            if (event.ctrlKey && cursor.indexColumn < lastValidIndexColumn) {
                 let line = EDITOR_getLineBoundaryPositions(cursor.indexLine);
                 let indexPosition = line.start + cursor.indexColumn;
                 let originalCharacterKind = EDITOR_getCharacterCurrent_KIND(cursor.indexColumn, indexPosition, line.end);
@@ -7550,7 +7567,7 @@ function EDITOR_render_do_RemoveSelection() {
             cursor.editLength = 0;
 
             let indexTrackedSyntax = EDITOR_drawViewPort_FindTrackedSyntax_StartingIndex(cursor.indexLine);
-            if (Number.isNaN(indexTrackedSyntax) || indexTrackedSyntax === -1) {
+            if (Number.isNaN(indexTrackedSyntax) || indexTrackedSyntax === -1 || indexTrackedSyntax === undefined) {
                 indexTrackedSyntax = EDITOR_trackedSyntaxList.count_abstract;
             }
             let possibleTrackedSyntaxToSpanSingleLine = false;
@@ -8253,7 +8270,7 @@ function EDITOR_insertDo(cursor: EDITOR_Cursor, character: string) {
 function EDITOR_stopTrackingIfTrackedSyntaxMadeToSpanSingleLine(cursor: EDITOR_Cursor) {
     // binary search for 'if (EDITOR_pooledTrackedSyntax_start + EDITOR_pooledTrackedSyntax_length > positionIndex)'
     let indexTrackedSyntax = EDITOR_drawViewPort_FindTrackedSyntax_StartingIndex(cursor.indexLine);
-    if (Number.isNaN(indexTrackedSyntax) || indexTrackedSyntax === -1) {
+    if (Number.isNaN(indexTrackedSyntax) || indexTrackedSyntax === -1 || indexTrackedSyntax === undefined) {
         indexTrackedSyntax = EDITOR_trackedSyntaxList.count_abstract;
     }
     if (indexTrackedSyntax < EDITOR_trackedSyntaxList.count_abstract) {
