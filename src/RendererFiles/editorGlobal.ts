@@ -3755,7 +3755,13 @@ function EDITOR_onMouseMoveDetailRankThree(event: MouseEvent, indexLineClicked: 
 
     // TODO: I remember this being bugged I think it makes sense why. You're checking if the cursor is exactly at the threshold rather than determining if the distance from previous event to this one puts you past the threshold.
     if (indexLineClicked === GLOBAL_detailRank3OriginLine) {
-        if (cursor.positionIndex !== GLOBAL_detail_smallPosition) {
+        // TODO: 'cursor.positionIndex' is incorrect there is no such field, but was this referring to the clicked position or the position that the cursor currently is at...
+        // ...it is presumed to be the position that the cursor is currently at because it would explain the bug where if you move the cursor somewhere that the mouse move events don't get
+        // sent then bring your mouse back into a place where they do you'll snap ahead by some indices and skip the threshold and it visually bugs.
+        // You could attach to I think it is window? but then I'm wondering if a race condition could ever occur.
+        // so you'd probably want to do both attach to window instead and protect against large movements that skip the exact threshold when transitioning.
+        //
+        if (EDITOR_getPositionIndex_raw(cursor) !== GLOBAL_detail_smallPosition) {
             let smallLineAndColumnPositionIndices = EDITOR_getLineAndColumnIndices(GLOBAL_detail_smallPosition);
             if (smallLineAndColumnPositionIndices === undefined) {
                 throw new Error();
