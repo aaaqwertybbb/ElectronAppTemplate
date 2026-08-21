@@ -2,7 +2,7 @@ import { TrackedSyntaxKind, TrackedSyntaxList } from "./trackedSyntaxTypes";
 import { ByteList, UInt32List } from './listTypes';
 import { DIALOG_Settings_editorDebugShowAdjacentCharacters } from './dialogGlobal';
 import { JS_line_lex, JS_line_lex_newVersion } from "./javascriptFeatures";
-import { MenuOption, Menu_CommandKind } from "./menuGlobal";
+import { MenuOption, Menu_CommandKind, menuSet } from "./menuGlobal";
 import { TOOLTIP_hide } from "./tooltipGlobal";
 
 /*
@@ -5508,7 +5508,7 @@ async function EDITOR_onContextMenu(event: PointerEvent) {
     let menuLeft = recentBoundingClientRect_left + gutterWidthTotal + EDITOR_primaryCursor.cursorTranslateXValue - lastReadNumber_scrollLeft;
     let menuTop = recentBoundingClientRect_top + EDITOR_primaryCursor.cursorTranslateYValue + lineHeight - lastReadNumber_scrollTop;
 
-    await menuSet('EDITOR', null, optionList, menuLeft, menuTop);
+    await menuSet('EDITOR', null, optionList, menuLeft, menuTop, undefined, undefined, null);
 }
 
 function EDITOR_onWheel(event: WheelEvent) {
@@ -7333,6 +7333,10 @@ function EDITOR_EnterKey(cursor: EDITOR_Cursor, ctrlKey: boolean, shiftKey: bool
 
     if (ctrlKey) cursor.indexColumn = 0;
     else if (shiftKey) cursor.indexColumn = EDITOR_getLastValidIndexColumn(cursor.indexLine);
+
+    if (!cursor.enterKey_newLinePlusIndentation_byteList) {
+        throw new Error();
+    }
 
     if (cursor.editLength === 0) {
 
