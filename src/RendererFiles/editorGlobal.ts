@@ -9036,4 +9036,6 @@ and what not
 
 I had a nightmare that I was in highschool in an algebra 2 class and I failed a test
 
+- [ ] TypeScript version works by end of day
+
 */
