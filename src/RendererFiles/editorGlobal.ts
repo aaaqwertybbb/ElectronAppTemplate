@@ -237,6 +237,9 @@ let gutterWidthTotal = 32;
 
 let recentBoundingClientRect_isNull_intFalsey = 1;
 
+let recentBoundingClientRect_left = 0;
+let recentBoundingClientRect_top = 0;
+
 class EDITOR_Cursor {
 
     static STATIC_CURSOR_ID = 1;
@@ -3396,8 +3399,8 @@ function EDITOR_onMouseMove_WRAPIT(event: MouseEvent) {
         // TODO: Consider short circuiting at via event.clientX and clientY by tracking the necessary thresholds for the cursor position to pass rather than the previous and current indices. (you can possibly thereby skip the calculation of the indices entirely for the redundant events).
         // TODO: Is it correct to use the cursor's indexLine and indexColumn directly as a means of determining redundancy? I worry about odd interactions, but I have no proof that such an odd interaction could exist.
 
-        let rX = event.clientX - get_EDITOR_recentBoundingClientRect_left() - gutterWidthTotal + lastReadNumber_scrollLeft;
-        let rY = event.clientY - get_EDITOR_recentBoundingClientRect_top() + lastReadNumber_scrollTop;
+        let rX = event.clientX - recentBoundingClientRect_left - gutterWidthTotal + lastReadNumber_scrollLeft;
+        let rY = event.clientY - recentBoundingClientRect_top + lastReadNumber_scrollTop;
 
         let indexColumn = Math.round(rX / EDITOR_characterWidth);
         let indexLine = Math.floor(rY / lineHeight);
@@ -5328,8 +5331,8 @@ function EDITOR_onMouseDown(event: MouseEvent) {
 
     if (recentBoundingClientRect_isNull_intFalsey) {
         let boundingClientRect = EDITOR_baseElement.getBoundingClientRect();
-        set_EDITOR_recentBoundingClientRect_left(boundingClientRect.left);
-        set_EDITOR_recentBoundingClientRect_top(boundingClientRect.top);
+        recentBoundingClientRect_left = boundingClientRect.left;
+        recentBoundingClientRect_top = boundingClientRect.top;
         recentBoundingClientRect_isNull_intFalsey = 0;
     }
 
@@ -5338,8 +5341,8 @@ function EDITOR_onMouseDown(event: MouseEvent) {
         EDITOR_baseElement.addEventListener('mousemove', EDITOR_onMouseMove_WRAPIT);
     }
 
-    let rY = event.clientY - get_EDITOR_recentBoundingClientRect_top() + lastReadNumber_scrollTop;
-    let rX = event.clientX - get_EDITOR_recentBoundingClientRect_left() - gutterWidthTotal + lastReadNumber_scrollLeft;
+    let rY = event.clientY - recentBoundingClientRect_top + lastReadNumber_scrollTop;
+    let rX = event.clientX - recentBoundingClientRect_left - gutterWidthTotal + lastReadNumber_scrollLeft;
     
     let indexLine = Math.floor(rY / lineHeight);
     let indexColumn = Math.round(rX / EDITOR_characterWidth);
@@ -5396,8 +5399,8 @@ async function EDITOR_onContextMenu(event: PointerEvent) {
         new MenuOption(get_CommandKind_Find(), 'Find', null),
     ];
 
-    let menuLeft = get_EDITOR_recentBoundingClientRect_left() + gutterWidthTotal + EDITOR_primaryCursor.cursorTranslateXValue - lastReadNumber_scrollLeft;
-    let menuTop = get_EDITOR_recentBoundingClientRect_top() + EDITOR_primaryCursor.cursorTranslateYValue + lineHeight - lastReadNumber_scrollTop;
+    let menuLeft = recentBoundingClientRect_left + gutterWidthTotal + EDITOR_primaryCursor.cursorTranslateXValue - lastReadNumber_scrollLeft;
+    let menuTop = recentBoundingClientRect_top + EDITOR_primaryCursor.cursorTranslateYValue + lineHeight - lastReadNumber_scrollTop;
 
     await menuSet('EDITOR', null, optionList, menuLeft, menuTop);
 }
@@ -8963,13 +8966,13 @@ function EDITOR_requestLspHover() {
     ///////////
     if (recentBoundingClientRect_isNull_intFalsey) {
         let boundingClientRect = EDITOR_baseElement.getBoundingClientRect();
-        set_EDITOR_recentBoundingClientRect_left(boundingClientRect.left);
-        set_EDITOR_recentBoundingClientRect_top(boundingClientRect.top);
+        recentBoundingClientRect_left = boundingClientRect.left;
+        recentBoundingClientRect_top = boundingClientRect.top;
         recentBoundingClientRect_isNull_intFalsey = 0;
     }
 
-    let rY = event.clientY - get_EDITOR_recentBoundingClientRect_top() + lastReadNumber_scrollTop;
-    let rX = event.clientX - get_EDITOR_recentBoundingClientRect_left() - gutterWidthTotal + lastReadNumber_scrollLeft;
+    let rY = event.clientY - recentBoundingClientRect_top + lastReadNumber_scrollTop;
+    let rX = event.clientX - recentBoundingClientRect_left - gutterWidthTotal + lastReadNumber_scrollLeft;
     
     let indexLine = Math.floor(rY / lineHeight);
     let indexColumn = Math.round(rX / EDITOR_characterWidth);
