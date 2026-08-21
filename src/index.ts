@@ -42,6 +42,7 @@ const createWindow = (): void => {
 	ipcMain.handle('choose-directory', chooseDirectory);
 	ipcMain.handle('choose-workspace', chooseWorkspace);
 	ipcMain.handle('get-filesystem-entries', getFilesystemEntries);
+	ipcMain.handle('get-filesystem-entry-by-id', getFilesystemEntryById);
 	ipcMain.handle('get-filesystem-entry-by-id-array', getFilesystemEntryById_ARRAY);
 	ipcMain.handle('editor-read-all-text', editorReadAllText);
 };
@@ -225,6 +226,30 @@ async function getFilesystemEntries(event: any, argument: number | string, argum
 	catch (err) {
 		console.error("Error reading directory:", err);
 		return [];
+	}
+}
+
+async function getFilesystemEntryById(event: any, id: number) {
+	try {
+		let entry = database.getBy_id(id);
+		if (!entry) {
+			return null;
+		}
+		else {
+			return {
+				basename: entry.displayName,
+				absolutePath: entry.value,
+				isDirectory: fs.statSync(entry.value)?.isDirectory() ?? false
+			};
+		}
+	}
+	catch (err) {
+		console.error("Error during get-filesystem-entry-by-id:", err);
+		return {
+			basename: null,
+			absolutePath: null,
+			isDirectory: false
+		};
 	}
 }
 

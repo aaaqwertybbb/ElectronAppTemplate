@@ -669,7 +669,7 @@ let EDITOR_cursorBlinkLastTimestamp = 0;
 
 let EDITOR_mousemove_eventListener_isActive = false;
 
-function EDITOR_init() {
+export function EDITOR_init() {
 
     cached_EDITOR_virtualization_horizontal = EDITOR_baseElement.children[0] as HTMLElement;
     cached_EDITOR_virtualization_vertical = EDITOR_baseElement.children[1] as HTMLElement;
@@ -2653,7 +2653,7 @@ export function EDITOR_getFinalizedEditsAndRawSaveFileData(NOTfinalizePendingEdi
     return {
         uint8arrayTextBytes: EDITOR_textByteList.bytes,
         countOfBytesInUse: EDITOR_textByteList.count,
-        lineEndString: EDITOR_lineEndString,
+        lineEndString: EDITOR_lineEndString ?? '\n',
         fileStartsWithBom: fileStartsWithBom
     };
 }

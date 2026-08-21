@@ -1,5 +1,5 @@
 import { DIALOG_show_async, DialogKind } from './dialogGlobal';
-import { EDITOR_getFinalizedEditsAndRawSaveFileData, EDITOR_textSourceIdentifier } from './editorGlobal';
+import { EDITOR_getFinalizedEditsAndRawSaveFileData, EDITOR_init, EDITOR_textSourceIdentifier } from './editorGlobal';
 import { EXPLORER_firstSpanWidth_SETTER, EXPLORER_firstSpanWidthValue, EXPLORER_firstSpanWidthValue_SETTER, EXPLORER_setShow, EXPLORER_init, EXPLORER_director } from './explorerGlobal';
 
 /**
@@ -74,6 +74,12 @@ export type myAPI_getFilesystemEntryById_ARRAY_entry = {
     isDirectory: boolean
 };
 
+export type myAPI_getFilesystemEntryById_result = {
+    basename: string | null,
+    absolutePath: string | null,
+    isDirectory: false
+};
+
 init();
 
 function init() {
@@ -106,7 +112,7 @@ function init() {
 function APP_render_init() {
     APP_measureLineHeightAndCharacterWidth();
     EXPLORER_init();
-    //EDITOR_init();
+    EDITOR_init();
 }
 
 function APP_measureLineHeightAndCharacterWidth() {
