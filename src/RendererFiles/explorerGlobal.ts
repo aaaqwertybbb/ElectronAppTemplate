@@ -139,7 +139,7 @@ class EXPLORER_TreeViewComponent extends TreeViewComponent {
     /** 
      * @param {number} caseThreeOrigin if left undefined or (falsey but not 0), this will default to 'this.beltIndexZero'
      */
-    drawItem_BATCH(start: number, length: number, onePositiveDiff_twoNegativeDiff_orThreeFullScreen: number, caseThreeOrigin: number, timestamp: number) {
+    drawItem_BATCH(start: number, length: number, onePositiveDiff_twoNegativeDiff_orThreeFullScreen: number, caseThreeOrigin: number | undefined, timestamp: number) {
 
         // TODO: I'm putting this in treeViewComponent.js as well for now when diff === 0:
         this.scrollEndDeadline = timestamp + 300;
@@ -711,7 +711,7 @@ const EXPLORER_NOTisExpandedText = '+';
 const EXPLORER_cannotBeExpandedText = '';
 
 /** Pixels */
-const EXPLORER_offsetPerDepth = 8;
+export const EXPLORER_offsetPerDepth = 8;
 
 let EXPLORER_show = true;
 

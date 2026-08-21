@@ -1,6 +1,8 @@
 import { APP_lineHeight } from './applicationRendererRoot';
 import { DIALOG_Settings_isDark, DIALOG_Settings_isDark_SETTER } from './dialogGlobal';
-import { TreeView_NodeKind, TreeViewComponent, TreeViewNodeList } from './treeViewComponent';
+import { EXPLORER_offsetPerDepth } from './explorerGlobal';
+import { MenuOption } from './menuGlobal';
+import { TreeView_NodeKind, TreeView_pooledNode_depth, TreeView_pooledNode_key, TreeView_pooledNode_nodeKind, TreeViewComponent, TreeViewNodeList } from './treeViewComponent';
 
 class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
     actualData: (any | string)[] | null;
@@ -41,7 +43,7 @@ class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
     /** 
      * @param {number} caseThreeOrigin if left undefined or (falsey but not 0), this will default to 'this.beltIndexZero'
      */
-    override drawItem_BATCH(start: number, length, onePositiveDiff_twoNegativeDiff_orThreeFullScreen, caseThreeOrigin, timestamp) {
+    override drawItem_BATCH(start: number, length: number, onePositiveDiff_twoNegativeDiff_orThreeFullScreen: number, caseThreeOrigin: number | undefined, timestamp: number) {
         let upperBound = start + length;
         let totalCount = this.nodeList.count_abstract;
         let loopCounter = 0;
@@ -69,9 +71,9 @@ class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
         for (var indexItem = start; indexItem < upperBound; indexItem++) {
 
             let depth = 0;
-            let nodeKind = get_TreeViewNodeKind_NOTisExpandable_NOTisExpanded();
+            let nodeKind: TreeView_NodeKind = TreeView_NodeKind.NOTisExpandable_NOTisExpanded;
 
-            let divItem;
+            let divItem: HTMLElement;
             let divIndex;
 
             switch (onePositiveDiff_twoNegativeDiff_orThreeFullScreen) {
@@ -90,8 +92,10 @@ class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
                     if (divIndex >= this.itemListElement.children.length)
                         divIndex -= this.itemListElement.children.length;
                     break;
+                default:
+                    throw new Error();
             }
-            divItem = this.itemListElement.children[divIndex];
+            divItem = this.itemListElement.children[divIndex] as HTMLElement;
 
             if (indexItem >= totalCount) {
                 // TODO: Will the user agent remove a text node that has an "empty" nodeValue?
@@ -119,16 +123,16 @@ class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
             }
 
             switch (nodeKind) {
-                case get_TreeViewNodeKind_isExpandable_isExpanded():
+                case TreeView_NodeKind.isExpandable_isExpanded:
                     divItem.children[0].textContent = '-';
                     break;
-                case get_TreeViewNodeKind_isExpandable_NOTisExpanded():
+                case TreeView_NodeKind.isExpandable_NOTisExpanded:
                     divItem.children[0].textContent = '+';
                     break;
-                case get_TreeViewNodeKind_NOTisExpandable_isExpanded():
+                case TreeView_NodeKind.NOTisExpandable_isExpanded:
                     divItem.children[0].textContent = '';
                     break;
-                case get_TreeViewNodeKind_NOTisExpandable_NOTisExpanded():
+                case TreeView_NodeKind.NOTisExpandable_NOTisExpanded:
                     divItem.children[0].textContent = '';
                     break;
             }
@@ -152,11 +156,11 @@ class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
     }
     
     /*** Not every key invokes this. */
-    override async onkeydown_async(divItem, indexItem, key) {
+    override async onkeydown_async(divItem: HTMLElement, indexItem: number, eventKey: string) {
         
     }
     
-    override async ondblclick_async(divItem, indexItem) {
+    override async ondblclick_async(divItem: HTMLElement, indexItem: number) {
         this.nodeList.getElementAt(indexItem);
         let key = TreeView_pooledNode_key;
         let depth = TreeView_pooledNode_depth;
@@ -192,7 +196,7 @@ class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
         }
     }
     
-    override async oncontextmenu_async(divItem, indexItem, event, relativeIndex) {
+    override async oncontextmenu_async(divItem: HTMLElement, indexItem: number, event: MouseEvent, relativeIndex: number) {
         
     }
 
@@ -202,7 +206,7 @@ class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
      * ...thus, you should consider checking the x position of the event against the x position of the nodeElement.children[0].
      * @param {*} event 
      */
-    override async expandCollapseIconWasClicked_async(divItem, indexItem) {
+    override async expandCollapseIconWasClicked_async(divItem: HTMLElement, indexItem: number) {
         this.nodeList.getElementAt(indexItem);
         let key = TreeView_pooledNode_key;
         let depth = TreeView_pooledNode_depth;
@@ -267,11 +271,11 @@ class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
         }
     }
     
-    override async arrowRight_async(divItem, indexItem) {
+    override async arrowRight_async(divItem: HTMLElement, indexItem: number) {
         
 	}
     
-    override async arrowLeft_async(divItem, indexItem) {
+    override async arrowLeft_async(divItem: HTMLElement, indexItem: number) {
         
     }
 
@@ -282,7 +286,7 @@ class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
     override drawItem_BATCH_PullDataDrawResult () {
     }
 
-    addSpecificMenuOptionsForTarget(optionList, divItem, target) {
+    addSpecificMenuOptionsForTarget(optionList: MenuOption[], divItem: HTMLElement, target: any) {
         
     }
 }
@@ -291,6 +295,9 @@ let DIALOG_FindAll_TreeViewDirector_instance: DIALOG_FindAll_TreeViewDirector | 
 
 export async function DIALOG_FindAll_Create_async() {
     let dialogBody = document.getElementById('DIALOG_body');
+    if (!dialogBody) {
+        throw new Error();
+    }
 
     let searchTextInput = document.createElement('input');
     searchTextInput.type = "text";
