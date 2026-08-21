@@ -50,7 +50,7 @@ let DIALOG_before_Y = 0;
 let DIALOG_after_X = 0;
 let DIALOG_after_Y = 0;
 
-let DIALOG_FindAll_options_matchWord = false;
+export let DIALOG_FindAll_options_matchWord = false;
 
 export let DIALOG_Settings_isDark = true;
 let DIALOG_Settings_trueTabs_falseSpaces = true;

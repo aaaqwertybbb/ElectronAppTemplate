@@ -22,6 +22,8 @@ export interface MyAPI {
   readClipboard: () => Promise<string>;
   editorSetClipboard: (uint8Array: Uint8Array, offset: number, length: number, EDITOR_lineEndString: string) => Promise<any>;
   editorSaveFile: (unvalidatedAbsolutePath: string, uint8Array: Uint8Array, count: number, EDITOR_lineEndString: string, EDITOR_fileStartsWithBom: boolean) => Promise<any>;
+  findAll: (search: string, matchWord: boolean) => Promise<any>;
+  findAllGetPositions: (absolutePath: string, search: string, matchWord: boolean) => Promise<any>,
 }
 
 declare global {

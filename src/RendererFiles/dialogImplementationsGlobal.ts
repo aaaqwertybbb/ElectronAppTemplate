@@ -1,5 +1,5 @@
 import { APP_lineHeight } from './applicationRendererRoot';
-import { DIALOG_Settings_isDark, DIALOG_Settings_isDark_SETTER } from './dialogGlobal';
+import { DIALOG_FindAll_options_matchWord, DIALOG_Settings_isDark, DIALOG_Settings_isDark_SETTER } from './dialogGlobal';
 import { EXPLORER_offsetPerDepth } from './explorerGlobal';
 import { MenuOption } from './menuGlobal';
 import { TreeView_NodeKind, TreeView_pooledNode_depth, TreeView_pooledNode_key, TreeView_pooledNode_nodeKind, TreeViewComponent, TreeViewNodeList } from './treeViewComponent';
@@ -166,7 +166,7 @@ class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
         let depth = TreeView_pooledNode_depth;
         let nodeKind = TreeView_pooledNode_nodeKind;
 
-        if (nodeKind === get_TreeViewNodeKind_NOTisExpandable_NOTisExpanded()) {
+        if (nodeKind === TreeView_NodeKind.NOTisExpandable_NOTisExpanded) {
 
             let textNode = divItem.lastChild;
             if (textNode.nodeType !== Node.TEXT_NODE) throw new Error('if (textNode.nodeType !== Node.TEXT_NODE)');
@@ -212,12 +212,12 @@ class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
         let depth = TreeView_pooledNode_depth;
         let nodeKind = TreeView_pooledNode_nodeKind;
 
-        if (nodeKind === get_TreeViewNodeKind_isExpandable_NOTisExpanded()) {
+        if (nodeKind === TreeView_NodeKind.isExpandable_NOTisExpanded) {
 
             divItem.children[0].textContent = '-';
-            this.nodeList.setNodeKind(indexItem, get_TreeViewNodeKind_isExpandable_isExpanded());
+            this.nodeList.setNodeKind(indexItem, TreeView_NodeKind.isExpandable_isExpanded);
 
-            let searchTextInput = document.getElementById('DIALOG_FindAll_searchTextInput');
+            let searchTextInput = document.getElementById('DIALOG_FindAll_searchTextInput') as HTMLInputElement;
             if (!searchTextInput) return;
             let results = await window.myAPI.findAllGetPositions(divItem.title, searchTextInput.value, DIALOG_FindAll_options_matchWord);
             if (!results) {
@@ -232,7 +232,7 @@ class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
                 }
 
                 for (let i = 0; i < results.length; i++) {
-                    let nodeKind = get_TreeViewNodeKind_NOTisExpandable_NOTisExpanded();
+                    let nodeKind = TreeView_NodeKind.NOTisExpandable_NOTisExpanded;
                     // TODO: Insert range, or at the least 'pre-emptively' resize the list so that it fits each insertion without resizing per insertion.
                     this.nodeList.insert(indexItem + 1 + i, nodeKind, indexItem + 1 + i, depth + 1);
                     this.itemHeightTotal = this.tvd_getTotalCount() * this.itemHeightNumber;
@@ -242,7 +242,7 @@ class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
 
             this.draw_render_fullReset_request();
         }
-        else if (nodeKind === get_TreeViewNodeKind_isExpandable_isExpanded()) {
+        else if (nodeKind === TreeView_NodeKind.isExpandable_isExpanded) {
 
             divItem.children[0].textContent = '+';
             this.nodeList.setNodeKind(indexItem, get_TreeViewNodeKind_isExpandable_NOTisExpanded());
@@ -352,13 +352,13 @@ export async function DIALOG_FindAll_Delete_async() {
     DIALOG_FindAll_TreeViewDirector_instance = null;
 }
 
-async function DIALOG_FindAll_searchTextInput_onkeydown(event) {
+async function DIALOG_FindAll_searchTextInput_onkeydown(event: KeyboardEvent) {
     if (event.key === 'Enter') {
         let dialogBody = document.getElementById('DIALOG_body');
         if (!dialogBody) return;
         let searchResultsDiv = document.getElementById('DIALOG_FindAll_searchResultsDiv');
         if (!searchResultsDiv) return;
-        let searchTextInput = document.getElementById('DIALOG_FindAll_searchTextInput');
+        let searchTextInput = document.getElementById('DIALOG_FindAll_searchTextInput') as HTMLInputElement;
         if (!searchTextInput) return;
         let spanNotes = document.getElementById('DIALOG_FindAll_spanNotes');
 	    if (spanNotes) {
