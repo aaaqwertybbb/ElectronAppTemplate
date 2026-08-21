@@ -6257,7 +6257,7 @@ async function EDITOR_copySelection(cursor: EDITOR_Cursor) {
         small = selectionEnd;
         large = selectionAnchor;
     }
-    return window.myAPI.editorSetClipboard(EDITOR_textByteList.bytes, small, large - small, EDITOR_lineEndString);
+    return window.myAPI.editorSetClipboard(EDITOR_textByteList.bytes, small, large - small, EDITOR_lineEndString ?? '\n');
 }
 
 /**
@@ -7246,6 +7246,7 @@ function EDITOR_render_do_EnterKey() {
                             case 'eCm':
                                 if (w_indexColumn_SpanTextContentRelative >= 2 && (w_indexColumn_SpanTextContentRelative <= w_span.textContent.length - 2)) {
                                     w_span.className = 'eCM';
+                                    let indexPosition = EDITOR_getPositionIndex_raw(cursor);
                                     let indexOfGreaterThanOrEqual = EDITOR_trackedSyntaxReposition_find(indexPosition);
                                     if (!Number.isNaN(indexOfGreaterThanOrEqual) && indexOfGreaterThanOrEqual !== -1 && indexOfGreaterThanOrEqual !== undefined) {
                                         EDITOR_trackedSyntaxList.insert(indexOfGreaterThanOrEqual, TrackedSyntaxKind.Comment, indexPosition - cursor.indexColumn + w_indexColumn_Sum, w_span.textContent.length);
@@ -7259,6 +7260,7 @@ function EDITOR_render_do_EnterKey() {
                             case 'eSm':
                                 if (w_indexColumn_SpanTextContentRelative >= 1 && (w_indexColumn_SpanTextContentRelative <= w_span.textContent.length - 1)) {
                                     w_span.className = 'eSM';
+                                    let indexPosition = EDITOR_getPositionIndex_raw(cursor);
                                     let indexOfGreaterThanOrEqual = EDITOR_trackedSyntaxReposition_find(indexPosition);
                                     if (!Number.isNaN(indexOfGreaterThanOrEqual) && indexOfGreaterThanOrEqual !== -1 && indexOfGreaterThanOrEqual !== undefined) {
                                         EDITOR_trackedSyntaxList.insert(indexOfGreaterThanOrEqual, TrackedSyntaxKind.String, indexPosition - cursor.indexColumn + w_indexColumn_Sum, w_span.textContent.length);
@@ -8149,7 +8151,7 @@ function EDITOR_state_do_Delete(cursor: EDITOR_Cursor, event: KeyboardEvent) {
                 originalCharacterKind = CharacterKind.None;
             }
 
-            let thisCharacterKind = CharacterKind.None;
+            let thisCharacterKind: CharacterKind = CharacterKind.None;
             
             tempIndexColumn++;
             tempPosition++;

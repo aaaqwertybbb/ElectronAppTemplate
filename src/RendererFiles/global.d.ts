@@ -20,6 +20,7 @@ export interface MyAPI {
   editorHoverRequest: (indexLine: number, indexColumn: number) => Promise<any>;
   /** TODO: Can the renderer import clipboard? I think I remember hearing that was an exception to the rule. */
   readClipboard: () => Promise<string>;
+  editorSetClipboard: (uint8Array: Uint8Array, offset: number, length: number, EDITOR_lineEndString: string) => Promise<any>;
 }
 
 declare global {
