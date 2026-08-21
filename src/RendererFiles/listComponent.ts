@@ -29,8 +29,8 @@ export abstract class ListComponent implements EventListenerObject {
     boundingClientRect_top: number = 0;
     boundingClientRect_isValid: boolean = false;
     virtualCount: number = 1;
-    virtualIndex_ofScrollTop: number;
-    cursorTopNumber: number;
+    virtualIndex_ofScrollTop: number = 0;
+    cursorTopNumber: number = 0;
 
     constructor() {
         /** @type {HTMLDivElement} */
@@ -176,10 +176,10 @@ export abstract class ListComponent implements EventListenerObject {
     handleEvent(event: Event) {
         switch (event.type) {
             case 'click':
-                this.event_click(event);
+                this.event_click(event as MouseEvent);
                 break;
             case 'keydown':
-                this.event_keydown(event);
+                this.event_keydown(event as KeyboardEvent);
                 break;
             case 'scroll':
                 this.event_scroll_WRAPIT();
@@ -280,7 +280,7 @@ export abstract class ListComponent implements EventListenerObject {
                     for (var i = 0; i < diff; i++) {
                         let indexItem = currVli + i;
                         
-                        let divItem = this.itemListElement.children[lastIndex--];
+                        let divItem = this.itemListElement.children[lastIndex--] as HTMLElement;
                         if (lastIndex <= -1) {
                             lastIndex = this.itemListElement.children.length - 1;
                         }
@@ -309,7 +309,7 @@ export abstract class ListComponent implements EventListenerObject {
                             beltIndexItem -= this.itemListElement.children.length;
                         }
 
-                        let divItem = this.itemListElement.children[beltIndexItem];
+                        let divItem = this.itemListElement.children[beltIndexItem] as HTMLElement;
 
                         divItem.style.transform = `translateY(${vertical}px)`;
                         vertical += this.itemHeightNumber;
@@ -343,13 +343,13 @@ export abstract class ListComponent implements EventListenerObject {
             divItem.style.position = 'absolute';
             divItem.style.transform = `translateY(${vertical}px)`;
             vertical += this.itemHeightNumber;
-            divItem.textContent = i;
+            divItem.textContent = `${i}`;
             this.itemListElement.appendChild(divItem);
             this.drawItemAction(divItem, this.virtualIndex_ofScrollTop + i);
         }
     }
 
-    event_click(event) {
+    event_click(event: MouseEvent) {
         this.ensure_boundingClientRect();
 
         let rY = event.clientY - this.boundingClientRect_top + this.rootElement.scrollTop;
@@ -358,7 +358,7 @@ export abstract class ListComponent implements EventListenerObject {
         this.state_cursor_setIndex(index);
     }
     
-    event_keydown(event) {
+    event_keydown(event: KeyboardEvent) {
         switch (event.key) {
             case 'ArrowDown':
                 event.preventDefault();
@@ -380,7 +380,7 @@ export abstract class ListComponent implements EventListenerObject {
                     if (virtualIndex_ofEvent >= this.itemListElement.children.length) {
                         virtualIndex_ofEvent -= this.itemListElement.children.length;
                     }
-                    this.onkeydownAction(this.itemListElement.children[virtualIndex_ofEvent], this.cursorIndex);
+                    this.onkeydownAction(this.itemListElement.children[virtualIndex_ofEvent] as HTMLElement, this.cursorIndex);
                 }
                 break;
         }
@@ -454,7 +454,7 @@ export abstract class ListComponent implements EventListenerObject {
     state_cursor_setIndex(indexItem: number) {
         if (this.cursorIndex === indexItem) return;
         this.cursorIndex = indexItem;
-        this.LIST_render_request(get_LISTrenderKind_Cursor());
+        this.LIST_render_request(List_RenderKind.Cursor);
     }
 
     /**
