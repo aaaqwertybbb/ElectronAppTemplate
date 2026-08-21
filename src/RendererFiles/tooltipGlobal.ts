@@ -72,7 +72,7 @@ function TOOLTIP_render_do_show() {
     TOOLTIP_exists = true;
 }
 
-function TOOLTIP_show(textContent: string) {
+export function TOOLTIP_show(textContent: string) {
     TOOLTIP_pending_textContent = textContent;
     TOOLTIP_render_request(Tooltip_RenderKind.Show);
 }
@@ -86,7 +86,7 @@ function TOOLTIP_render_do_hide() {
     TOOLTIP_exists = false;
 }
 
-function TOOLTIP_hide() {
+export function TOOLTIP_hide() {
     TOOLTIP_pending_textContent = null;
     TOOLTIP_render_request(Tooltip_RenderKind.Hide);
 }

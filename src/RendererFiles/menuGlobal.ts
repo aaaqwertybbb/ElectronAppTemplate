@@ -1,4 +1,5 @@
 import { APP_lineHeight } from './applicationRendererRoot'
+import { EDITOR_MenuOnClick } from './editorGlobal';
 import { EXPLORER_MenuOnClick, EXPLORER_pickFolderOrWorkspaceButton_MenuOnClick } from './explorerGlobal'
 
 export const Menu_CommandKind = {
@@ -362,9 +363,9 @@ async function optionOnClick(indexClicked: number, elementClicked: HTMLElement) 
             case 'EXPLORER':
                 await EXPLORER_MenuOnClick(indexClicked, elementClicked);
                 break;
-            //case 'EDITOR':
-            //    await EDITOR_MenuOnClick(indexClicked, elementClicked);
-            //    break;
+            case 'EDITOR':
+                await EDITOR_MenuOnClick(indexClicked, elementClicked);
+                break;
             case 'EXPLORER_pickFolderOrWorkspaceButton':
                 await EXPLORER_pickFolderOrWorkspaceButton_MenuOnClick(indexClicked, elementClicked);
                 break;

@@ -3,6 +3,7 @@ import { ByteList, UInt32List } from './listTypes';
 import { DIALOG_Settings_editorDebugShowAdjacentCharacters } from './dialogGlobal';
 import { JS_line_lex_newVersion } from "./javascriptFeatures";
 import { MenuOption, Menu_CommandKind } from "./menuGlobal";
+import { TOOLTIP_hide } from "./tooltipGlobal";
 
 /*
 ###################################
@@ -1902,6 +1903,11 @@ function EDITOR_finalizeEdit_InsertLtr(cursor: EDITOR_Cursor, indexLine_editOccu
  * @param {EDITOR_Cursor} cursor 
  */
 function EDITOR_finalizeEdit_Enter(cursor: EDITOR_Cursor, indexLine_editOccurredOn: number) {
+
+    if (!cursor.enterKey_newLinePlusIndentation_byteList) {
+        throw new Error();
+    }
+
     if (cursor.editRenderedDisplacement !== cursor.editLength) {
         EDITOR_render_do_EnterKey();
     }
@@ -2480,7 +2486,7 @@ function EDITOR_finalizeEdit_DeleteLtr_BackspaceRtl_RemoveTextNoBatching(cursor:
         for (let i = EDITOR_lineEndPositionList_PENDING.count - 1; i >= 0; i--) {
             let lineEndPos = EDITOR_lineEndPositionList_PENDING.data[i];
             if (cursor.editPosition <= lineEndPos && cursor.editPosition + cursor.editLength > lineEndPos) {
-                lastMatchedIndexLine = EDITOR_getLineAndColumnIndices_raw(lineEndPos).indexLine;
+                lastMatchedIndexLine = (EDITOR_getLineAndColumnIndices_raw(lineEndPos) ?? EDITOR_required('EDITOR_getLineAndColumnIndices_raw(lineEndPos)')).indexLine;
                 count++;
                 EDITOR_lineEndPositionList_PENDING.removeAt(i, 1);
             }
@@ -6328,6 +6334,9 @@ function EDITOR_render_do_DuplicateOrPaste() {
             else if (cursor.editKind === EditKind.Paste) {
                 large = EDITOR_getPositionIndex_raw(cursor);
                 let clipboardContent = cursor.EDITOR_paste_clipboardContent;
+                if (!clipboardContent) {
+                    throw new Error();
+                }
                 let clipboardContentLength = clipboardContent.length;
 
                 let lengthBytes = 0;
@@ -6563,9 +6572,15 @@ function EDITOR_render_do_DuplicateOrPaste() {
 
                         beltIndexLine_current = (beltIndexLine_current + 1) % ArrayFrom_textElement_children_length;
                         let lineDiv = cached_EDITOR_textElement.children[beltIndexLine_current];
-                        w_div = lineDiv;
+                        w_div = lineDiv as HTMLElement;
+                        if (!w_div) {
+                            throw new Error();
+                        }
                         w_indexSpan = 0;
-                        w_span = lineDiv.children[w_indexSpan];
+                        w_span = lineDiv.children[w_indexSpan] as HTMLElement;
+                        if (!w_span) {
+                            throw new Error();
+                        }
                         w_indexColumn_Goal = 0;
                         w_indexColumn_Sum = 0;
                         w_indexColumn_SpanTextContentRelative = 0;
@@ -6585,9 +6600,15 @@ function EDITOR_render_do_DuplicateOrPaste() {
                             cached_EDITOR_textElement.children[beltIndexLine_current].appendChild(span);
 
                             let lineDiv = cached_EDITOR_textElement.children[beltIndexLine_current];
-                            w_div = lineDiv;
+                            w_div = lineDiv as HTMLElement;
+                            if (!w_div) {
+                                throw new Error();
+                            }
                             w_indexSpan = 0;
-                            w_span = lineDiv.children[w_indexSpan];
+                            w_span = lineDiv.children[w_indexSpan] as HTMLElement;
+                            if (!w_span) {
+                                throw new Error();
+                            }
                             w_indexColumn_Goal = 0;
                             w_indexColumn_Sum = 0;
                             w_indexColumn_SpanTextContentRelative = 0;
@@ -6634,9 +6655,15 @@ function EDITOR_render_do_DuplicateOrPaste() {
                             }
 
                             let lineDiv = cached_EDITOR_textElement.children[beltIndexLine_current];
-                            w_div = lineDiv;
+                            w_div = lineDiv as HTMLElement;
+                            if (!w_div) {
+                                throw new Error();
+                            }
                             w_indexSpan = 0;
-                            w_span = lineDiv.children[w_indexSpan];
+                            w_span = lineDiv.children[w_indexSpan] as HTMLElement;
+                            if (!w_span) {
+                                throw new Error();
+                            }
                             w_indexColumn_Goal = 0;
                             w_indexColumn_Sum = 0;
                             w_indexColumn_SpanTextContentRelative = 0;
@@ -7180,13 +7207,19 @@ function EDITOR_render_do_EnterKey() {
                         walkLineUntilIndexColumn(cursor);
 
                         let shouldPreserveCssClassWhenSplittingAmongLine = false;
+
+                        if (!w_span || !w_div) {
+                            throw new Error();
+                        }
                         
                         switch (w_span.className) {
                             case 'eCm':
                                 if (w_indexColumn_SpanTextContentRelative >= 2 && (w_indexColumn_SpanTextContentRelative <= w_span.textContent.length - 2)) {
                                     w_span.className = 'eCM';
                                     let indexOfGreaterThanOrEqual = EDITOR_trackedSyntaxReposition_find(indexPosition);
-                                    EDITOR_trackedSyntaxList.insert(indexOfGreaterThanOrEqual, TrackedSyntaxKind.Comment, indexPosition - cursor.indexColumn + w_indexColumn_Sum, w_span.textContent.length);
+                                    if (!Number.isNaN(indexOfGreaterThanOrEqual) && indexOfGreaterThanOrEqual !== -1 && indexOfGreaterThanOrEqual !== undefined) {
+                                        EDITOR_trackedSyntaxList.insert(indexOfGreaterThanOrEqual, TrackedSyntaxKind.Comment, indexPosition - cursor.indexColumn + w_indexColumn_Sum, w_span.textContent.length);
+                                    }
                                     shouldPreserveCssClassWhenSplittingAmongLine = true;
                                 }
                                 break;
@@ -7197,7 +7230,9 @@ function EDITOR_render_do_EnterKey() {
                                 if (w_indexColumn_SpanTextContentRelative >= 1 && (w_indexColumn_SpanTextContentRelative <= w_span.textContent.length - 1)) {
                                     w_span.className = 'eSM';
                                     let indexOfGreaterThanOrEqual = EDITOR_trackedSyntaxReposition_find(indexPosition);
-                                    EDITOR_trackedSyntaxList.insert(indexOfGreaterThanOrEqual, TrackedSyntaxKind.String, indexPosition - cursor.indexColumn + w_indexColumn_Sum, w_span.textContent.length);
+                                    if (!Number.isNaN(indexOfGreaterThanOrEqual) && indexOfGreaterThanOrEqual !== -1 && indexOfGreaterThanOrEqual !== undefined) {
+                                        EDITOR_trackedSyntaxList.insert(indexOfGreaterThanOrEqual, TrackedSyntaxKind.String, indexPosition - cursor.indexColumn + w_indexColumn_Sum, w_span.textContent.length);
+                                    }
                                     shouldPreserveCssClassWhenSplittingAmongLine = true;
                                 }
                                 break;
@@ -7600,6 +7635,9 @@ function EDITOR_render_do_RemoveSelection() {
     let editLength = largePosition - smallPosition;
 
     let smallLineAndColumnIndices = EDITOR_RemoveSelection_smallLineAndColumnIndices;
+    if (!smallLineAndColumnIndices) {
+        throw new Error();
+    }
 
     let largeLineAndColumnIndices = EDITOR_RemoveSelection_largeLineAndColumnIndices;
 
@@ -7720,7 +7758,7 @@ function EDITOR_render_do_RemoveSelection() {
                     remaining = largePosition - smallPosition;
                 }
 
-                if (w_span && w_indexColumn_SpanTextContentRelative >= 0) {
+                if (w_span && w_div && w_indexColumn_SpanTextContentRelative >= 0) {
                     smallLineDiv = w_div;
                     while (remaining > 0) {
                         let available = w_span.textContent.length - w_indexColumn_SpanTextContentRelative;
@@ -7740,7 +7778,10 @@ function EDITOR_render_do_RemoveSelection() {
             
                         if (remaining > 0) {
                             if (w_indexSpan >= w_div.children.length) break;
-                            w_span = w_div.children[w_indexSpan];
+                            w_span = w_div.children[w_indexSpan] as HTMLElement;
+                            if (!w_span) {
+                                throw new Error();
+                            }
                             w_indexColumn_SpanTextContentRelative = 0;
                         }
                     }
@@ -7758,7 +7799,7 @@ function EDITOR_render_do_RemoveSelection() {
 
                 walkLineUntilIndexColumn(cursor);
 
-                if (w_span && w_indexColumn_SpanTextContentRelative >= 0) {
+                if (w_span && w_div && w_indexColumn_SpanTextContentRelative >= 0) {
                     largeLineDiv = w_div;
                     while (remaining > 0) {
                         let available = w_span.textContent.length - w_indexColumn_SpanTextContentRelative;
@@ -7775,7 +7816,10 @@ function EDITOR_render_do_RemoveSelection() {
             
                         if (remaining > 0) {
                             if (w_indexSpan >= w_div.children.length) break;
-                            w_span = w_div.children[w_indexSpan];
+                            w_span = w_div.children[w_indexSpan] as HTMLElement;
+                            if (!w_span) {
+                                throw new Error();
+                            }
                             w_indexColumn_SpanTextContentRelative = 0;
                         }
                     }
@@ -7915,7 +7959,7 @@ function EDITOR_render_do_Delete() {
         if (cursor.editRenderedDisplacement < cursor.editLength) {
             walkLineUntilIndexColumn(cursor);
 
-            if (!w_span || w_indexColumn_SpanTextContentRelative < 0) {
+            if (!w_span || !w_div || w_indexColumn_SpanTextContentRelative < 0) {
                 // TODO: this
             }
             else {
@@ -8001,7 +8045,10 @@ function EDITOR_render_do_Delete() {
                             }
                         }
                         else {
-                            w_span = w_div.children[w_indexSpan];
+                            w_span = w_div.children[w_indexSpan] as HTMLElement;
+                            if (!w_span) {
+                                throw new Error();
+                            }
                             w_indexColumn_SpanTextContentRelative = 0;
                         }
                     }
@@ -8116,7 +8163,7 @@ function EDITOR_render_do_Backspace() {
         if (cursor.editRenderedDisplacement < cursor.editLength) {
             walkLineUntilIndexColumn(cursor);
 
-            if (!w_span || w_indexColumn_SpanTextContentRelative < 0) {
+            if (!w_span || !w_div || w_indexColumn_SpanTextContentRelative < 0) {
                 // TODO: this
             }
             else {
@@ -8195,7 +8242,10 @@ function EDITOR_render_do_Backspace() {
                             }
                         }
                         else {
-                            w_span = w_div.children[w_indexSpan];
+                            w_span = w_div.children[w_indexSpan] as HTMLElement;
+                            if (!w_span) {
+                                throw new Error();
+                            }
                             w_indexColumn_SpanTextContentRelative = 0;
                         }
                     }
@@ -8478,7 +8528,10 @@ function EDITOR_getCharacterKind(character: string) {
     }
 }
 
-async function EDITOR_MenuOnClick(indexClicked: number, elementClicked: HTMLElement) {
+export async function EDITOR_MenuOnClick(indexClicked: number, elementClicked: HTMLElement) {
+    if (!elementClicked.dataset.commandKind) {
+        throw new Error();
+    }
     const commandKind = parseInt(elementClicked.dataset.commandKind, 10);
     if (!commandKind) {
         return;
@@ -9049,7 +9102,9 @@ function EDITOR_mouseOver(e: MouseEvent) {
     //if (!tokenElement) return;
     //
     // Clear previous timer because the mouse is still moving
-    clearTimeout(EDITOR_hoverTimeout);
+    if (EDITOR_hoverTimeout) {
+        clearTimeout(EDITOR_hoverTimeout);
+    }
     //
     // Extract line and column stored in the DOM node's data attributes
     //const line = parseInt(tokenElement.dataset.line);
@@ -9061,8 +9116,10 @@ function EDITOR_mouseOver(e: MouseEvent) {
 
 function EDITOR_mouseOut() {
     // Clear timer if mouse leaves the token before 1000ms
-    clearTimeout(EDITOR_hoverTimeout);
-    EDITOR_hoverTimeout = null;
+    if (EDITOR_hoverTimeout) {
+        clearTimeout(EDITOR_hoverTimeout);
+        EDITOR_hoverTimeout = null;
+    }
     EDITOR_mouseOver_event = null;
     EDITOR_hideTooltip();
 }
@@ -9077,6 +9134,9 @@ function EDITOR_doEditorGoToDefinitionRequest() {
 
 function EDITOR_requestLspHover() {
     let event = EDITOR_mouseOver_event;
+    if (!event) {
+        throw new Error();
+    }
     EDITOR_mouseOver_event = null;
 
     ///////////
