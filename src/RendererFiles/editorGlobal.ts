@@ -210,7 +210,7 @@ const EDITOR_encoder = new TextEncoder();
 export const EDITOR_decoder = new TextDecoder();
 
 /** TODO: I null forgave this because it should always be there but... */
-const EDITOR_baseElement = document.getElementById('EDITOR')!;
+export const EDITOR_baseElement = document.getElementById('EDITOR')!;
 
 /** TODO: All of these are set via an "unchecked" ' as HTMLElement' */
 let cached_EDITOR_virtualization_horizontal: HTMLElement;

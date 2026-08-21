@@ -1,4 +1,5 @@
 import { APP_lineHeight, myAPI_languageServer_SLICEresponse } from "./applicationRendererRoot";
+import { EDITOR_baseElement } from "./editorGlobal";
 import { EXPLORER_firstSpanWidthValue } from "./explorerGlobal";
 
 let AUTOCOMPLETE_exists = false;
@@ -587,9 +588,9 @@ function AUTOCOMPLETE_events_onkeydown(event: KeyboardEvent) {
             break;
         default:
             AUTOCOMPLETE_hide();
-            //if (EDITOR_baseElement) {
-            //    EDITOR_baseElement.focus();
-            //}
+            if (EDITOR_baseElement) {
+                EDITOR_baseElement.focus();
+            }
             break;
     }
 }
