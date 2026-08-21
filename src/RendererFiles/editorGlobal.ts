@@ -153,6 +153,27 @@ export type ExtensionKind = typeof ExtensionKind[keyof typeof ExtensionKind];
 
 
 
+/**
+ * Do not change the order/values of these, they are used in equality comparisons, the larger the number says when double clicking between a character and a punctuation
+ * whoever has larger number gets selected then the selection continues while the same kind is being read.
+ * 
+ * TODO: Bug only 1 character selected when punctuation then letterOrDigit click between them the letterOrDigit is more than 1 contiguous only 1 selected.
+ */
+export const CharacterKind = {
+    None: 0,
+    Whitespace: 1,
+    Punctuation: 2,
+    LetterOrDigit: 3,
+} as const;
+// Derive the type union from the object values
+export type CharacterKind = typeof CharacterKind[keyof typeof CharacterKind];
+
+
+
+
+
+
+
 export type LspQueue_Entry = {
     absolutePath: string,
     version: number,
@@ -247,6 +268,8 @@ let GLOBAL_indexCursor = 0;
 let GLOBAL_indent_startingIndex = 0;
 
 let GLOBAL_indent_SMALL_lineAndColumnIndices_indexLine = 0;
+
+let GLOBAL_detailRank = 0;
 
 class EDITOR_Cursor {
 
@@ -3439,13 +3462,13 @@ function EDITOR_onMouseMove_WRAPIT(event: MouseEvent) {
         cursor.indexLine = indexLine;
         cursor.indexColumn = indexColumn;
 
-        if (get_EDITOR_detailRank() === 3) {
+        if (GLOBAL_detailRank === 3) {
             EDITOR_onMouseMoveDetailRankThree(event, indexLine, indexColumn);
         }
-        else if (get_EDITOR_detailRank() === 2) {
+        else if (GLOBAL_detailRank === 2) {
             EDITOR_onMouseMoveDetailRankTwo(event, indexLine, indexColumn);
         }
-        else if (get_EDITOR_detailRank() === 1) {
+        else if (GLOBAL_detailRank === 1) {
             EDITOR_onMouseMoveDetailRankOne(event, indexLine, indexColumn);
         }
 
@@ -3549,7 +3572,7 @@ function EDITOR_getCharacterPrevious(indexColumn: number, positionIndex: number)
     }
     else {
         // TODO: I'm pretty sure this was supposed to say '\0' but it happens to "work" due to them both being 0.
-        return get_CharacterKind_None();
+        return CharacterKind.None;
     }
 }
 
@@ -3568,7 +3591,7 @@ function EDITOR_getCharacterCurrent(indexColumn: number, positionIndex: number, 
     }
     else {
         // TODO: I'm pretty sure this was supposed to say '\0' but it happens to "work" due to them both being 0.
-        return get_CharacterKind_None();
+        return CharacterKind.None;
     }
 }
 
@@ -3577,7 +3600,7 @@ function EDITOR_getCharacterPrevious_KIND(indexColumn: number, positionIndex: nu
         return EDITOR_getCharacterKind(EDITOR_getCharacterPrevious(indexColumn, positionIndex));
     }
     else {
-        return get_CharacterKind_None();
+        return CharacterKind.None;
     }
 }
 
@@ -3586,7 +3609,7 @@ function EDITOR_getCharacterCurrent_KIND(indexColumn: number, positionIndex: num
         return EDITOR_getCharacterKind(EDITOR_getCharacterCurrent(indexColumn, positionIndex, lineEnd));
     }
     else {
-        return get_CharacterKind_None();
+        return CharacterKind.None;
     }
 }
 
@@ -5373,7 +5396,7 @@ function EDITOR_onMouseDown(event: MouseEvent) {
     }
 
     if (rX < -1 * gutterPaddingRightNumber) {
-        set_EDITOR_detailRank(3);
+        GLOBAL_detailRank = 3;
         EDITOR_onMouseDownDetailRankThree(event, indexLine, indexColumn);
         if (!EDITOR_isChecking_cursorBlinkTrailingEdge) {
             EDITOR_cursorBlink_startChecking();
@@ -5382,15 +5405,15 @@ function EDITOR_onMouseDown(event: MouseEvent) {
     }
 
     if (event.detail % 3 === 0) {
-        set_EDITOR_detailRank(3);
+        GLOBAL_detailRank = 3;
         EDITOR_onMouseDownDetailRankThree(event, indexLine, indexColumn);
     }
     else if (event.detail % 2 === 0) {
-        set_EDITOR_detailRank(2);
+        GLOBAL_detailRank = 2;
         EDITOR_onMouseDownDetailRankTwo(event, indexLine, indexColumn);
     }
     else {
-        set_EDITOR_detailRank(1);
+        GLOBAL_detailRank = 1;
         EDITOR_onMouseDownDetailRankOne(event, indexLine, indexColumn);
     }
 
@@ -7956,10 +7979,10 @@ function EDITOR_state_do_Delete(cursor: EDITOR_Cursor, event: KeyboardEvent) {
                 originalCharacterKind = getCharacter_kind_raw(tempPosition);
             }
             else {
-                originalCharacterKind = get_CharacterKind_None();
+                originalCharacterKind = CharacterKind.None;
             }
 
-            let thisCharacterKind = get_CharacterKind_None();
+            let thisCharacterKind = CharacterKind.None;
             
             tempIndexColumn++;
             tempPosition++;
@@ -7970,7 +7993,7 @@ function EDITOR_state_do_Delete(cursor: EDITOR_Cursor, event: KeyboardEvent) {
                     thisCharacterKind = getCharacter_kind_raw(tempPosition);
                 }
                 else {
-                    thisCharacterKind = get_CharacterKind_None();
+                    thisCharacterKind = CharacterKind.None;
                 }
                 if (thisCharacterKind !== originalCharacterKind) {
                     break;
@@ -8358,14 +8381,14 @@ function EDITOR_getCharacterKind(character: string) {
         case '7':
         case '8':
         case '9':
-            return get_CharacterKind_LetterOrDigit();
+            return CharacterKind.LetterOrDigit;
         case ' ':
         case '\t':
         case '\r':
         case '\n':
-            return get_CharacterKind_Whitespace();
+            return CharacterKind.Whitespace;
         default:
-            return get_CharacterKind_Punctuation();
+            return CharacterKind.Punctuation;
     }
 }
 
