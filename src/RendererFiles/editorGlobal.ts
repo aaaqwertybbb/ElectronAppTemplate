@@ -1062,7 +1062,7 @@ function EDITOR_render_do_Scroll(timestamp: number) {
 /**
  * @returns true if scrollTop (and a few other details) have not changed, thus indicating the invoker should immediately return from their own rather than continuing with scroll logic.
  */
-function EDITOR_onScroll_LeadingEdge(timestamp) {
+function EDITOR_onScroll_LeadingEdge(timestamp: number) {
     
     isScrolling = true;
 
@@ -1101,7 +1101,7 @@ function EDITOR_onScroll_LeadingEdge(timestamp) {
     return false;
 }
 
-function EDITOR_render_do_ScrollTrailingEdgeCheck(timestamp) {
+function EDITOR_render_do_ScrollTrailingEdgeCheck(timestamp: number) {
     // If the scroll deadline hasn't been met yet, keep checking on the next frame
     if (timestamp < EDITOR_scrollEndDeadline) {
         requestAnimationFrame(EDITOR_render_do_ScrollTrailingEdgeCheck);
@@ -1393,7 +1393,7 @@ function EDITOR_clear() {
     EDITOR_render_request(RenderKind.Clear);
 }
 
-function EDITOR_state_setText(text, fileStartsWithBom, textSourceIdentifier, FORMATTED_textSourceIdentifier, extensionKind, lineEndString) {
+function EDITOR_state_setText(text: string, fileStartsWithBom: boolean, textSourceIdentifier: string, FORMATTED_textSourceIdentifier: string, extensionKind: ExtensionKind, lineEndString: string | null) {
     EDITOR_baseElement.scrollTop = 0;
     lastReadNumber_scrollTop = 0;
     EDITOR_baseElement.scrollLeft = 0;
@@ -1507,7 +1507,7 @@ function EDITOR_state_setText(text, fileStartsWithBom, textSourceIdentifier, FOR
  * @param {string} textSourceIdentifier I intend to have this be an absolute path. Then when the app saves a file, it can verify against the database that this absolute path is "safe" and then write to the file.
  * @param {string} lineEndString pass null (or do not include the parameter) to have line endings set to the first encountered kind in the text. Otherwise specify here. The string is used EXACTLY AS PROVIDED if non-falsey.
  */
-export function EDITOR_setText(text: string, fileStartsWithBom: boolean, textSourceIdentifier: string, FORMATTED_textSourceIdentifier: string, extensionKind, lineEndString: string | null) {
+export function EDITOR_setText(text: string, fileStartsWithBom: boolean, textSourceIdentifier: string, FORMATTED_textSourceIdentifier: string, extensionKind: ExtensionKind, lineEndString: string | null) {
     EDITOR_state_setText(text, fileStartsWithBom, textSourceIdentifier, FORMATTED_textSourceIdentifier, extensionKind, lineEndString);
     EDITOR_render_request(RenderKind.SetText);
 }
@@ -2574,7 +2574,7 @@ async function processLspQueue() {
  * @param {*} NOTfinalizePendingEdits if there is a pending edit, it needs to be finalized in order to see the updated text. The default behavior is to finalize the pending edits. To use default behavior, do NOT provide the parameter, or provide a falsey expression like 'null'.
  * @returns
  */
-function EDITOR_getFinalizedEditsAndRawSaveFileData(NOTfinalizePendingEdits) {
+function EDITOR_getFinalizedEditsAndRawSaveFileData(NOTfinalizePendingEdits: boolean) {
     if (!NOTfinalizePendingEdits) {
         EDITOR_finalizeAllCursors();
     }
@@ -2590,7 +2590,7 @@ function EDITOR_getFinalizedEditsAndRawSaveFileData(NOTfinalizePendingEdits) {
  * @param {*} indexLine
  * @returns {number} the last valid POSITION index on the line, but with respect to any pending edits.
  */
-function EDITOR_readLineEndPositionList(indexLine) {
+function EDITOR_readLineEndPositionList(indexLine: number) {
     let lineEndPositionIndex = EDITOR_lineEndPositionList.data[indexLine];
 
     // If you need to determine the text without finalizing an edit, you DO have to loop forwards right?
@@ -3248,7 +3248,7 @@ function EDITOR_createStyleForSelection_indentMore(cursor: EDITOR_Cursor) {
     cursor.DRAWN_selectionEnd = cursor.selectionEnd;
 }
 
-function EDITOR_getLastValidIndexColumn(indexLine) {
+function EDITOR_getLastValidIndexColumn(indexLine: number) {
     if (indexLine < EDITOR_lineEndPositionList.count) {
         if (indexLine === 0) {
             return EDITOR_readLineEndPositionList(indexLine) - 0;
@@ -3260,7 +3260,7 @@ function EDITOR_getLastValidIndexColumn(indexLine) {
     return 0;
 }
 
-function EDITOR_getLastValidIndexColumn_raw(indexLine) {
+function EDITOR_getLastValidIndexColumn_raw(indexLine: number) {
     if (indexLine < EDITOR_lineEndPositionList.count) {
         if (indexLine === 0) {
             return EDITOR_lineEndPositionList.data[indexLine] - 0;
@@ -3284,7 +3284,7 @@ function EDITOR_getLastValidIndexColumn_raw(indexLine) {
  * 
  * @returns an object with properties 'start' inclusive, 'end' exclusive
  */
-function EDITOR_getLineBoundaryPositions(indexLine) {
+function EDITOR_getLineBoundaryPositions(indexLine: number) {
     if (indexLine < EDITOR_lineEndPositionList.count) {
         if (indexLine === 0) {
             return {
@@ -3442,7 +3442,7 @@ function EDITOR_onMouseMove_WRAPIT(event: MouseEvent) {
     }
 }
 
-function EDITOR_onMouseMoveDetailRankOne(event, indexLineClicked, indexColumnClicked) {
+function EDITOR_onMouseMoveDetailRankOne(event: MouseEvent, indexLineClicked: number, indexColumnClicked: number) {
     let cursor = EDITOR_primaryCursor;
     cursor.indexLine = indexLineClicked;
     cursor.indexColumn = indexColumnClicked;
@@ -3525,7 +3525,7 @@ function getCharacter(positionIndex) {
  * @param {*} cursor 
  * @param {*} positionIndex 
  */
-function EDITOR_getCharacterPrevious(indexColumn, positionIndex) {
+function EDITOR_getCharacterPrevious(indexColumn: number, positionIndex: number) {
     // TODO: Make a 'getCharacter(...) method so the gap buffer logic can be in one location.
     if (indexColumn !== 0) {
         return getCharacter(positionIndex - 1);
@@ -3545,7 +3545,7 @@ function EDITOR_getCharacterPrevious(indexColumn, positionIndex) {
  * @param {*} positionIndex 
  * @param {*} line 
  */
-function EDITOR_getCharacterCurrent(indexColumn, positionIndex, lineEnd) {
+function EDITOR_getCharacterCurrent(indexColumn: number, positionIndex: number, lineEnd: number) {
     if (indexColumn < lineEnd) {
         return getCharacter(positionIndex);
     }
@@ -3555,7 +3555,7 @@ function EDITOR_getCharacterCurrent(indexColumn, positionIndex, lineEnd) {
     }
 }
 
-function EDITOR_getCharacterPrevious_KIND(indexColumn, positionIndex) {
+function EDITOR_getCharacterPrevious_KIND(indexColumn: number, positionIndex: number) {
     if (indexColumn !== 0) {
         return EDITOR_getCharacterKind(EDITOR_getCharacterPrevious(indexColumn, positionIndex));
     }
@@ -3564,7 +3564,7 @@ function EDITOR_getCharacterPrevious_KIND(indexColumn, positionIndex) {
     }
 }
 
-function EDITOR_getCharacterCurrent_KIND(indexColumn, positionIndex, lineEnd) {
+function EDITOR_getCharacterCurrent_KIND(indexColumn: number, positionIndex: number, lineEnd: number) {
     if (indexColumn < lineEnd) {
         return EDITOR_getCharacterKind(EDITOR_getCharacterCurrent(indexColumn, positionIndex, lineEnd));
     }
@@ -3573,7 +3573,7 @@ function EDITOR_getCharacterCurrent_KIND(indexColumn, positionIndex, lineEnd) {
     }
 }
 
-function EDITOR_onMouseMoveDetailRankTwo(event, indexLineClicked, indexColumnClicked) {
+function EDITOR_onMouseMoveDetailRankTwo(event: MouseEvent, indexLineClicked: number, indexColumnClicked: number) {
     let nextPositionIndex = EDITOR_getPositionIndex_Overload(indexLineClicked, indexColumnClicked);
     let cursor = EDITOR_primaryCursor;
 
@@ -3662,7 +3662,7 @@ function EDITOR_onMouseMoveDetailRankTwo(event, indexLineClicked, indexColumnCli
     }
 }
 
-function EDITOR_onMouseMoveDetailRankThree(event, indexLineClicked, indexColumnClicked) {
+function EDITOR_onMouseMoveDetailRankThree(event: MouseEvent, indexLineClicked: number, indexColumnClicked: number) {
     let cursor = EDITOR_primaryCursor;
 
     if (indexLineClicked === get_EDITOR_detailRank3OriginLine()) {
@@ -3745,7 +3745,7 @@ function EDITOR_getPositionIndex(cursor: EDITOR_Cursor) {
     return EDITOR_getLineStart_pos(cursor.indexLine) + cursor.indexColumn;
 }
 
-function EDITOR_getPositionIndex_Overload(indexLine, indexColumn) {
+function EDITOR_getPositionIndex_Overload(indexLine: number, indexColumn: number) {
     return EDITOR_getLineStart_pos(indexLine) + indexColumn;
 }
 
@@ -3757,7 +3757,7 @@ function EDITOR_getPositionIndex_raw(cursor: EDITOR_Cursor) {
     return EDITOR_getLineStart_pos_raw(cursor.indexLine) + cursor.indexColumn;
 }
 
-function EDITOR_onMouseDownDetailRankOne(event, indexLineClicked, indexColumnClicked) {
+function EDITOR_onMouseDownDetailRankOne(event: MouseEvent, indexLineClicked: number, indexColumnClicked: number) {
     let cursor = EDITOR_primaryCursor;
 
     let selectionPlusContextMenuCase = event.button === 2 && cursor.hasSelection();
@@ -3784,7 +3784,7 @@ function EDITOR_onMouseDownDetailRankOne(event, indexLineClicked, indexColumnCli
     EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
 }
 
-function EDITOR_onMouseDownDetailRankTwo(event, indexLineClicked, indexColumnClicked) {
+function EDITOR_onMouseDownDetailRankTwo(event: MouseEvent, indexLineClicked: number, indexColumnClicked: number) {
     if (event.shiftKey) {
         EDITOR_onMouseDownDetailRankOne(event, indexLineClicked, indexColumnClicked);
         return;
@@ -3902,7 +3902,7 @@ function EDITOR_onMouseDownDetailRankTwo(event, indexLineClicked, indexColumnCli
     }
 }
 
-function EDITOR_onMouseDownDetailRankThree(event, indexLineClicked, indexColumnClicked) {
+function EDITOR_onMouseDownDetailRankThree(event: MouseEvent, indexLineClicked: number, indexColumnClicked: number) {
     if (event.shiftKey) {
         EDITOR_onMouseDownDetailRankOne(event, indexLineClicked, indexColumnClicked);
         return;
@@ -4078,7 +4078,7 @@ function EDITOR_postKeyboardMovementSelectionLogic(cursor: EDITOR_Cursor, shiftK
  * More accurate description for this method beyond the name:
  * Duplicate the primaryCursor, then move the primaryCursor ArrowDown.
  */
-function EDITOR_createCursorLineBelow(event) {
+function EDITOR_createCursorLineBelow(event: KeyboardEvent) {
     let indexLastCursor = EDITOR_cursorList.length - 1;
     let lastCursor = EDITOR_cursorList[indexLastCursor];
     let clone = lastCursor.clone();
@@ -4091,7 +4091,7 @@ function EDITOR_createCursorLineBelow(event) {
     EDITOR_render_request(RenderKind.Cursor_flag_scrollIntoViewExplicit);
 }
 
-function EDITOR_createCursorAtNextMatchSelection(event) {
+function EDITOR_createCursorAtNextMatchSelection(event: KeyboardEvent) {
     if (!EDITOR_primaryCursor.hasSelection()) {
         return;
     }
@@ -4437,7 +4437,7 @@ const EDITOR_required = (name = 'Value') => {
   throw new Error(`${name} is required`);
 };
 
-function EDITOR_editEvent_theEditIself_InsertLtr(event) {
+function EDITOR_editEvent_theEditIself_InsertLtr(event: KeyboardEvent) {
     for (var i = 0; i < EDITOR_cursorList.length; i++) {
         let cursor = EDITOR_cursorList[i];
         set_EDITOR_indexCursor(i);
@@ -4460,7 +4460,7 @@ function EDITOR_editEvent_theEditIself_InsertLtr(event) {
     }
 }
 
-function EDITOR_editEvent_theEditIself_DeleteLtr(event) {
+function EDITOR_editEvent_theEditIself_DeleteLtr(event: KeyboardEvent) {
     for (var i = 0; i < EDITOR_cursorList.length; i++) {
         let cursor = EDITOR_cursorList[i];
         set_EDITOR_indexCursor(i);
@@ -4484,7 +4484,7 @@ function EDITOR_editEvent_theEditIself_DeleteLtr(event) {
     }
 }
 
-function EDITOR_editEvent_theEditIself_BackspaceRtl(event) {
+function EDITOR_editEvent_theEditIself_BackspaceRtl(event: KeyboardEvent) {
     for (var i = 0; i < EDITOR_cursorList.length; i++) {
         let cursor = EDITOR_cursorList[i];
         set_EDITOR_indexCursor(i);
@@ -4509,7 +4509,7 @@ function EDITOR_editEvent_theEditIself_BackspaceRtl(event) {
     }
 }
 
-function EDITOR_editEvent_theEditIself_Tab(event) {
+function EDITOR_editEvent_theEditIself_Tab(event: KeyboardEvent) {
     for (var i = EDITOR_cursorList.length - 1; i >= 0; i--) {
         let cursor = EDITOR_cursorList[i];
         EDITOR_movementBasedCacheInvalidation(cursor);
@@ -4550,7 +4550,7 @@ function EDITOR_editEvent_theEditIself_Tab(event) {
     }
 }
 
-function EDITOR_editEvent_theEditIself_Enter(event) {
+function EDITOR_editEvent_theEditIself_Enter(event: KeyboardEvent) {
     for (var i = 0; i < EDITOR_cursorList.length; i++) {
         let cursor = EDITOR_cursorList[i];
         if (cursor.editKind !== EditKind.Enter) {
@@ -4563,7 +4563,7 @@ function EDITOR_editEvent_theEditIself_Enter(event) {
     }
 }
 
-function EDITOR_editEvent_theEditIself_Paste(clipboardContent) {
+function EDITOR_editEvent_theEditIself_Paste(clipboardContent: string) {
     for (var i = 0; i < EDITOR_cursorList.length; i++) {
         let cursor = EDITOR_cursorList[i];
         if (cursor.editKind !== EditKind.Enter) {
@@ -5216,7 +5216,7 @@ function EDITOR_onKeyDown_PageUp(event) {
     }
 }
 
-async function EDITOR_onKeyDown_keyLengthEqualsOne_ctrlKey(event) {
+async function EDITOR_onKeyDown_keyLengthEqualsOne_ctrlKey(event: KeyboardEvent) {
     let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
     EDITOR_movementBasedCacheInvalidation(EDITOR_primaryCursor);
     switch (event.key) {
@@ -5308,7 +5308,7 @@ function EDITOR_onKeyDown_keyLengthEqualsOne_altKey(event) {
     }
 }
 
-function EDITOR_onMouseDown(event) {
+function EDITOR_onMouseDown(event: MouseEvent) {
     EDITOR_movementBasedCacheInvalidation(EDITOR_primaryCursor);
     
     if (EDITOR_cursorList.length > 1) {
@@ -5382,7 +5382,7 @@ function EDITOR_onMouseDown(event) {
     }
 }
 
-async function EDITOR_onContextMenu(event) {
+async function EDITOR_onContextMenu(event: PointerEvent) {
     let optionList = [
         new MenuOption(get_CommandKind_Cut(), 'Cut', null),
         new MenuOption(get_CommandKind_Copy(), 'Copy', null),
@@ -5396,7 +5396,7 @@ async function EDITOR_onContextMenu(event) {
     await menuSet('EDITOR', null, optionList, menuLeft, menuTop);
 }
 
-function EDITOR_onWheel(event) {
+function EDITOR_onWheel(event: WheelEvent) {
     if (event.shiftKey) {
         EDITOR_baseElement.scrollBy(event.deltaY, 0);
         // TODO: 'lastReadNumber_scrollLeft' here?
@@ -5546,7 +5546,7 @@ function EDITOR_findOverlay_doSearch() {
     spanTotal.textContent = EDITOR_findOverlay_searchResultPositionList.count;
 }
 
-function EDITOR_findOverlay_input_onkeydown(event) {
+function EDITOR_findOverlay_input_onkeydown(event: KeyboardEvent) {
     switch (event.key) {
         case 'Enter':
             EDITOR_findOverlay_doSearch();
@@ -5578,7 +5578,7 @@ function EDITOR_findOverlay_checkboxMatchWord_onchange() {
     }
 }
 
-function EDITOR_findOverlay_showSetter(showValue) {
+function EDITOR_findOverlay_showSetter(showValue: boolean) {
     EDITOR_finalizeAllCursors();
 
     if (!get_EDITOR_findOverlay_show() && showValue) {
@@ -6713,7 +6713,7 @@ function EDITOR_paste(cursor: EDITOR_Cursor, content: string) {
 /**
  * @returns {boolean} 'shouldPreserveCssClassWhenSplittingAmongLine'
  */
-function EDITOR_duplicate_and_paste_handleNotHasSeenLinefeed(hasSeenLinefeed, original_indexColumn_SpanTextContentRelative, original_span_textContent_length, indexPosition, cursor: EDITOR_Cursor) {
+function EDITOR_duplicate_and_paste_handleNotHasSeenLinefeed(hasSeenLinefeed: boolean, original_indexColumn_SpanTextContentRelative: number, original_span_textContent_length: number, indexPosition: number, cursor: EDITOR_Cursor) {
     // The only way to invoke this is if you encountered a linefeed for the first time,
     // therefore 'w_span' is the original span and no variable for the original needs to be made.
     // (unless in the future you don't end up using the w_span in some way or etc...)
@@ -6916,7 +6916,7 @@ function EDITOR_lineWasInsertedValidateGutter() {
  * @param {*} indexPosition 
  * @param {*} insertionCount 
  */
-function EDITOR_trackedSyntaxList_inefficientUpdateStartAndLength(indexPosition, insertionCount) {
+function EDITOR_trackedSyntaxList_inefficientUpdateStartAndLength(indexPosition: number, insertionCount: number) {
     for (var i = 0; i < EDITOR_trackedSyntaxList.count_abstract; i++) {
         EDITOR_trackedSyntaxList.getElementAt(i);
         if (indexPosition <= EDITOR_pooledTrackedSyntax_start) {
@@ -7142,7 +7142,7 @@ function EDITOR_render_do_EnterKey() {
  * - "end of line":
  * - "among a line":
  */
-function EDITOR_EnterKey(cursor: EDITOR_Cursor, ctrlKey, shiftKey) {
+function EDITOR_EnterKey(cursor: EDITOR_Cursor, ctrlKey: boolean, shiftKey: boolean) {
     if (!cursor.enterKey_newLinePlusIndentation_byteList)
         EDITOR_cacheIndentation(cursor);
 
@@ -7195,7 +7195,7 @@ function EDITOR_EnterKey(cursor: EDITOR_Cursor, ctrlKey, shiftKey) {
  * 
  * TODO: implement this but by an arbitrary distance
  */
-function EDITOR_shiftLinesOfText_ToALarger_IndexLine_byOne(beltIndexLine_last, inclusiveSmallestBeltIndexLineToShift) {
+function EDITOR_shiftLinesOfText_ToALarger_IndexLine_byOne(beltIndexLine_last: number, inclusiveSmallestBeltIndexLineToShift: number) {
     // TODO: This remove logic for the last line wasn't written with the correct understanding...
     // ...
     // It appears that this logic for 99% of cases is NOT needed.
@@ -7224,7 +7224,7 @@ function EDITOR_shiftLinesOfText_ToALarger_IndexLine_byOne(beltIndexLine_last, i
  * 
  * TODO: an idea that you might be able to short circuit if you start shifting 'out of bounds lines of text' into 'out of bounds lines of text'?
  * */
-function EDITOR_shiftLinesOfText_ToASmaller_IndexLine_byDistance(beltIndexLine_last, smallestBeltIndexLineToReceive, distance, local_virtualIndexLine, local_virtualCount) {
+function EDITOR_shiftLinesOfText_ToASmaller_IndexLine_byDistance(beltIndexLine_last: number, smallestBeltIndexLineToReceive: number, distance: number, local_virtualIndexLine?: number, local_virtualCount?: number) {
 
     // TODO: Does 'coalesce assignment' exist, and is it equivalent?
     if (!local_virtualIndexLine) local_virtualIndexLine = virtualIndexLine;
@@ -7258,7 +7258,7 @@ function EDITOR_shiftLinesOfText_ToASmaller_IndexLine_byDistance(beltIndexLine_l
     }
 }
 
-function EDITOR_render_do_Resize(timestamp) {
+function EDITOR_render_do_Resize(timestamp: number) {
     EDITOR_baseElement.style.width = '';
     EDITOR_baseElement.style.height = '';
     EDITOR_baseElement.style.contain = '';
@@ -7886,7 +7886,7 @@ function EDITOR_render_do_Delete() {
 }
 
 /** @param {EDITOR_Cursor} cursor  */
-function EDITOR_state_do_Delete(cursor: EDITOR_Cursor, event) {
+function EDITOR_state_do_Delete(cursor: EDITOR_Cursor, event: KeyboardEvent) {
     if (cursor.hasSelection()) {
         EDITOR_removeSelection(cursor);
         return;
@@ -7976,7 +7976,7 @@ function EDITOR_state_do_Delete(cursor: EDITOR_Cursor, event) {
  * @param {*} event 
  * @returns 
  */
-function EDITOR_deleteDo(cursor: EDITOR_Cursor, event) {
+function EDITOR_deleteDo(cursor: EDITOR_Cursor, event: KeyboardEvent) {
     EDITOR_state_do_Delete(cursor, event);
 }
 
@@ -8079,7 +8079,7 @@ function EDITOR_render_do_Backspace() {
     }
 }
 
-function EDITOR_state_do_Backspace(cursor: EDITOR_Cursor, event) {
+function EDITOR_state_do_Backspace(cursor: EDITOR_Cursor, event: KeyboardEvent) {
     if (cursor.hasSelection()) {
         EDITOR_removeSelection(cursor);
         return;
@@ -8143,7 +8143,7 @@ function EDITOR_state_do_Backspace(cursor: EDITOR_Cursor, event) {
  * @param {*} event 
  * @returns 
  */
-function EDITOR_backspaceDo(cursor: EDITOR_Cursor, event) {
+function EDITOR_backspaceDo(cursor: EDITOR_Cursor, event: KeyboardEvent) {
     EDITOR_state_do_Backspace(cursor, event);
 
     // EDITOR_render_request(RenderKind.BackspaceRtl);
@@ -8159,7 +8159,7 @@ function EDITOR_backspaceDo(cursor: EDITOR_Cursor, event) {
  * @param {EDITOR_Cursor} cursor 
  * @param {string} character 
  */
-function EDITOR_insertDo(cursor: EDITOR_Cursor, character) {
+function EDITOR_insertDo(cursor: EDITOR_Cursor, character: string) {
     /*
     TODO: (optimization idea) if you are inserting at the 0th or length position it might be worthwhile
     to have a conditional branch make the textContent with 1 less slice invocation.
@@ -8276,7 +8276,7 @@ function EDITOR_scrollCursorIntoView(cursor: EDITOR_Cursor) {
     }
 }
 
-function EDITOR_getCharacterKind(character) {
+function EDITOR_getCharacterKind(character: string) {
     switch (character) {
         case 'a':
         case 'b':
@@ -8352,7 +8352,7 @@ function EDITOR_getCharacterKind(character) {
     }
 }
 
-async function EDITOR_MenuOnClick(indexClicked, elementClicked) {
+async function EDITOR_MenuOnClick(indexClicked: number, elementClicked: HTMLElement) {
     const commandKind = parseInt(elementClicked.dataset.commandKind, 10);
     if (!commandKind) {
         return;
@@ -8385,7 +8385,7 @@ async function EDITOR_MenuOnClick(indexClicked, elementClicked) {
 /**
  * This clears the cursor's selection.
  */
-function EDITOR_moveCursor_position(intValue) {
+function EDITOR_moveCursor_position(intValue: number) {
     let lineAndColumnIndices = EDITOR_getLineAndColumnIndices(intValue);
     EDITOR_moveCursor_indexLine_indexColumn(lineAndColumnIndices.indexLine, lineAndColumnIndices.indexColumn);
 }
@@ -8393,7 +8393,7 @@ function EDITOR_moveCursor_position(intValue) {
 /**
  * This clears the cursor's selection.
  */
-function EDITOR_moveCursor_indexLine_indexColumn(indexLine, indexColumn) {
+function EDITOR_moveCursor_indexLine_indexColumn(indexLine: number, indexColumn: number) {
     let lastValidIndexColumn = EDITOR_getLastValidIndexColumn(indexLine);
 
     if (indexColumn > lastValidIndexColumn) {
@@ -8418,7 +8418,7 @@ function EDITOR_moveCursor_indexLine_indexColumn(indexLine, indexColumn) {
  * 
  * @returns {string}
  */
-function EDITOR_decode_textonly(start, length) {
+function EDITOR_decode_textonly(start: number, length: number) {
 
     if (!EDITOR_lineEndString)
         EDITOR_lineEndString = '\n';
@@ -8739,7 +8739,7 @@ function EDITOR_decode_textonly(start, length) {
 	return EDITOR_decode_pooled_stringBuilder_array.join('');
 }
 
-export function EDITOR_toExtensionKind(extensionWithPeriod) {
+export function EDITOR_toExtensionKind(extensionWithPeriod: string) {
     switch (extensionWithPeriod) {
         case '.js':
         case '.cjs':
@@ -8749,7 +8749,7 @@ export function EDITOR_toExtensionKind(extensionWithPeriod) {
     }
 }
 
-function EDITOR_language_line_lex_SET(extensionKind) {
+function EDITOR_language_line_lex_SET(extensionKind: ExtensionKind) {
     switch (extensionKind) {
         case ExtensionKind.JavaScript:
             EDITOR_language_line_lex = JS_line_lex;
@@ -8769,7 +8769,7 @@ function EDITOR_language_line_lex_SET(extensionKind) {
  * not only did I not measure it but I went back and forth between vscode I actually have no idea if this faster I can't remember anything I'm super tired.
  * I'm tired and I still have to write more of the multicursor logic so I'm just vibing out the optimizations for a bit I'll get measurements later when the app works more.
  */
-function PLAINTEXT_line_lex(div, substart, lineEnd, childIndex) {
+function PLAINTEXT_line_lex(div: HTMLElement, substart: number, lineEnd: number, childIndex: number) {
     let length = 0;
     let pos = substart;
 
