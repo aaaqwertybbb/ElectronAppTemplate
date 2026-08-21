@@ -18,14 +18,19 @@ export abstract class ListComponent implements EventListenerObject {
     _ONSCROLLvirtualCount: number;
     scrollTimer: null;
     hasTrailingCall: boolean;
-    rAFTimer: null;
+    rAFTimer: number | null;
     beltIndexZero: number;
     LIST_renderKindArray: List_RenderKind[];
     LIST_isRenderPending: boolean;
     LIST_ArrayFrom_menuOptionList_children: HTMLElement[];
-    itemHeightNumber: number;
-    itemHeightStyleAttributeValueString: string;
-    boundingClientRect: null;
+    itemHeightNumber: number = 20;
+    itemHeightStyleAttributeValueString: string = '20px';
+    boundingClientRect_height: number = 0;
+    boundingClientRect_top: number = 0;
+    boundingClientRect_isValid: boolean = false;
+    virtualCount: number = 1;
+    virtualIndex_ofScrollTop: number;
+    cursorTopNumber: number;
 
     constructor() {
         /** @type {HTMLDivElement} */
@@ -111,23 +116,18 @@ export abstract class ListComponent implements EventListenerObject {
      * @param {*} onkeydownAction receives the div that represents the individual item in the list, the index of the item OR -1 to indicate there is no entry at that location.
      * @param {*} getItemsCountFunc returns the total count of items
      */
-    setItems(itemHeightNumber: number, itemHeightStyleAttributeValueString: string, drawItemAction, onkeydownAction, getItemsCountFunc) {
+    setItems(itemHeightNumber: number, itemHeightStyleAttributeValueString: string) {
         this.itemListElement.innerHTML = '';
         this.virtualizationElement.style.height = 1 + 'px';
         this.state_cursor_setIndex(0);
 
         this.itemHeightNumber = itemHeightNumber;
         this.itemHeightStyleAttributeValueString = itemHeightStyleAttributeValueString;
-        /** receives the div that represents the individual item in the list, the index of the item, and the item itself. This div is empty, and you can do "whatever you want to it" provided the height stays consistent. */
-        this.drawItemAction = drawItemAction;
-        /** receives the div that represents the individual item in the list, the index of the item, and the item itself. */
-        this.onkeydownAction = onkeydownAction;
 
         this.cursorElement.style.height = this.itemHeightStyleAttributeValueString;
-        this.getItemsCountFunc = getItemsCountFunc;
         this.itemHeightTotal = this.getItemsCountFunc() * this.itemHeightNumber;
         this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
-        this.boundingClientRect = null;
+        this.boundingClientRect_isValid = false;
     }
 
     /**
@@ -154,7 +154,7 @@ export abstract class ListComponent implements EventListenerObject {
     draw_delete() {
         if (!this.rootElement.parentElement) return;
         this.draw_removeEvents();
-        this.boundingClientRect = null;
+        this.boundingClientRect_isValid = false;
         this.rootElement.parentElement.removeChild(this.rootElement);
     }
 
@@ -191,7 +191,7 @@ export abstract class ListComponent implements EventListenerObject {
     }
 
     draw_render() {
-        if (!this.boundingClientRect) {
+        if (!this.boundingClientRect_isValid) {
             this.ensure_boundingClientRect();
         }
 
@@ -244,7 +244,7 @@ export abstract class ListComponent implements EventListenerObject {
                             beltIndexItem -= this.itemListElement.children.length;
                         }
 
-                        let divItem = this.itemListElement.children[beltIndexItem];
+                        let divItem = this.itemListElement.children[beltIndexItem] as HTMLElement;
                         
                         divItem.style.transform = `translateY(${vertical}px)`;
                         vertical += this.itemHeightNumber;
@@ -352,7 +352,7 @@ export abstract class ListComponent implements EventListenerObject {
     event_click(event) {
         this.ensure_boundingClientRect();
 
-        let rY = event.clientY - this.boundingClientRect.top + this.rootElement.scrollTop;
+        let rY = event.clientY - this.boundingClientRect_top + this.rootElement.scrollTop;
         let index = Math.floor(rY / this.itemHeightNumber);
         index = this.state_cursor_validateIndex(index);
         this.state_cursor_setIndex(index);
@@ -390,7 +390,7 @@ export abstract class ListComponent implements EventListenerObject {
      * intra-app resizes or movements will also invoke this; i.e.: if a list is shown in a dialog and the dialog is resized or moved.
      */
     event_windowResize() {
-        this.boundingClientRect = null;
+        this.boundingClientRect_isValid = false;
     }
 
     // 1. The Entry Point (Replaces WRAPIT)
@@ -414,8 +414,11 @@ export abstract class ListComponent implements EventListenerObject {
     }
 
     ensure_boundingClientRect() {
-        if (!this.boundingClientRect) {
-            this.boundingClientRect = this.rootElement.getBoundingClientRect();
+        if (!this.boundingClientRect_isValid) {
+            let boundingClientRect = this.rootElement.getBoundingClientRect();
+            this.boundingClientRect_height = boundingClientRect.height;
+            this.boundingClientRect_top = boundingClientRect.top;
+            this.boundingClientRect_isValid = true;
             this.virtualCount = Math.ceil(this.rootElement.offsetHeight / this.itemHeightNumber);
         }
     }
@@ -430,8 +433,8 @@ export abstract class ListComponent implements EventListenerObject {
         // If no UI modifications were made prior that are still pending this might avoid a synchronous layout.
         // TODO: If you touch the transform style first... I don't know what would happen it is a GPU related style... so I'm unsure.
         //
-        if (this.cursorTopNumber + (2 * this.itemHeightNumber) > this.rootElement.scrollTop + this.boundingClientRect.height) {
-            let currentBottom = this.rootElement.scrollTop + this.boundingClientRect.height;
+        if (this.cursorTopNumber + (2 * this.itemHeightNumber) > this.rootElement.scrollTop + this.boundingClientRect_height) {
+            let currentBottom = this.rootElement.scrollTop + this.boundingClientRect_height;
             let changeToMakeBottomTouch = this.cursorTopNumber - currentBottom;
             let entireValueToScrollBy = changeToMakeBottomTouch + (2 * this.itemHeightNumber);
             this.rootElement.scrollBy(0, entireValueToScrollBy);
@@ -448,7 +451,7 @@ export abstract class ListComponent implements EventListenerObject {
      * 
      * @param {*} indexItem 
      */
-    state_cursor_setIndex(indexItem) {
+    state_cursor_setIndex(indexItem: number) {
         if (this.cursorIndex === indexItem) return;
         this.cursorIndex = indexItem;
         this.LIST_render_request(get_LISTrenderKind_Cursor());
@@ -459,7 +462,7 @@ export abstract class ListComponent implements EventListenerObject {
      * 
      * @param {*} indexItem 
      */
-    state_cursor_validateIndex(indexItem) {
+    state_cursor_validateIndex(indexItem: number) {
         let itemsCount = this.getItemsCountFunc();
         if (indexItem >= itemsCount) {
             indexItem = itemsCount - 1;
@@ -470,7 +473,7 @@ export abstract class ListComponent implements EventListenerObject {
         return indexItem;
     }
 
-    protected abstract drawItemAction(): any;
-    protected abstract onkeydownAction(): any;
+    protected abstract drawItemAction(divItem: HTMLElement, indexItem: number): any;
+    protected abstract onkeydownAction(divItem: HTMLElement, indexItem: number): any;
     protected abstract getItemsCountFunc(): any;
 }
