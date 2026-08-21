@@ -1917,7 +1917,7 @@ function EDITOR_finalizeEdit_Enter(cursor: EDITOR_Cursor, indexLine_editOccurred
     EDITOR_trackedSyntaxList_inefficientUpdateStartAndLength(cursor.editPosition, cursor.editLength);
 
     // throws an exception if 'EnterKeyEventKind.None' (...or falsey).
-    if (!cursor.enterKeyEventKind || cursor.enterKeyEventKind === EnterKeyEventKind.None) { EDITOR_finalizeEdit_ClearEditState(cursor); throw new Error('if (!enterKeyEventKind...)'); }
+    if (cursor.enterKeyEventKind === EnterKeyEventKind.None || cursor.enterKeyEventKind === undefined || cursor.enterKeyEventKind === null) { EDITOR_finalizeEdit_ClearEditState(cursor); throw new Error('if (!enterKeyEventKind...)'); }
 
     EDITOR_textByteList.insertBytes(cursor.editPosition, cursor.enterKey_newLinePlusIndentation_byteList.bytes, /*offset*/ 0, cursor.enterKey_newLinePlusIndentation_byteList.count);
 
@@ -4508,6 +4508,9 @@ function EDITOR_editEvent(editKind: EditKind, event: KeyboardEvent, clipboardCon
         EDITOR_editEvent_theEditIself_Enter(event);
             break;
         case EditKind.Paste:
+            if (!clipboardContent) {
+                throw new Error();
+            }
             EDITOR_editEvent_theEditIself_Paste(clipboardContent);
             break;
         case EditKind.Duplicate:
@@ -6123,6 +6126,8 @@ function EDITOR_render_do_IndentLess() {
                         case 4:
                             lesstraWidth = lesstraWidth_4;
                             break;
+                        default:
+                            throw new Error();
                     }
                     widthNumberValue -= lesstraWidth;
                     lineSelectionDiv.style.width = widthNumberValue + 'px';

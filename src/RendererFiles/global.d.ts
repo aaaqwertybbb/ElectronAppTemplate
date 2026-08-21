@@ -14,6 +14,10 @@ export interface MyAPI {
   onMessage: (callback) => Promise<any>;
   editorCompletionRequest_slice: (indexStart: number, indexEnd: number) => Promise<any>;
   editorReadAllText: (absoluteFilePath: string) => Promise<any>;
+  didChangeTextDocumentNotification: (absolutePath: string, version: number, startLine: number, startCharacter: number, endLine: number, endCharacter: number, text: string | null) => Promise<any>;
+  editorGoToDefinitionRequest: (indexLine: number, indexColumn: number) => Promise<any>;
+  editorCompletionRequest: (indexLine: number, indexColumn: number) => Promise<any>;
+
 }
 
 declare global {

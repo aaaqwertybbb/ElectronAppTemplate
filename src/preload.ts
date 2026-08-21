@@ -16,7 +16,7 @@ contextBridge.exposeInMainWorld('myAPI', {
   onMessage: (callback: ((arg: myAPI_languageServer_response) => Promise<void>)) => ipcRenderer.on('from-main', (_event, value: myAPI_languageServer_response) => callback(value)),
   chooseDirectory: () => ipcRenderer.invoke('choose-directory'),
   chooseWorkspace: () => ipcRenderer.invoke('choose-workspace'),
-  //didChangeTextDocumentNotification: (absolutePath: string, version, startLine, startCharacter, endLine, endCharacter, text) => ipcRenderer.invoke('did-change-text-document-notification', absolutePath, version, startLine, startCharacter, endLine, endCharacter, text),
+  didChangeTextDocumentNotification: (absolutePath: string, version: number, startLine: number, startCharacter: number, endLine: number, endCharacter: number, text: string | null) => ipcRenderer.invoke('did-change-text-document-notification', absolutePath, version, startLine, startCharacter, endLine, endCharacter, text),
   /**
    * The provided absolute file path is validated by the main process.
    * If the absolute file path is NOT recognized by the main process, then an empty enumeration is returned.
