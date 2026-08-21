@@ -240,6 +240,14 @@ let recentBoundingClientRect_isNull_intFalsey = 1;
 let recentBoundingClientRect_left = 0;
 let recentBoundingClientRect_top = 0;
 
+let fileStartsWithBom = false;
+
+let GLOBAL_indexCursor = 0;
+
+let GLOBAL_indent_startingIndex = 0;
+
+let GLOBAL_indent_SMALL_lineAndColumnIndices_indexLine = 0;
+
 class EDITOR_Cursor {
 
     static STATIC_CURSOR_ID = 1;
@@ -1378,7 +1386,7 @@ function EDITOR_state_clear() {
     EDITOR_textSourceIdentifier = '';
     EDITOR_FORMATTED_textSourceIdentifier = '';
     EDITOR_extensionKind = ExtensionKind.None;
-    set_EDITOR_fileStartsWithBom(false);
+    fileStartsWithBom = false;
     EDITOR_lineEndString = null;
     EDITOR_lineEndPositionList.clear();
     EDITOR_textByteList.clear();
@@ -1387,7 +1395,7 @@ function EDITOR_state_clear() {
     
     // Explicitly inlining 'clearMulticursorState()' because it currently is and I just don't want to make a decision about this right now.
     // So what I can do is mark the code paragraph for later decision making.
-    set_EDITOR_indexCursor(0);
+    GLOBAL_indexCursor = 0;
     offsetLine = 0;
     set_EDITOR_offsetColumn_withRespectToThisIndexLine(0);
     offsetColumn = 0;
@@ -1403,7 +1411,7 @@ function EDITOR_clear() {
     EDITOR_render_request(RenderKind.Clear);
 }
 
-function EDITOR_state_setText(text: string, fileStartsWithBom: boolean, textSourceIdentifier: string, FORMATTED_textSourceIdentifier: string, extensionKind: ExtensionKind, lineEndString: string | null) {
+function EDITOR_state_setText(text: string, localFileStartsWithBom: boolean, textSourceIdentifier: string, FORMATTED_textSourceIdentifier: string, extensionKind: ExtensionKind, lineEndString: string | null) {
     EDITOR_baseElement.scrollTop = 0;
     lastReadNumber_scrollTop = 0;
     EDITOR_baseElement.scrollLeft = 0;
@@ -1411,7 +1419,7 @@ function EDITOR_state_setText(text: string, fileStartsWithBom: boolean, textSour
     
     EDITOR_state_clear();
 
-    set_EDITOR_fileStartsWithBom(fileStartsWithBom);
+    fileStartsWithBom = localFileStartsWithBom;
 
     EDITOR_textSourceIdentifier = textSourceIdentifier;
     EDITOR_FORMATTED_textSourceIdentifier = FORMATTED_textSourceIdentifier;
@@ -1918,10 +1926,10 @@ function EDITOR_finalizeEdit_Tab(cursor: EDITOR_Cursor, indexLine_editOccurredOn
  */
 function EDITOR_finalizeEdit_IndentMore(cursor: EDITOR_Cursor, indexLine_editOccurredOn: number) {
 
-    let startingIndex = get_EDITOR_indent_startingIndex();
-    set_EDITOR_indent_startingIndex(0);
-    let SMALL_lineAndColumnIndices_indexLine = get_EDITOR_indent_SMALL_lineAndColumnIndices_indexLine();
-    set_EDITOR_indent_SMALL_lineAndColumnIndices_indexLine(0);
+    let startingIndex = GLOBAL_indent_startingIndex;
+    GLOBAL_indent_startingIndex = 0;
+    let SMALL_lineAndColumnIndices_indexLine = GLOBAL_indent_SMALL_lineAndColumnIndices_indexLine;
+    GLOBAL_indent_SMALL_lineAndColumnIndices_indexLine = 0;
 
     let ORIGINAL_incrementBy = (startingIndex + 1 - SMALL_lineAndColumnIndices_indexLine) * 4;
     let incrementBy = ORIGINAL_incrementBy;
@@ -2037,10 +2045,10 @@ function EDITOR_finalizeEdit_IndentLess(cursor: EDITOR_Cursor, indexLine_editOcc
     //let decrementBy = get_EDITOR_indent_ORIGINAL_indentBy();
     //set_EDITOR_indent_ORIGINAL_indentBy(0);
 
-    let startingIndex = get_EDITOR_indent_startingIndex();
-    set_EDITOR_indent_startingIndex(0);
-    let SMALL_lineAndColumnIndices_indexLine = get_EDITOR_indent_SMALL_lineAndColumnIndices_indexLine();
-    set_EDITOR_indent_SMALL_lineAndColumnIndices_indexLine(0);
+    let startingIndex = GLOBAL_indent_startingIndex;
+    GLOBAL_indent_startingIndex = 0;
+    let SMALL_lineAndColumnIndices_indexLine = GLOBAL_indent_SMALL_lineAndColumnIndices_indexLine;
+    GLOBAL_indent_SMALL_lineAndColumnIndices_indexLine = 0;
 
     // !!!!!! watch out for the big breaks when hitting a tab presuming that_four is 4
     let that_four = 4;
@@ -2592,7 +2600,7 @@ export function EDITOR_getFinalizedEditsAndRawSaveFileData(NOTfinalizePendingEdi
         uint8arrayTextBytes: EDITOR_textByteList.bytes,
         countOfBytesInUse: EDITOR_textByteList.count,
         lineEndString: EDITOR_lineEndString,
-        fileStartsWithBom: Boolean(get_EDITOR_fileStartsWithBom())
+        fileStartsWithBom: fileStartsWithBom
     };
 }
 
@@ -4449,7 +4457,7 @@ const EDITOR_required = (name = 'Value') => {
 function EDITOR_editEvent_theEditIself_InsertLtr(event: KeyboardEvent) {
     for (var i = 0; i < EDITOR_cursorList.length; i++) {
         let cursor = EDITOR_cursorList[i];
-        set_EDITOR_indexCursor(i);
+        GLOBAL_indexCursor = i;
         EDITOR_movementBasedCacheInvalidation(cursor);
         if (get_EDITOR_offsetColumn_withRespectToThisIndexLine() !== cursor.indexLine) {
             set_EDITOR_offsetColumn_withRespectToThisIndexLine(cursor.indexLine);
@@ -4472,7 +4480,7 @@ function EDITOR_editEvent_theEditIself_InsertLtr(event: KeyboardEvent) {
 function EDITOR_editEvent_theEditIself_DeleteLtr(event: KeyboardEvent) {
     for (var i = 0; i < EDITOR_cursorList.length; i++) {
         let cursor = EDITOR_cursorList[i];
-        set_EDITOR_indexCursor(i);
+        GLOBAL_indexCursor = i;
         EDITOR_movementBasedCacheInvalidation(cursor);
         if (get_EDITOR_offsetColumn_withRespectToThisIndexLine() !== cursor.indexLine) {
             set_EDITOR_offsetColumn_withRespectToThisIndexLine(cursor.indexLine);
@@ -4496,7 +4504,7 @@ function EDITOR_editEvent_theEditIself_DeleteLtr(event: KeyboardEvent) {
 function EDITOR_editEvent_theEditIself_BackspaceRtl(event: KeyboardEvent) {
     for (var i = 0; i < EDITOR_cursorList.length; i++) {
         let cursor = EDITOR_cursorList[i];
-        set_EDITOR_indexCursor(i);
+        GLOBAL_indexCursor = i;
         EDITOR_movementBasedCacheInvalidation(cursor);
         if (get_EDITOR_offsetColumn_withRespectToThisIndexLine() !== cursor.indexLine) {
             set_EDITOR_offsetColumn_withRespectToThisIndexLine(cursor.indexLine);
@@ -4710,8 +4718,8 @@ function EDITOR_editEvent_checkFor_NOTcanBatch_IndentMore() {
     // TODO: '..._EDITOR_indent_ORIGINAL_indentBy()' is no longer in use
 
     // # Determine the total count of text that will be inserted, prior to actually beginning the edit.
-    if (get_EDITOR_indent_SMALL_lineAndColumnIndices_indexLine() === SMALL_lineAndColumnIndices.indexLine &&
-        get_EDITOR_indent_startingIndex() === startingIndex) {
+    if (GLOBAL_indent_SMALL_lineAndColumnIndices_indexLine === SMALL_lineAndColumnIndices.indexLine &&
+        GLOBAL_indent_startingIndex === startingIndex) {
 
             return false;
     }
@@ -4770,8 +4778,8 @@ function EDITOR_editEvent_checkFor_NOTcanBatch_IndentLess() {
     }
 
     // # Determine the total count of text that will be inserted, prior to actually beginning the edit.
-    if (get_EDITOR_indent_SMALL_lineAndColumnIndices_indexLine() === SMALL_lineAndColumnIndices.indexLine &&
-        get_EDITOR_indent_startingIndex() === startingIndex) {
+    if (GLOBAL_indent_SMALL_lineAndColumnIndices_indexLine === SMALL_lineAndColumnIndices.indexLine &&
+        GLOBAL_indent_startingIndex === startingIndex) {
 
             return false;
     }
@@ -4828,7 +4836,7 @@ function EDITOR_cursorBlink_startChecking() {
 async function EDITOR_onKeyDown(event: KeyboardEvent) {
     // Explicitly inlining 'clearMulticursorState()' because it currently is and I just don't want to make a decision about this right now.
     // So what I can do is mark the code paragraph for later decision making.
-    set_EDITOR_indexCursor(0);
+    GLOBAL_indexCursor = 0;
     offsetLine = 0;
     set_EDITOR_offsetColumn_withRespectToThisIndexLine(0);
     offsetColumn = 0;
@@ -4913,7 +4921,7 @@ function EDITOR_onKeyDown_ArrowLeft(event: KeyboardEvent) {
             
     for (var i = 0; i < EDITOR_cursorList.length; i++) {
         let cursor = EDITOR_cursorList[i];
-        set_EDITOR_indexCursor(i);
+        GLOBAL_indexCursor = i;
         EDITOR_movementBasedCacheInvalidation(cursor);
         if (get_EDITOR_offsetColumn_withRespectToThisIndexLine() !== cursor.indexLine) {
             set_EDITOR_offsetColumn_withRespectToThisIndexLine(cursor.indexLine);
@@ -5053,7 +5061,7 @@ function EDITOR_onKeyDown_ArrowRight(event: KeyboardEvent) {
 
     for (var i = 0; i < EDITOR_cursorList.length; i++) {
         let cursor = EDITOR_cursorList[i];
-        set_EDITOR_indexCursor(i);
+        GLOBAL_indexCursor = i;
         EDITOR_movementBasedCacheInvalidation(cursor);
         if (get_EDITOR_offsetColumn_withRespectToThisIndexLine() !== cursor.indexLine) {
             set_EDITOR_offsetColumn_withRespectToThisIndexLine(cursor.indexLine);
@@ -5325,7 +5333,7 @@ function EDITOR_onMouseDown(event: MouseEvent) {
     }
     
     // TODO: You might want to do this inside 'EDITOR_finalizeAllCursors_andClearNonPrimaryCursors();' at the end... I'm not sure.
-    set_EDITOR_indexCursor(0);
+    GLOBAL_indexCursor = 0;
     offsetColumn = 0;
     offsetLine = 0;
 
@@ -5771,8 +5779,8 @@ function EDITOR_render_do_IndentMore() {
     //
     // and ensure that they render properly. This currently if two edits get done in a single "rAF" the second is cancelled for redundancy yet each one only handles 1 editDisplacement so you missed 1 displacement.
 
-    let startingIndex = get_EDITOR_indent_startingIndex(startingIndex);
-    let SMALL_lineAndColumnIndices_indexLine = get_EDITOR_indent_SMALL_lineAndColumnIndices_indexLine(SMALL_lineAndColumnIndices.indexLine);
+    let startingIndex = GLOBAL_indent_startingIndex;
+    let SMALL_lineAndColumnIndices_indexLine = GLOBAL_indent_SMALL_lineAndColumnIndices_indexLine;
 
     // TODO: Consider having this string available rather than making it everytime this function is invoked.
     let EDITOR_on_tab_string = '';
@@ -5898,8 +5906,8 @@ function EDITOR_indentMore(cursor: EDITOR_Cursor) {
         return;
     }
 
-    set_EDITOR_indent_SMALL_lineAndColumnIndices_indexLine(SMALL_lineAndColumnIndices.indexLine);
-    set_EDITOR_indent_startingIndex(startingIndex);
+    GLOBAL_indent_SMALL_lineAndColumnIndices_indexLine = SMALL_lineAndColumnIndices.indexLine;
+    GLOBAL_indent_startingIndex = startingIndex;
 
     if (cursor.editLength === 0) {
         EDITOR_indentLess_startingLinePos_end = startingLinePos.end;
@@ -5933,8 +5941,8 @@ function EDITOR_indentMore(cursor: EDITOR_Cursor) {
 
 function EDITOR_render_do_IndentLess() {
 
-    let startingIndex = get_EDITOR_indent_startingIndex(startingIndex);
-    let SMALL_lineAndColumnIndices_indexLine = get_EDITOR_indent_SMALL_lineAndColumnIndices_indexLine(SMALL_lineAndColumnIndices.indexLine);
+    let startingIndex = GLOBAL_indent_startingIndex;
+    let SMALL_lineAndColumnIndices_indexLine = GLOBAL_indent_SMALL_lineAndColumnIndices_indexLine;
 
     for (let cursorI = EDITOR_cursorList.length - 1; cursorI >= 0; cursorI--) {
         let cursor = EDITOR_cursorList[cursorI];
@@ -6086,8 +6094,8 @@ function EDITOR_indentLess(cursor: EDITOR_Cursor) {
         return;
     }
 
-    set_EDITOR_indent_SMALL_lineAndColumnIndices_indexLine(SMALL_lineAndColumnIndices.indexLine);
-    set_EDITOR_indent_startingIndex(startingIndex);
+    GLOBAL_indent_SMALL_lineAndColumnIndices_indexLine = SMALL_lineAndColumnIndices.indexLine;
+    GLOBAL_indent_startingIndex = startingIndex;
 
     if (cursor.editLength === 0) {
         EDITOR_indentLess_startingLinePos_end = startingLinePos.end;
