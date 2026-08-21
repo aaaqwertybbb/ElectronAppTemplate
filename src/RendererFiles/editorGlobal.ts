@@ -289,6 +289,8 @@ let GLOBAL_findOverlay_wasSearched = false;
 
 let GLOBAL_offsetWithinSpan = 0;
 
+let GLOBAL_totalShift = 0;
+
 class EDITOR_Cursor {
 
     static STATIC_CURSOR_ID = 1;
@@ -1440,7 +1442,7 @@ function EDITOR_state_clear() {
     offsetLine = 0;
     GLOBAL_offsetColumn_withRespectToThisIndexLine = 0;
     offsetColumn = 0;
-    set_EDITOR_totalShift(0);
+    GLOBAL_totalShift = 0;
     EDITOR_offsetWithinSpan_withRespectToThisSpan = null;
     GLOBAL_offsetWithinSpan = 0;
     
@@ -4513,7 +4515,7 @@ function EDITOR_editEvent_theEditIself_InsertLtr(event: KeyboardEvent) {
         cursor.STORED_indexColumn = cursor.indexColumn;
         EDITOR_render_request(RenderKind.Cursor_n + i);
         //offsetColumn = offsetColumn + cursor.editLength;
-        //set_EDITOR_totalShift(get_EDITOR_totalShift() + cursor.editLength); // this isn't needed here, but it is needed elsewhere so in order to create a pattern it was included here... TODO: maybe get rid of this or...?
+        //GLOBAL_totalShift = (GLOBAL_totalShift + cursor.editLength); // this isn't needed here, but it is needed elsewhere so in order to create a pattern it was included here... TODO: maybe get rid of this or...?
         EDITOR_render_request(RenderKind.InsertLtr);
     }
 }
@@ -4538,7 +4540,7 @@ function EDITOR_editEvent_theEditIself_DeleteLtr(event: KeyboardEvent) {
         }
         EDITOR_render_request(RenderKind.Cursor_n + i);
         //offsetColumn = offsetColumn - cursor.editLength;
-        //set_EDITOR_totalShift(get_EDITOR_totalShift() - cursor.editLength); // this isn't needed here, but it is needed elsewhere so in order to create a pattern it was included here... TODO: maybe get rid of this or...?
+        //GLOBAL_totalShift = (GLOBAL_totalShift - cursor.editLength); // this isn't needed here, but it is needed elsewhere so in order to create a pattern it was included here... TODO: maybe get rid of this or...?
     }
 }
 
@@ -4563,7 +4565,7 @@ function EDITOR_editEvent_theEditIself_BackspaceRtl(event: KeyboardEvent) {
         }
         EDITOR_render_request(RenderKind.Cursor_n + i);
         //offsetColumn = offsetColumn - cursor.editLength;
-        //set_EDITOR_totalShift(get_EDITOR_totalShift() - cursor.editLength); // this isn't needed here, but it is needed elsewhere so in order to create a pattern it was included here... TODO: maybe get rid of this or...?
+        //GLOBAL_totalShift = (GLOBAL_totalShift - cursor.editLength); // this isn't needed here, but it is needed elsewhere so in order to create a pattern it was included here... TODO: maybe get rid of this or...?
     }
 }
 
@@ -4881,7 +4883,7 @@ async function EDITOR_onKeyDown(event: KeyboardEvent) {
     offsetLine = 0;
     GLOBAL_offsetColumn_withRespectToThisIndexLine = 0;
     offsetColumn = 0;
-    set_EDITOR_totalShift(0);
+    GLOBAL_totalShift = 0;
     EDITOR_offsetWithinSpan_withRespectToThisSpan = null;
     GLOBAL_offsetWithinSpan = 0;
 
@@ -5020,7 +5022,7 @@ function EDITOR_onKeyDown_ArrowLeft(event: KeyboardEvent) {
             EDITOR_cursorBlink_startChecking();
         }
         //offsetColumn = offsetColumn + cursor.editLength;
-        //set_EDITOR_totalShift(get_EDITOR_totalShift() + cursor.editLength);
+        //GLOBAL_totalShift = (GLOBAL_totalShift + cursor.editLength);
     }
 }
 
@@ -5161,7 +5163,7 @@ function EDITOR_onKeyDown_ArrowRight(event: KeyboardEvent) {
             EDITOR_cursorBlink_startChecking();
         }
         //offsetColumn = offsetColumn + cursor.editLength;
-        //set_EDITOR_totalShift(get_EDITOR_totalShift() + cursor.editLength);
+        //GLOBAL_totalShift = (GLOBAL_totalShift + cursor.editLength);
     }
 }
 
