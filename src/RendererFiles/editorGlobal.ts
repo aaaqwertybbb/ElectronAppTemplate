@@ -3145,6 +3145,8 @@ function EDITOR_clearSelectionStyle(cursor: EDITOR_Cursor) {
  *      throw new Error();
  *  }
  * 
+ * TODO: I just need it to run once so I can breathe and I'll take this scuffed case, not all the error fixes are scuffed.
+ * 
  * 
  * 
  */
