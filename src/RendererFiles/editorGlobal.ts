@@ -534,12 +534,12 @@ EDITOR_findOverlay.style.visibility = 'hidden';
 /** TODO: I null forgave this because it should always be there but... */
 const EDITOR_gutterBackgroundColor = document.getElementById('EDITOR_gutter_background_color')!;
 
-const EDITOR_tab_tabsbytes = new Uint8Array(4);
+export const EDITOR_tab_tabsbytes = new Uint8Array(4);
 EDITOR_tab_tabsbytes[0] = 9 /* TAB '\t' */;
 EDITOR_tab_tabsbytes[1] = 0;
 EDITOR_tab_tabsbytes[2] = 0;
 EDITOR_tab_tabsbytes[3] = 0;
-const EDITOR_tab_spacesbytes = new Uint8Array(4);
+export const EDITOR_tab_spacesbytes = new Uint8Array(4);
 EDITOR_tab_spacesbytes[0] = 32 /* SPACE ' ' */;
 EDITOR_tab_spacesbytes[1] = 32 /* SPACE ' ' */;
 EDITOR_tab_spacesbytes[2] = 32 /* SPACE ' ' */;
@@ -548,7 +548,8 @@ EDITOR_tab_spacesbytes[3] = 32 /* SPACE ' ' */;
 /**
  * Null characters provide visual width for proportional fonts. They do not get copied or saved out.
  */
-let EDITOR_on_tab_bytes = EDITOR_tab_tabsbytes;
+export let EDITOR_on_tab_bytes: Uint8Array = EDITOR_tab_tabsbytes;
+export function EDITOR_on_tab_bytes_SETTER(value: Uint8Array) { EDITOR_on_tab_bytes = value; }
 
 /**
  * When a cursor removes a line end the position of the line end is stored in this list until the edit is finalized.
@@ -563,7 +564,7 @@ export let EDITOR_lineEndPositionList = new UInt32List(128);
 
 let gutterWidthTotal_withPxUnits: string;
 
-let EDITOR_primaryCursor = new EDITOR_Cursor();
+export let EDITOR_primaryCursor = new EDITOR_Cursor();
 //cached_EDITOR_cursorListElement.appendChild(EDITOR_primaryCursor.caretRow);
 /**
  * Ensure that the cursors are sorted ascending by positionIndex (which is calculated via the method 'EDITOR_getPositionIndex(...)') at all times.
@@ -2997,7 +2998,7 @@ function EDITOR_draw_all_cursors() {
  * @param {EDITOR_Cursor} cursor 
  * @param {boolean} NOTscrollCursorIntoView 
  */
-function EDITOR_drawCursor(cursor: EDITOR_Cursor, NOTscrollCursorIntoView?: boolean) {
+export function EDITOR_drawCursor(cursor: EDITOR_Cursor, NOTscrollCursorIntoView?: boolean) {
     cursor.cursorTranslateYValue = (cursor.indexLine + offsetLine) * lineHeight;
     cursor.cursorTranslateXValue = (cursor.indexColumn + offsetColumn) * EDITOR_characterWidth;
 

@@ -1,5 +1,6 @@
 import { APP_lineHeight } from './applicationRendererRoot';
-import { DIALOG_FindAll_options_matchWord, DIALOG_Settings_isDark, DIALOG_Settings_isDark_SETTER } from './dialogGlobal';
+import { DIALOG_FindAll_options_matchWord, DIALOG_FindAll_options_matchWord_SETTER, DIALOG_Settings_editorDebugShowAdjacentCharacters_SETTER, DIALOG_Settings_isDark, DIALOG_Settings_isDark_SETTER, DIALOG_Settings_trueTabs_falseSpaces, DIALOG_Settings_trueTabs_falseSpaces_SETTER } from './dialogGlobal';
+import { EDITOR_drawCursor, EDITOR_on_tab_bytes_SETTER, EDITOR_primaryCursor, EDITOR_tab_spacesbytes, EDITOR_tab_tabsbytes } from './editorGlobal';
 import { EXPLORER_offsetPerDepth } from './explorerGlobal';
 import { MenuOption } from './menuGlobal';
 import { TreeView_NodeKind, TreeView_pooledNode_depth, TreeView_pooledNode_key, TreeView_pooledNode_nodeKind, TreeViewComponent, TreeViewNodeList } from './treeViewComponent';
@@ -235,7 +236,7 @@ class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
                     let nodeKind = TreeView_NodeKind.NOTisExpandable_NOTisExpanded;
                     // TODO: Insert range, or at the least 'pre-emptively' resize the list so that it fits each insertion without resizing per insertion.
                     this.nodeList.insert(indexItem + 1 + i, nodeKind, indexItem + 1 + i, depth + 1);
-                    this.itemHeightTotal = this.tvd_getTotalCount() * this.itemHeightNumber;
+                    this.itemHeightTotal = this.getTotalCount() * this.itemHeightNumber;
                     this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
                 }
             }
@@ -245,7 +246,7 @@ class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
         else if (nodeKind === TreeView_NodeKind.isExpandable_isExpanded) {
 
             divItem.children[0].textContent = '+';
-            this.nodeList.setNodeKind(indexItem, get_TreeViewNodeKind_isExpandable_NOTisExpanded());
+            this.nodeList.setNodeKind(indexItem, TreeView_NodeKind.isExpandable_NOTisExpanded);
 
             let countChildren = 0;
             for (let i = indexItem + 1; i < this.nodeList.count_abstract; i++) {
@@ -264,7 +265,7 @@ class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
                     // TODO: Maybe you could delay this cause you'd know there is an expansion at such and such and then on the fly sum it instead.
                     this.nodeList.setKey(i, this.nodeList.getKey(i) - countChildren);
                 }
-                this.itemHeightTotal = this.tvd_getTotalCount() * this.itemHeightNumber;
+                this.itemHeightTotal = this.getTotalCount() * this.itemHeightNumber;
                 this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
                 this.draw_render_fullReset_request();
             }
@@ -375,15 +376,15 @@ async function DIALOG_FindAll_searchTextInput_onkeydown(event: KeyboardEvent) {
             DIALOG_FindAll_TreeViewDirector_instance = new DIALOG_FindAll_TreeViewDirector();
         }
         DIALOG_FindAll_TreeViewDirector_instance.setData_causes_state_reset(results);
-        DIALOG_FindAll_TreeViewDirector_instance.component.draw_create_request(searchResultsDiv, null);
+        DIALOG_FindAll_TreeViewDirector_instance.draw_create_request(searchResultsDiv, null);
     }
 }
 
 function DIALOG_FindAll_checkboxMatchWord_onchange() {
 	// for an onchange event, event.target might always be precise?
-	let checkboxMatchWord = document.getElementById('DIALOG_FindAll_checkboxMatchWord');
+	let checkboxMatchWord = document.getElementById('DIALOG_FindAll_checkboxMatchWord') as HTMLInputElement;
     if (checkboxMatchWord) {
-    	DIALOG_FindAll_options_matchWord = checkboxMatchWord.checked;
+    	DIALOG_FindAll_options_matchWord_SETTER(checkboxMatchWord.checked);
     	let spanNotes = document.getElementById('DIALOG_FindAll_spanNotes');
 	    if (spanNotes) {
 	        spanNotes.textContent = 'NOTE: changing \'matchWord\' here does not re-do the search';
@@ -462,23 +463,23 @@ function DIALOG_buttonTheme_onclick() {
 }
 
 function DIALOG_checkboxTrueTabsFalseSpaces_onchange() {
-    let checkboxTrueTabsFalseSpaces = document.getElementById('SETTINGS_trueTabs_falseSpaces');
+    let checkboxTrueTabsFalseSpaces = document.getElementById('SETTINGS_trueTabs_falseSpaces') as HTMLInputElement;
     if (!checkboxTrueTabsFalseSpaces) return;
 
-    DIALOG_Settings_trueTabs_falseSpaces = checkboxTrueTabsFalseSpaces.checked;
+    DIALOG_Settings_trueTabs_falseSpaces_SETTER(checkboxTrueTabsFalseSpaces.checked);
     if (DIALOG_Settings_trueTabs_falseSpaces) {
-        EDITOR_on_tab_bytes = EDITOR_tab_tabsbytes;
+        EDITOR_on_tab_bytes_SETTER(EDITOR_tab_tabsbytes);
     }
     else {
-        EDITOR_on_tab_bytes = EDITOR_tab_spacesbytes;
+        EDITOR_on_tab_bytes_SETTER(EDITOR_tab_spacesbytes);
     }
 }
 
 function DIALOG_checkboxEditorDebugShowAdjacentCharacters_onchange() {
-    let checkboxEditorDebugShowAdjacentCharacters = document.getElementById('SETTINGS_editorDebugShowAdjacentCharacters');
+    let checkboxEditorDebugShowAdjacentCharacters = document.getElementById('SETTINGS_editorDebugShowAdjacentCharacters') as HTMLInputElement;
     if (!checkboxEditorDebugShowAdjacentCharacters) return;
 
-    DIALOG_Settings_editorDebugShowAdjacentCharacters = checkboxEditorDebugShowAdjacentCharacters.checked;
+    DIALOG_Settings_editorDebugShowAdjacentCharacters_SETTER(checkboxEditorDebugShowAdjacentCharacters.checked);
     EDITOR_drawCursor(EDITOR_primaryCursor);
 }
 

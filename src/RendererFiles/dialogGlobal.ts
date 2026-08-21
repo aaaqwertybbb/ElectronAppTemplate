@@ -51,10 +51,15 @@ let DIALOG_after_X = 0;
 let DIALOG_after_Y = 0;
 
 export let DIALOG_FindAll_options_matchWord = false;
+export function DIALOG_FindAll_options_matchWord_SETTER(value: boolean) { DIALOG_FindAll_options_matchWord = value; }
 
 export let DIALOG_Settings_isDark = true;
-let DIALOG_Settings_trueTabs_falseSpaces = true;
+
+export let DIALOG_Settings_trueTabs_falseSpaces = true;
+export function DIALOG_Settings_trueTabs_falseSpaces_SETTER(value: boolean) { DIALOG_Settings_trueTabs_falseSpaces = value; }
+
 export let DIALOG_Settings_editorDebugShowAdjacentCharacters = false;
+export function DIALOG_Settings_editorDebugShowAdjacentCharacters_SETTER(value: boolean) { DIALOG_Settings_editorDebugShowAdjacentCharacters = value; }
 
 let DIALOG_renderKindArray: number[] = [];
 let DIALOG_isRenderPending = false;
