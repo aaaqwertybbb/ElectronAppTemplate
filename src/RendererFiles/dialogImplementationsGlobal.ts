@@ -283,7 +283,7 @@ class DIALOG_FindAll_TreeViewDirector {
 let DIALOG_FindAll_TreeViewDirector_instance = null;
 
 
-async function DIALOG_FindAll_Create_async() {
+export async function DIALOG_FindAll_Create_async() {
     let dialogBody = document.getElementById('DIALOG_body');
 
     let searchTextInput = document.createElement('input');
@@ -325,7 +325,7 @@ async function DIALOG_FindAll_Create_async() {
     dialogBody.appendChild(searchResultsDiv);
 }
 
-async function DIALOG_FindAll_Delete_async() {
+export async function DIALOG_FindAll_Delete_async() {
     let searchTextInput = document.getElementById('DIALOG_FindAll_searchTextInput');
     if (searchTextInput) {
         searchTextInput.removeEventListener('keydown', DIALOG_FindAll_searchTextInput_onkeydown);
@@ -469,7 +469,7 @@ function DIALOG_checkboxEditorDebugShowAdjacentCharacters_onchange() {
     EDITOR_drawCursor(EDITOR_primaryCursor);
 }
 
-async function DIALOG_DocumentSymbol_Create_async() {
+export async function DIALOG_DocumentSymbol_Create_async() {
     let dialogBody = document.getElementById('DIALOG_body');
     if (!dialogBody) return;
 
@@ -487,7 +487,7 @@ async function DIALOG_DocumentSymbol_Create_async() {
     }
 }
 
-async function DIALOG_DocumentSymbol_Delete_async() {
+export async function DIALOG_DocumentSymbol_Delete_async() {
     let dialogBody = document.getElementById('DIALOG_body');
     if (!dialogBody) return;
     if (EDITOR_listComponent) {
@@ -500,7 +500,7 @@ async function DIALOG_DocumentSymbol_Delete_async() {
 //let DEBUG_listData = null;
 //let DEBUG_listComponent = null;
 
-async function DIALOG_Debug_Create_async() {
+export async function DIALOG_Debug_Create_async() {
 //    let dialogBody = document.getElementById('DIALOG_body');
 //    if (!dialogBody) return;
 //    
@@ -558,7 +558,7 @@ async function DIALOG_Debug_Create_async() {
 //    }
 }
 
-async function DIALOG_Debug_Delete_async() {
+export async function DIALOG_Debug_Delete_async() {
 //    let dialogBody = document.getElementById('DIALOG_body');
 //    if (!dialogBody) return;
 //

@@ -1,4 +1,4 @@
-import { DIALOG_Settings_Create_async, DIALOG_Settings_Delete_async } from "./dialogImplementationsGlobal"
+import { DIALOG_Debug_Create_async, DIALOG_Debug_Delete_async, DIALOG_DocumentSymbol_Create_async, DIALOG_DocumentSymbol_Delete_async, DIALOG_FindAll_Create_async, DIALOG_FindAll_Delete_async, DIALOG_Settings_Create_async, DIALOG_Settings_Delete_async } from "./dialogImplementationsGlobal"
 
 
 
