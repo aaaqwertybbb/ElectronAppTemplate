@@ -228,6 +228,8 @@ let gutterWidthStyleValue = 32;
 const gutterPaddingLeftNumber = 3;
 const gutterPaddingRightNumber = 6;
 
+let longestLine_length_PreviousValueWhenLastDrewHorizontalScrollbar = 0;
+
 class EDITOR_Cursor {
 
     static STATIC_CURSOR_ID = 1;
@@ -638,7 +640,7 @@ function EDITOR_init() {
 
     EDITOR_drawGutter_Width();
 
-    set_EDITOR_longestLine_length_PreviousValueWhenLastDrewHorizontalScrollbar(1); // necessary for the first render, otherwise the if statement sees 0 !== 0.
+    longestLine_length_PreviousValueWhenLastDrewHorizontalScrollbar = 1; // necessary for the first render, otherwise the if statement sees 0 !== 0.
     EDITOR_drawHorizontalScrollbar();
     EDITOR_draw_all_cursors();
 
@@ -1604,9 +1606,9 @@ function EDITOR_drawHorizontalScrollbar() {
         cached_EDITOR_horizontal_scrollbar.style.width = EDITOR_horizontal_scrollbar_widthValue + 'px';
     }
 
-    if (longestLine_length !== get_EDITOR_longestLine_length_PreviousValueWhenLastDrewHorizontalScrollbar()) {
+    if (longestLine_length !== longestLine_length_PreviousValueWhenLastDrewHorizontalScrollbar) {
         
-        set_EDITOR_longestLine_length_PreviousValueWhenLastDrewHorizontalScrollbar(longestLine_length);
+        longestLine_length_PreviousValueWhenLastDrewHorizontalScrollbar = longestLine_length;
 
         set_EDITOR_contentWidth(Math.ceil(longestLine_length * EDITOR_characterWidth));
 
@@ -3453,15 +3455,15 @@ function EDITOR_onMouseMoveDetailRankOne(event: MouseEvent, indexLineClicked: nu
     EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
 }
 
-function getCharacter_raw(positionIndex) {
+function getCharacter_raw(positionIndex: number) {
     return String.fromCharCode(EDITOR_textByteList.bytes[positionIndex]);
 }
 
-function getCharacter_kind_raw(positionIndex) {
+function getCharacter_kind_raw(positionIndex: number) {
     return EDITOR_getCharacterKind(getCharacter_raw(positionIndex));
 }
 
-function getCharacter(positionIndex) {
+function getCharacter(positionIndex: number) {
 
     // in this getCharacter function, you'd actually already know the total shift if you just looped forwards.
     // Also this currently is EXTREMELY unoptimized given that it resets the totalShift each time it gets invoked rather than remembering the previous result.
@@ -5192,7 +5194,7 @@ function EDITOR_onKeyDown_PageDown(event: KeyboardEvent) {
     }
 }
 
-function EDITOR_onKeyDown_PageUp(event) {
+function EDITOR_onKeyDown_PageUp(event: KeyboardEvent) {
     event.stopPropagation();
 
     if (event.ctrlKey) {        
@@ -5291,7 +5293,7 @@ async function EDITOR_onKeyDown_keyLengthEqualsOne_ctrlKey(event: KeyboardEvent)
     }
 }
 
-function EDITOR_onKeyDown_keyLengthEqualsOne_altKey(event) {
+function EDITOR_onKeyDown_keyLengthEqualsOne_altKey(event: KeyboardEvent) {
     switch (event.key) {
         case '>':
             if (event.shiftKey) {
@@ -6532,7 +6534,7 @@ function EDITOR_render_do_DuplicateOrPaste() {
                 linefeedLength = 0;
             }
 
-            function EDITOR_duplicate_and_paste_writeWord(wordLength, cursor: EDITOR_Cursor, word) {
+            function EDITOR_duplicate_and_paste_writeWord(wordLength: number, cursor: EDITOR_Cursor, word: string) {
                 w_span.textContent = 
                     w_span.textContent.slice(0, w_indexColumn_SpanTextContentRelative) +
                     word +
