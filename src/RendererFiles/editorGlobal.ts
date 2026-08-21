@@ -235,6 +235,8 @@ let contentWidth = 0;
 
 let gutterWidthTotal = 32;
 
+let recentBoundingClientRect_isNull_intFalsey = 1;
+
 class EDITOR_Cursor {
 
     static STATIC_CURSOR_ID = 1;
@@ -1216,7 +1218,7 @@ function EDITOR_render_do_SyntaxHighlighting() {
     }
 
     let trackedSyntax_I = EDITOR_drawViewPort_FindTrackedSyntax_StartingIndex(indexLine);
-    if (Number.isNaN(trackedSyntax_I) || trackedSyntax_I === -1)
+    if (Number.isNaN(trackedSyntax_I) || trackedSyntax_I === -1 || trackedSyntax_I === undefined)
         trackedSyntax_I = EDITOR_trackedSyntaxList.count_abstract;
     
     for (; i < i_bounded; i++) {
@@ -1369,7 +1371,7 @@ More accurately the ones that seem to not have an importance of position, they d
 function EDITOR_state_clear() {
     EDITOR_finalizeAllCursors_andClearNonPrimaryCursors();
     EDITOR_primaryCursor.clear();
-    set_EDITOR_recentBoundingClientRect_isNull_intFalsey(1);
+    recentBoundingClientRect_isNull_intFalsey = 1;
     EDITOR_textSourceIdentifier = '';
     EDITOR_FORMATTED_textSourceIdentifier = '';
     EDITOR_extensionKind = ExtensionKind.None;
@@ -2810,7 +2812,7 @@ function EDITOR_drawLine(indexLine: number, gutterLineElement: HTMLElement, text
     }
 
     let trackedSyntax_StartingIndex = EDITOR_drawViewPort_FindTrackedSyntax_StartingIndex(indexLine);
-    if (Number.isNaN(trackedSyntax_StartingIndex) || trackedSyntax_StartingIndex === -1) {
+    if (Number.isNaN(trackedSyntax_StartingIndex) || trackedSyntax_StartingIndex === -1 || trackedSyntax_StartingIndex === undefined) {
         trackedSyntax_StartingIndex = EDITOR_trackedSyntaxList.count_abstract;
     }
     let line = EDITOR_getLineBoundaryPositions(indexLine);
@@ -3389,7 +3391,7 @@ function EDITOR_getLineEnd_pos_raw(indexLine: number) {
 }
 
 function EDITOR_onMouseMove_WRAPIT(event: MouseEvent) {
-    if ((event.buttons & 1) && !get_EDITOR_recentBoundingClientRect_isNull_intFalsey()) {
+    if ((event.buttons & 1) && !recentBoundingClientRect_isNull_intFalsey) {
 
         // TODO: Consider short circuiting at via event.clientX and clientY by tracking the necessary thresholds for the cursor position to pass rather than the previous and current indices. (you can possibly thereby skip the calculation of the indices entirely for the redundant events).
         // TODO: Is it correct to use the cursor's indexLine and indexColumn directly as a means of determining redundancy? I worry about odd interactions, but I have no proof that such an odd interaction could exist.
@@ -5324,11 +5326,11 @@ function EDITOR_onMouseDown(event: MouseEvent) {
     offsetColumn = 0;
     offsetLine = 0;
 
-    if (get_EDITOR_recentBoundingClientRect_isNull_intFalsey()) {
+    if (recentBoundingClientRect_isNull_intFalsey) {
         let boundingClientRect = EDITOR_baseElement.getBoundingClientRect();
         set_EDITOR_recentBoundingClientRect_left(boundingClientRect.left);
         set_EDITOR_recentBoundingClientRect_top(boundingClientRect.top);
-        set_EDITOR_recentBoundingClientRect_isNull_intFalsey(0);
+        recentBoundingClientRect_isNull_intFalsey = 0;
     }
 
     if (event.button === 0) {
@@ -7287,7 +7289,7 @@ function EDITOR_render_do_Resize(timestamp: number) {
         }
     }
 
-    set_EDITOR_recentBoundingClientRect_isNull_intFalsey(1);
+    recentBoundingClientRect_isNull_intFalsey = 1;
 
     EDITOR_drawHorizontalScrollbar();
 }
@@ -8959,11 +8961,11 @@ function EDITOR_requestLspHover() {
     // # GET INDICES
     ///////////
     ///////////
-    if (get_EDITOR_recentBoundingClientRect_isNull_intFalsey()) {
+    if (recentBoundingClientRect_isNull_intFalsey) {
         let boundingClientRect = EDITOR_baseElement.getBoundingClientRect();
         set_EDITOR_recentBoundingClientRect_left(boundingClientRect.left);
         set_EDITOR_recentBoundingClientRect_top(boundingClientRect.top);
-        set_EDITOR_recentBoundingClientRect_isNull_intFalsey(0);
+        recentBoundingClientRect_isNull_intFalsey = 0;
     }
 
     let rY = event.clientY - get_EDITOR_recentBoundingClientRect_top() + lastReadNumber_scrollTop;
