@@ -1,7 +1,7 @@
 import { APP_lineHeight } from './applicationRendererRoot';
-import { DIALOG_FindAll_options_matchWord, DIALOG_FindAll_options_matchWord_SETTER, DIALOG_Settings_editorDebugShowAdjacentCharacters_SETTER, DIALOG_Settings_isDark, DIALOG_Settings_isDark_SETTER, DIALOG_Settings_trueTabs_falseSpaces, DIALOG_Settings_trueTabs_falseSpaces_SETTER } from './dialogGlobal';
-import { EDITOR_drawCursor, EDITOR_on_tab_bytes_SETTER, EDITOR_primaryCursor, EDITOR_tab_spacesbytes, EDITOR_tab_tabsbytes } from './editorGlobal';
-import { EXPLORER_offsetPerDepth } from './explorerGlobal';
+import { DIALOG_FindAll_options_matchWord, DIALOG_FindAll_options_matchWord_SETTER, DIALOG_Settings_editorDebugShowAdjacentCharacters, DIALOG_Settings_editorDebugShowAdjacentCharacters_SETTER, DIALOG_Settings_isDark, DIALOG_Settings_isDark_SETTER, DIALOG_Settings_trueTabs_falseSpaces, DIALOG_Settings_trueTabs_falseSpaces_SETTER } from './dialogGlobal';
+import { EDITOR_documentSymbolResult, EDITOR_documentSymbolResult_SETTER, EDITOR_drawCursor, EDITOR_lineEndPositionList, EDITOR_listComponent, EDITOR_listComponent_SETTER, EDITOR_moveCursor_indexLine_indexColumn, EDITOR_on_tab_bytes_SETTER, EDITOR_primaryCursor, EDITOR_tab_spacesbytes, EDITOR_tab_tabsbytes } from './editorGlobal';
+import { EXPLORER_offsetPerDepth, EXPLORER_openInEditor } from './explorerGlobal';
 import { MenuOption } from './menuGlobal';
 import { TreeView_NodeKind, TreeView_pooledNode_depth, TreeView_pooledNode_key, TreeView_pooledNode_nodeKind, TreeViewComponent, TreeViewNodeList } from './treeViewComponent';
 
@@ -487,7 +487,7 @@ export async function DIALOG_DocumentSymbol_Create_async() {
     let dialogBody = document.getElementById('DIALOG_body');
     if (!dialogBody) return;
 
-    if (EDITOR_documentSymbolResult) {
+    if (EDITOR_documentSymbolResult && EDITOR_listComponent) {
         let div = document.createElement('div');
         div.textContent = 'EDITOR_documentSymbolResult.length: ' + EDITOR_documentSymbolResult.length;
         div.style.height = APP_lineHeight + 'px';
@@ -506,9 +506,9 @@ export async function DIALOG_DocumentSymbol_Delete_async() {
     if (!dialogBody) return;
     if (EDITOR_listComponent) {
         EDITOR_listComponent.draw_delete();
-        EDITOR_listComponent = null;
+        EDITOR_listComponent_SETTER(null);
     }
-    EDITOR_documentSymbolResult = null;
+    EDITOR_documentSymbolResult_SETTER(null);
 }
 
 //let DEBUG_listData = null;

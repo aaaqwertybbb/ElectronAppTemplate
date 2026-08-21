@@ -137,7 +137,7 @@ export abstract class ListComponent implements EventListenerObject {
      * @param {HTMLElement} parentElement 
      * @param {*} insertBeforeThisChild (if falsey, the list UI is appended to the parent element)
      */
-    draw_create(parentElement: HTMLElement, insertBeforeThisChild: HTMLElement) {
+    draw_create(parentElement: HTMLElement, insertBeforeThisChild: HTMLElement | null) {
         if (this.rootElement.parentElement) return;
         parentElement.insertBefore(this.rootElement, insertBeforeThisChild);
         this.draw_addEvents();

@@ -813,7 +813,7 @@ export function EXPLORER_setShow(shouldShow: boolean) {
 	}
 }
 
-async function EXPLORER_openInEditor(absolutePath: string, shouldFocus?: boolean) {
+export async function EXPLORER_openInEditor(absolutePath: string, shouldFocus?: boolean) {
     const itHasBom = await window.myAPI.editorReadAllText(absolutePath);
 
     if (!itHasBom.text && itHasBom.text != '') {
