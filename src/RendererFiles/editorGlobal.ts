@@ -4387,7 +4387,7 @@ function EDITOR_movementBasedCacheInvalidation(cursor: EDITOR_Cursor) {
 /**
  * @param {*} clipboardContent This is a temporary hack to help in transitioning paste to an edit.
  */
-function EDITOR_editEvent(editKind: EditKind, event: KeyboardEvent, clipboardContent: string) {
+function EDITOR_editEvent(editKind: EditKind, event: KeyboardEvent, clipboardContent: string | null) {
     // check for pending => selection
     // if so then finalize all current pending
     // ...this actually is checking for selection, then presuming at least 1 cursor has a pending...
@@ -4938,21 +4938,21 @@ async function EDITOR_onKeyDown(event: KeyboardEvent) {
             EDITOR_onKeyDown_PageUp(event);
             break;
         case 'Delete':
-            EDITOR_editEvent(EditKind.DeleteLtr, event);
+            EDITOR_editEvent(EditKind.DeleteLtr, event, null);
             break;
         case 'Backspace':
-            EDITOR_editEvent(EditKind.BackspaceRtl, event);
+            EDITOR_editEvent(EditKind.BackspaceRtl, event, null);
             break;
         case 'Escape':
             EDITOR_finalizeAllCursors_andClearNonPrimaryCursors();
             break;
         case 'Tab':
             event.preventDefault();
-            EDITOR_editEvent(EditKind.Tab, event);
+            EDITOR_editEvent(EditKind.Tab, event, null);
             break;
         case 'Enter':
             // Enter key relies on cached data that would be cleared, pattern doesn't match on purpose
-            EDITOR_editEvent(EditKind.Enter, event);
+            EDITOR_editEvent(EditKind.Enter, event, null);
             break;
         case 'F12':
             EDITOR_doEditorGoToDefinitionRequest();
@@ -4968,7 +4968,7 @@ async function EDITOR_onKeyDown(event: KeyboardEvent) {
                 }
                 else {
                     event.preventDefault();
-                    EDITOR_editEvent(EditKind.InsertLtr, event);
+                    EDITOR_editEvent(EditKind.InsertLtr, event, null);
                 }
             }
             break;
@@ -5331,7 +5331,7 @@ async function EDITOR_onKeyDown_keyLengthEqualsOne_ctrlKey(event: KeyboardEvent)
             event.preventDefault();
             event.stopPropagation();
 
-            EDITOR_editEvent(EditKind.Duplicate, event);
+            EDITOR_editEvent(EditKind.Duplicate, event, null);
             break;
         case 'a':
 
@@ -5342,6 +5342,9 @@ async function EDITOR_onKeyDown_keyLengthEqualsOne_ctrlKey(event: KeyboardEvent)
             EDITOR_primaryCursor.selectionAnchor = 0;
             EDITOR_primaryCursor.selectionEnd = EDITOR_textByteList.count;
             let selectionEndLineAndColumnIndices = EDITOR_getLineAndColumnIndices(EDITOR_primaryCursor.selectionEnd);
+            if (selectionEndLineAndColumnIndices === undefined) {
+                throw new Error();
+            }
             EDITOR_primaryCursor.indexLine = selectionEndLineAndColumnIndices.indexLine;
             EDITOR_primaryCursor.indexColumn = selectionEndLineAndColumnIndices.indexColumn;
             EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
@@ -5486,7 +5489,10 @@ function EDITOR_horizontal_scrollbar_onScroll() {
 }
 
 function EDITOR_findOverlay_doSearch() {
-	let input = document.getElementById('EDITOR_findOverlay_input_elementId');
+
+    if (!EDITOR_findOverlay_searchResultPositionList) throw new Error();
+
+	let input = document.getElementById('EDITOR_findOverlay_input_elementId') as HTMLInputElement;
     if (!input || !input.value) return;
     
     let spanCurrent = document.getElementById('EDITOR_findOverlay_current');
