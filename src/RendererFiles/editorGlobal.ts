@@ -230,6 +230,10 @@ const gutterPaddingRightNumber = 6;
 
 let longestLine_length_PreviousValueWhenLastDrewHorizontalScrollbar = 0;
 
+let contentWidth = 0;
+
+let gutterWidthTotal = 32;
+
 class EDITOR_Cursor {
 
     static STATIC_CURSOR_ID = 1;
@@ -1568,8 +1572,8 @@ function EDITOR_drawGutter_Width() {
     drawn_count_of_digits_longest_line_number = digitCountOfLargestLineNumber;
 
     gutterWidthStyleValue = (Math.ceil(digitCountOfLargestLineNumber * EDITOR_characterWidth));
-    set_EDITOR_gutterWidthTotal(gutterWidthStyleValue + gutterPaddingLeftNumber + gutterPaddingRightNumber);
-    gutterWidthTotal_withPxUnits = `${get_EDITOR_gutterWidthTotal()}px`;
+    gutterWidthTotal = (gutterWidthStyleValue + gutterPaddingLeftNumber + gutterPaddingRightNumber);
+    gutterWidthTotal_withPxUnits = `${gutterWidthTotal}px`;
 
     let gutterWidth = gutterWidthStyleValue + 'px';
     cached_EDITOR_gutter.style.width = gutterWidth;
@@ -1596,13 +1600,13 @@ function EDITOR_drawGutter_Width() {
  * then at that point you redraw this.
  */
 function EDITOR_drawHorizontalScrollbar() {
-    if (DRAWN_NUMBER_cached_EDITOR_horizontal_scrollbar_style_left !== get_EDITOR_gutterWidthTotal()) {
+    if (DRAWN_NUMBER_cached_EDITOR_horizontal_scrollbar_style_left !== gutterWidthTotal) {
         cached_EDITOR_horizontal_scrollbar.style.left = gutterWidthTotal_withPxUnits;
-        DRAWN_NUMBER_cached_EDITOR_horizontal_scrollbar_style_left = get_EDITOR_gutterWidthTotal();
+        DRAWN_NUMBER_cached_EDITOR_horizontal_scrollbar_style_left = gutterWidthTotal;
     }
 
-    if (EDITOR_horizontal_scrollbar_widthValue !== (EDITOR_baseElement.clientWidth - get_EDITOR_gutterWidthTotal())) {
-        EDITOR_horizontal_scrollbar_widthValue = EDITOR_baseElement.clientWidth - get_EDITOR_gutterWidthTotal();
+    if (EDITOR_horizontal_scrollbar_widthValue !== (EDITOR_baseElement.clientWidth - gutterWidthTotal)) {
+        EDITOR_horizontal_scrollbar_widthValue = EDITOR_baseElement.clientWidth - gutterWidthTotal;
         cached_EDITOR_horizontal_scrollbar.style.width = EDITOR_horizontal_scrollbar_widthValue + 'px';
     }
 
@@ -1610,16 +1614,16 @@ function EDITOR_drawHorizontalScrollbar() {
         
         longestLine_length_PreviousValueWhenLastDrewHorizontalScrollbar = longestLine_length;
 
-        set_EDITOR_contentWidth(Math.ceil(longestLine_length * EDITOR_characterWidth));
+        contentWidth = (Math.ceil(longestLine_length * EDITOR_characterWidth));
 
-        if ((get_EDITOR_contentWidth() < (EDITOR_baseElement.clientWidth - get_EDITOR_gutterWidthTotal())) && (EDITOR_baseElement.clientWidth - get_EDITOR_gutterWidthTotal() > 0)) {
-            set_EDITOR_contentWidth(Math.floor(EDITOR_baseElement.clientWidth - get_EDITOR_gutterWidthTotal()));
+        if ((contentWidth < (EDITOR_baseElement.clientWidth - gutterWidthTotal)) && (EDITOR_baseElement.clientWidth - gutterWidthTotal > 0)) {
+            contentWidth = (Math.floor(EDITOR_baseElement.clientWidth - gutterWidthTotal));
         }
 
-        let local_cached_EDITOR_horizontal_scrollbar_virtualization_boundary_style_width = get_EDITOR_contentWidth() + 'px';
+        let local_cached_EDITOR_horizontal_scrollbar_virtualization_boundary_style_width = contentWidth + 'px';
 
         cached_EDITOR_horizontal_scrollbar_virtualization_boundary.style.width = local_cached_EDITOR_horizontal_scrollbar_virtualization_boundary_style_width;
-        cached_EDITOR_virtualization_horizontal.style.width = get_EDITOR_contentWidth() + get_EDITOR_gutterWidthTotal() + 'px';
+        cached_EDITOR_virtualization_horizontal.style.width = contentWidth + gutterWidthTotal + 'px';
 
         for (let i = 0; i < ArrayFrom_textElement_children_length; i++) {
             ArrayFrom_textElement_children[i].style.width = local_cached_EDITOR_horizontal_scrollbar_virtualization_boundary_style_width;
@@ -3392,7 +3396,7 @@ function EDITOR_onMouseMove_WRAPIT(event: MouseEvent) {
         // TODO: Consider short circuiting at via event.clientX and clientY by tracking the necessary thresholds for the cursor position to pass rather than the previous and current indices. (you can possibly thereby skip the calculation of the indices entirely for the redundant events).
         // TODO: Is it correct to use the cursor's indexLine and indexColumn directly as a means of determining redundancy? I worry about odd interactions, but I have no proof that such an odd interaction could exist.
 
-        let rX = event.clientX - get_EDITOR_recentBoundingClientRect_left() - get_EDITOR_gutterWidthTotal() + lastReadNumber_scrollLeft;
+        let rX = event.clientX - get_EDITOR_recentBoundingClientRect_left() - gutterWidthTotal + lastReadNumber_scrollLeft;
         let rY = event.clientY - get_EDITOR_recentBoundingClientRect_top() + lastReadNumber_scrollTop;
 
         let indexColumn = Math.round(rX / EDITOR_characterWidth);
@@ -5335,7 +5339,7 @@ function EDITOR_onMouseDown(event: MouseEvent) {
     }
 
     let rY = event.clientY - get_EDITOR_recentBoundingClientRect_top() + lastReadNumber_scrollTop;
-    let rX = event.clientX - get_EDITOR_recentBoundingClientRect_left() - get_EDITOR_gutterWidthTotal() + lastReadNumber_scrollLeft;
+    let rX = event.clientX - get_EDITOR_recentBoundingClientRect_left() - gutterWidthTotal + lastReadNumber_scrollLeft;
     
     let indexLine = Math.floor(rY / lineHeight);
     let indexColumn = Math.round(rX / EDITOR_characterWidth);
@@ -5392,7 +5396,7 @@ async function EDITOR_onContextMenu(event: PointerEvent) {
         new MenuOption(get_CommandKind_Find(), 'Find', null),
     ];
 
-    let menuLeft = get_EDITOR_recentBoundingClientRect_left() + get_EDITOR_gutterWidthTotal() + EDITOR_primaryCursor.cursorTranslateXValue - lastReadNumber_scrollLeft;
+    let menuLeft = get_EDITOR_recentBoundingClientRect_left() + gutterWidthTotal + EDITOR_primaryCursor.cursorTranslateXValue - lastReadNumber_scrollLeft;
     let menuTop = get_EDITOR_recentBoundingClientRect_top() + EDITOR_primaryCursor.cursorTranslateYValue + lineHeight - lastReadNumber_scrollTop;
 
     await menuSet('EDITOR', null, optionList, menuLeft, menuTop);
@@ -8965,7 +8969,7 @@ function EDITOR_requestLspHover() {
     }
 
     let rY = event.clientY - get_EDITOR_recentBoundingClientRect_top() + lastReadNumber_scrollTop;
-    let rX = event.clientX - get_EDITOR_recentBoundingClientRect_left() - get_EDITOR_gutterWidthTotal() + lastReadNumber_scrollLeft;
+    let rX = event.clientX - get_EDITOR_recentBoundingClientRect_left() - gutterWidthTotal + lastReadNumber_scrollLeft;
     
     let indexLine = Math.floor(rY / lineHeight);
     let indexColumn = Math.round(rX / EDITOR_characterWidth);
