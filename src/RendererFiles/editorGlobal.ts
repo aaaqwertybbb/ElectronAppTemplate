@@ -3137,6 +3137,16 @@ function EDITOR_clearSelectionStyle(cursor: EDITOR_Cursor) {
 
 /**
  * @param {EDITOR_Cursor} cursor 
+ * 
+ *
+ * TODO: I can't just not return undefined or throw here (actually you literally can't because the invoker still is technically 'undefined' I think but you can coallesce required)...
+ * ...anxiety anxiety anxiety anxiety I can't do it I can't do it I'm typing this everywhere don't talk to me.
+ * if (LARGE_lineAndColumnIndices === undefined) {
+ *      throw new Error();
+ *  }
+ * 
+ * 
+ * 
  */
 function EDITOR_createStyleForSelection(cursor: EDITOR_Cursor) {
     if (cursor.DRAWN_selectionAnchor !== cursor.selectionAnchor ||
@@ -5625,8 +5635,8 @@ function EDITOR_findOverlay_doSearch() {
     if (nextMatchNumber === -1) {
         nextMatchNumber = 1;
     }
-    spanCurrent.textContent = nextMatchNumber;
-    spanTotal.textContent = EDITOR_findOverlay_searchResultPositionList.count;
+    spanCurrent.textContent = `${nextMatchNumber}`;
+    spanTotal.textContent = `${EDITOR_findOverlay_searchResultPositionList.count}`;
 }
 
 function EDITOR_findOverlay_input_onkeydown(event: KeyboardEvent) {
@@ -5772,6 +5782,9 @@ function EDITOR_findOverlay_showSetter(showValue: boolean) {
 }
 
 function EDITOR_btnPrev_onclick(/*event*/) {
+
+    if (!EDITOR_findOverlay_searchResultPositionList) throw new Error();
+
 	let spanCurrent = document.getElementById('EDITOR_findOverlay_current');
 	if (!spanCurrent) return;
 	
@@ -5791,7 +5804,7 @@ function EDITOR_btnPrev_onclick(/*event*/) {
 				current = 1;
 			}
 		}
-		spanCurrent.textContent = current;
+		spanCurrent.textContent = `${current}`;
 	}
 	else {
 		spanCurrent.textContent = 'parseInt not successful?';
@@ -5807,6 +5820,9 @@ function EDITOR_btnPrev_onclick(/*event*/) {
 }
 
 function EDITOR_btnNext_onclick() {
+
+    if (!EDITOR_findOverlay_searchResultPositionList) throw new Error();
+
 	let spanCurrent = document.getElementById('EDITOR_findOverlay_current');
 	if (!spanCurrent) return;
 	
@@ -5821,7 +5837,7 @@ function EDITOR_btnNext_onclick() {
 		if (current > total || current < 1) {
 			current = 1;
 		}
-		spanCurrent.textContent = current;
+		spanCurrent.textContent = `${current}`;
 	}
 	else {
 		spanCurrent.textContent = 'parseInt not successful?';
@@ -5957,7 +5973,13 @@ function EDITOR_indentMore(cursor: EDITOR_Cursor) {
         LARGE_pos = cursor.selectionAnchor;
     }
     let SMALL_lineAndColumnIndices = EDITOR_getLineAndColumnIndices_raw(SMALL_pos);
+    if (SMALL_lineAndColumnIndices === undefined) {
+        throw new Error();
+    }
     let LARGE_lineAndColumnIndices = EDITOR_getLineAndColumnIndices_raw(LARGE_pos);
+    if (LARGE_lineAndColumnIndices === undefined) {
+        throw new Error();
+    }
 
     // # Determine the starting indexLine (the start is the large position, this confused me for a moment)
     let startingIndex = LARGE_lineAndColumnIndices.indexLine;
@@ -6145,7 +6167,13 @@ function EDITOR_indentLess(cursor: EDITOR_Cursor) {
         LARGE_pos = cursor.selectionAnchor;
     }
     let SMALL_lineAndColumnIndices = EDITOR_getLineAndColumnIndices(SMALL_pos);
+    if (SMALL_lineAndColumnIndices === undefined) {
+        throw new Error();
+    }
     let LARGE_lineAndColumnIndices = EDITOR_getLineAndColumnIndices(LARGE_pos);
+    if (LARGE_lineAndColumnIndices === undefined) {
+        throw new Error();
+    }
 
     // starting index
     let startingIndex = LARGE_lineAndColumnIndices.indexLine;
@@ -6233,6 +6261,9 @@ async function EDITOR_duplicateSelection(cursor: EDITOR_Cursor) {
 
     cursor.editPosition = large;
     let large_lineAndColumnIndices = EDITOR_getLineAndColumnIndices(large);
+    if (large_lineAndColumnIndices === undefined) {
+        throw new Error();
+    }
     cursor.editIndexLine = large_lineAndColumnIndices.indexLine;
     cursor.editIndexColumn = large_lineAndColumnIndices.indexColumn;
     cursor.editLength = length;
@@ -7528,6 +7559,9 @@ function EDITOR_removeSelection(cursor: EDITOR_Cursor) {
     EDITOR_startEdit(cursor, EditKind.RemoveTextNoBatching, smallPosition, /*editLength*/ 0);
 
     let smallLineAndColumnIndices = EDITOR_getLineAndColumnIndices(smallPosition);
+    if (smallLineAndColumnIndices === undefined) {
+        throw new Error();
+    }
     EDITOR_RemoveSelection_smallLineAndColumnIndices = smallLineAndColumnIndices;
     cursor.indexLine = smallLineAndColumnIndices.indexLine;
     cursor.indexColumn = smallLineAndColumnIndices.indexColumn;
@@ -7535,6 +7569,9 @@ function EDITOR_removeSelection(cursor: EDITOR_Cursor) {
     cursor.editIndexColumn = smallLineAndColumnIndices.indexColumn;
 
     let largeLineAndColumnIndices = EDITOR_getLineAndColumnIndices(largePosition);
+    if (largeLineAndColumnIndices === undefined) {
+        throw new Error();
+    }
     EDITOR_RemoveSelection_largeLineAndColumnIndices = largeLineAndColumnIndices;
     cursor.END_editIndexLine = largeLineAndColumnIndices.indexLine;
     cursor.END_editIndexColumn = largeLineAndColumnIndices.indexColumn;
@@ -8470,6 +8507,9 @@ async function EDITOR_MenuOnClick(indexClicked: number, elementClicked: HTMLElem
  */
 function EDITOR_moveCursor_position(intValue: number) {
     let lineAndColumnIndices = EDITOR_getLineAndColumnIndices(intValue);
+    if (lineAndColumnIndices === undefined) {
+        throw new Error();
+    }
     EDITOR_moveCursor_indexLine_indexColumn(lineAndColumnIndices.indexLine, lineAndColumnIndices.indexColumn);
 }
 
