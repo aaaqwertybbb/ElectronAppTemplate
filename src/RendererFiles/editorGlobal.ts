@@ -631,7 +631,7 @@ let lastReadNumber_offsetWidth = 0;
 
 let EDITOR_isRenderPending = false;
 
-let EDITOR_renderKindArray: RenderKind[] = [];
+let EDITOR_renderKindArray: (RenderKind | number)[] = [];
 
 // Persistent, flat JS arrays that stay alive forever in memory
 let ArrayFrom_gutter_children: HTMLElement[] = [];
@@ -782,7 +782,7 @@ function EDITOR_render_do(timestamp: number) {
     EDITOR_isRenderPending = false; // Reset the lock
 }
 
-function EDITOR_render_do_cursor(timestamp: number, renderKind: RenderKind) {
+function EDITOR_render_do_cursor(timestamp: number, renderKind: RenderKind | number) {
     EDITOR_cursorBlinkLastTimestamp = timestamp;
     let indexCursor = renderKind - (count_of_wellknown_renderKinds - 1);
     if (indexCursor >= EDITOR_cursorList.length) {
@@ -3147,8 +3147,6 @@ function EDITOR_clearSelectionStyle(cursor: EDITOR_Cursor) {
  * 
  * TODO: I just need it to run once so I can breathe and I'll take this scuffed case, not all the error fixes are scuffed.
  * 
- * 
- * 
  */
 function EDITOR_createStyleForSelection(cursor: EDITOR_Cursor) {
     if (cursor.DRAWN_selectionAnchor !== cursor.selectionAnchor ||
@@ -5009,6 +5007,9 @@ function EDITOR_onKeyDown_ArrowLeft(event: KeyboardEvent) {
                 small = cursor.selectionEnd;
             }
             let lineAndColumnIndices = EDITOR_getLineAndColumnIndices(small);
+            if (lineAndColumnIndices === undefined) {
+                throw new Error();
+            }
             cursor.indexLine = lineAndColumnIndices.indexLine;
             cursor.indexColumn = lineAndColumnIndices.indexColumn;
             cursor.selectionAnchor = cursor.selectionEnd;
@@ -5149,6 +5150,9 @@ function EDITOR_onKeyDown_ArrowRight(event: KeyboardEvent) {
                 large = cursor.selectionAnchor;
             }
             let lineAndColumnIndices = EDITOR_getLineAndColumnIndices(large);
+            if (lineAndColumnIndices === undefined) {
+                throw new Error();
+            }
             cursor.indexLine = lineAndColumnIndices.indexLine;
             cursor.indexColumn = lineAndColumnIndices.indexColumn;
             cursor.selectionAnchor = cursor.selectionEnd;
