@@ -271,6 +271,13 @@ let GLOBAL_indent_SMALL_lineAndColumnIndices_indexLine = 0;
 
 let GLOBAL_detailRank = 0;
 
+let GLOBAL_detail_smallPosition = 0;
+let GLOBAL_detail_largePosition = 0;
+
+let GLOBAL_detailRank3OriginLine = 0;
+
+let GLOBAL_findOverlay_show = false;
+
 class EDITOR_Cursor {
 
     static STATIC_CURSOR_ID = 1;
@@ -3617,9 +3624,9 @@ function EDITOR_onMouseMoveDetailRankTwo(event: MouseEvent, indexLineClicked: nu
     let nextPositionIndex = EDITOR_getPositionIndex_Overload(indexLineClicked, indexColumnClicked);
     let cursor = EDITOR_primaryCursor;
 
-    if (nextPositionIndex <= get_EDITOR_detail_smallPosition()) {
+    if (nextPositionIndex <= GLOBAL_detail_smallPosition) {
         if (cursor.selectionAnchor < cursor.selectionEnd) {
-            cursor.selectionAnchor = get_EDITOR_detail_largePosition();
+            cursor.selectionAnchor = GLOBAL_detail_largePosition;
         }
 
         cursor.indexLine = indexLineClicked;
@@ -3628,7 +3635,7 @@ function EDITOR_onMouseMoveDetailRankTwo(event: MouseEvent, indexLineClicked: nu
 
         cursor.selectionEnd = positionIndex;
 
-        if (nextPositionIndex < get_EDITOR_detail_smallPosition()) {
+        if (nextPositionIndex < GLOBAL_detail_smallPosition) {
             let goalCharacterKind = EDITOR_getCharacterCurrent_KIND(cursor.indexColumn, positionIndex, EDITOR_getLineEnd_pos(cursor.indexLine));
 
             let leftWasFound = false;
@@ -3656,10 +3663,10 @@ function EDITOR_onMouseMoveDetailRankTwo(event: MouseEvent, indexLineClicked: nu
     }
     else {
         if (cursor.selectionAnchor > cursor.selectionEnd) {
-            cursor.selectionAnchor = get_EDITOR_detail_smallPosition();
+            cursor.selectionAnchor = GLOBAL_detail_smallPosition;
         }
 
-        if (nextPositionIndex >= get_EDITOR_detail_largePosition()) {
+        if (nextPositionIndex >= GLOBAL_detail_largePosition) {
             cursor.indexLine = indexLineClicked;
             cursor.indexColumn = indexColumnClicked;
             let positionIndex = nextPositionIndex;
@@ -3691,10 +3698,10 @@ function EDITOR_onMouseMoveDetailRankTwo(event: MouseEvent, indexLineClicked: nu
             }
         }
         else {
-            let largeLineAndColumnIndices = EDITOR_getLineAndColumnIndices(get_EDITOR_detail_largePosition());
+            let largeLineAndColumnIndices = EDITOR_getLineAndColumnIndices(GLOBAL_detail_largePosition);
             cursor.indexLine = largeLineAndColumnIndices.indexLine;
             cursor.indexColumn = largeLineAndColumnIndices.indexColumn;
-            cursor.selectionEnd = get_EDITOR_detail_largePosition();
+            cursor.selectionEnd = GLOBAL_detail_largePosition;
         }
 
         let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
@@ -3705,32 +3712,32 @@ function EDITOR_onMouseMoveDetailRankTwo(event: MouseEvent, indexLineClicked: nu
 function EDITOR_onMouseMoveDetailRankThree(event: MouseEvent, indexLineClicked: number, indexColumnClicked: number) {
     let cursor = EDITOR_primaryCursor;
 
-    if (indexLineClicked === get_EDITOR_detailRank3OriginLine()) {
-        if (cursor.positionIndex !== get_EDITOR_detail_smallPosition()) {
-            let smallLineAndColumnPositionIndices = EDITOR_getLineAndColumnIndices(get_EDITOR_detail_smallPosition());
+    if (indexLineClicked === GLOBAL_detailRank3OriginLine) {
+        if (cursor.positionIndex !== GLOBAL_detail_smallPosition) {
+            let smallLineAndColumnPositionIndices = EDITOR_getLineAndColumnIndices(GLOBAL_detail_smallPosition);
             cursor.indexLine = smallLineAndColumnPositionIndices.indexLine;
             cursor.indexColumn = smallLineAndColumnPositionIndices.indexColumn;
         }
 
-        if (cursor.selectionEnd !== get_EDITOR_detail_smallPosition()) {
-            cursor.selectionEnd = get_EDITOR_detail_smallPosition();
+        if (cursor.selectionEnd !== GLOBAL_detail_smallPosition) {
+            cursor.selectionEnd = GLOBAL_detail_smallPosition;
         }
 
-        if (cursor.selectionAnchor !== get_EDITOR_detail_largePosition()) {
-            cursor.selectionAnchor = get_EDITOR_detail_largePosition();
+        if (cursor.selectionAnchor !== GLOBAL_detail_largePosition) {
+            cursor.selectionAnchor = GLOBAL_detail_largePosition;
         }
 
         let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
         EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
     }
-    else if (indexLineClicked < get_EDITOR_detailRank3OriginLine()) {
+    else if (indexLineClicked < GLOBAL_detailRank3OriginLine) {
         if (cursor.selectionAnchor < cursor.selectionEnd) {
-            let smallLineAndColumnPositionIndices = EDITOR_getLineAndColumnIndices(get_EDITOR_detail_smallPosition());
+            let smallLineAndColumnPositionIndices = EDITOR_getLineAndColumnIndices(GLOBAL_detail_smallPosition);
 
             cursor.indexLine = smallLineAndColumnPositionIndices.indexLine;
             cursor.indexColumn = smallLineAndColumnPositionIndices.indexColumn;
 
-            cursor.selectionEnd = get_EDITOR_detail_smallPosition();
+            cursor.selectionEnd = GLOBAL_detail_smallPosition;
 
             let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
             EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
@@ -3744,10 +3751,10 @@ function EDITOR_onMouseMoveDetailRankThree(event: MouseEvent, indexLineClicked: 
         let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
         EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
     }
-    else if (indexLineClicked > get_EDITOR_detailRank3OriginLine()) {
+    else if (indexLineClicked > GLOBAL_detailRank3OriginLine) {
 
-        if (cursor.selectionAnchor !== get_EDITOR_detail_smallPosition()) {
-            cursor.selectionAnchor = get_EDITOR_detail_smallPosition();
+        if (cursor.selectionAnchor !== GLOBAL_detail_smallPosition) {
+            cursor.selectionAnchor = GLOBAL_detail_smallPosition;
         }
 
         cursor.indexLine = indexLineClicked;
@@ -3933,12 +3940,12 @@ function EDITOR_onMouseDownDetailRankTwo(event: MouseEvent, indexLineClicked: nu
     }
 
     if (cursor.selectionAnchor < cursor.selectionEnd) {
-        set_EDITOR_detail_smallPosition(cursor.selectionAnchor);
-        set_EDITOR_detail_largePosition(cursor.selectionEnd);
+        GLOBAL_detail_smallPosition = cursor.selectionAnchor;
+        GLOBAL_detail_largePosition = cursor.selectionEnd;
     }
     else {
-        set_EDITOR_detail_smallPosition(cursor.selectionEnd);
-        set_EDITOR_detail_largePosition(cursor.selectionAnchor);
+        GLOBAL_detail_smallPosition = cursor.selectionEnd;
+        GLOBAL_detail_largePosition = cursor.selectionAnchor;
     }
 }
 
@@ -3955,7 +3962,7 @@ function EDITOR_onMouseDownDetailRankThree(event: MouseEvent, indexLineClicked: 
     
     cursor.selectionAnchor = EDITOR_getPositionIndex_Overload(cursor.indexLine, 0);
     
-    set_EDITOR_detailRank3OriginLine(cursor.indexLine);
+    GLOBAL_detailRank3OriginLine = cursor.indexLine;
 
     if (cursor.indexLine === EDITOR_lineEndPositionList.count - 1) {
         let line = EDITOR_getLineBoundaryPositions(cursor.indexLine);
@@ -3973,12 +3980,12 @@ function EDITOR_onMouseDownDetailRankThree(event: MouseEvent, indexLineClicked: 
     }
 
     if (cursor.selectionAnchor < cursor.selectionEnd) {
-        set_EDITOR_detail_smallPosition(cursor.selectionAnchor);
-        set_EDITOR_detail_largePosition(cursor.selectionEnd);
+        GLOBAL_detail_smallPosition = cursor.selectionAnchor;
+        GLOBAL_detail_largePosition = cursor.selectionEnd;
     }
     else {
-        set_EDITOR_detail_smallPosition(cursor.selectionEnd);
-        set_EDITOR_detail_largePosition(cursor.selectionAnchor);
+        GLOBAL_detail_smallPosition = cursor.selectionEnd;
+        GLOBAL_detail_largePosition = cursor.selectionAnchor;
     }
 }
 
@@ -4136,11 +4143,11 @@ function EDITOR_createCursorAtNextMatchSelection(event: KeyboardEvent) {
         return;
     }
 
-    if (get_EDITOR_findOverlay_show() && !get_EDITOR_findOverlay_isBeingShownDueToMultiCursorMatching()) {
+    if (GLOBAL_findOverlay_show && !get_EDITOR_findOverlay_isBeingShownDueToMultiCursorMatching()) {
         EDITOR_findOverlay_showSetter(false);
     }
 
-    if (!get_EDITOR_findOverlay_show()) {
+    if (!GLOBAL_findOverlay_show) {
         set_EDITOR_findOverlay_isBeingShownDueToMultiCursorMatching(true);
         EDITOR_findOverlay_showSetter(true);
         EDITOR_findOverlay_doSearch();
@@ -5315,7 +5322,7 @@ async function EDITOR_onKeyDown_keyLengthEqualsOne_ctrlKey(event: KeyboardEvent)
             event.preventDefault();
             event.stopPropagation();
 
-            EDITOR_findOverlay_showSetter(!get_EDITOR_findOverlay_show());
+            EDITOR_findOverlay_showSetter(!GLOBAL_findOverlay_show);
             break;
         case 'z':
             //alert('undo');
@@ -5621,7 +5628,7 @@ function EDITOR_findOverlay_checkboxMatchWord_onchange() {
 function EDITOR_findOverlay_showSetter(showValue: boolean) {
     EDITOR_finalizeAllCursors();
 
-    if (!get_EDITOR_findOverlay_show() && showValue) {
+    if (!GLOBAL_findOverlay_show && showValue) {
         EDITOR_findOverlay.style.visibility = '';
         EDITOR_findOverlay_searchResultPositionList = new UInt32List(256);
         
@@ -5699,7 +5706,7 @@ function EDITOR_findOverlay_showSetter(showValue: boolean) {
             }
         }
     }
-    else if (get_EDITOR_findOverlay_show() && !showValue) {
+    else if (GLOBAL_findOverlay_show && !showValue) {
         EDITOR_findOverlay.style.visibility = 'hidden';
         EDITOR_findOverlay_searchResultPositionList = null;
         let input = document.getElementById('EDITOR_findOverlay_input_elementId');
@@ -5725,7 +5732,7 @@ function EDITOR_findOverlay_showSetter(showValue: boolean) {
         set_EDITOR_findOverlay_isBeingShownDueToMultiCursorMatching(false);
     }
 
-    set_EDITOR_findOverlay_show(showValue);
+    GLOBAL_findOverlay_show = showValue;
 }
 
 function EDITOR_btnPrev_onclick(/*event*/) {
@@ -8417,7 +8424,7 @@ async function EDITOR_MenuOnClick(indexClicked: number, elementClicked: HTMLElem
             EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
             return;
         case get_CommandKind_Find():
-            EDITOR_findOverlay_showSetter(!get_EDITOR_findOverlay_show());
+            EDITOR_findOverlay_showSetter(!GLOBAL_findOverlay_show);
             return;
     }
 }
