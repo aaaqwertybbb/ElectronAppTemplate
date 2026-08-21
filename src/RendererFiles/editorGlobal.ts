@@ -3975,7 +3975,8 @@ function EDITOR_onMouseDownDetailRankTwo(event: MouseEvent, indexLineClicked: nu
         while (cursor.indexColumn < lineLength) {
             cursor.indexColumn++;
             positionIndex++;
-            rightCharacterKind = EDITOR_getCharacterCurrent(cursor.indexColumn, positionIndex, line.end);
+            // omg this bug existed for so long lol. It seems to be the bug that I remember and it was just about changing it to kind.
+            rightCharacterKind = EDITOR_getCharacterCurrent_KIND(cursor.indexColumn, positionIndex, line.end);
             if (rightCharacterKind !== goalCharacterKind) {
                 cursor.selectionEnd = positionIndex;
                 rightWasFound = true;
@@ -4002,7 +4003,7 @@ function EDITOR_onMouseDownDetailRankTwo(event: MouseEvent, indexLineClicked: nu
     }
 }
 
-function EDITOR_onMouseDownDetailRankThree(event: MouseEvent, indexLineClicked: number, indexColumnClicked: number) {
+function EDITOR_onMouseDownDetailRankThree(event: MouseEvent | {shiftKey:false}, indexLineClicked: number, indexColumnClicked: number) {
     if (event.shiftKey) {
         EDITOR_onMouseDownDetailRankOne(event, indexLineClicked, indexColumnClicked);
         return;
@@ -4245,6 +4246,9 @@ function EDITOR_createCursorAtNextMatchSelection(event: KeyboardEvent) {
     let prePosition = EDITOR_getPositionIndex(EDITOR_primaryCursor);
 
     // Avoid two cursors on the same line; wasteful double determination of primaryCursor index is occurring in this function; even a single case is likely not good long term.
+    if (!EDITOR_findOverlay_searchResultPositionList) {
+        throw new Error();
+    }
     let upcomingPositionIndex = EDITOR_findOverlay_searchResultPositionList.data[upcomingNumber - 1];
     if (upcomingPositionIndex) {
         let upcomingLineAndColumnIndices = EDITOR_getLineAndColumnIndices(upcomingPositionIndex);
