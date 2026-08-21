@@ -2,6 +2,7 @@ import { TrackedSyntaxKind, TrackedSyntaxList } from "./trackedSyntaxTypes";
 import { ByteList, UInt32List } from './listTypes';
 import { DIALOG_Settings_editorDebugShowAdjacentCharacters } from './dialogGlobal';
 import { JS_line_lex_newVersion } from "./javascriptFeatures";
+import { MenuOption, Menu_CommandKind } from "./menuGlobal";
 
 /*
 ###################################
@@ -277,6 +278,16 @@ let GLOBAL_detail_largePosition = 0;
 let GLOBAL_detailRank3OriginLine = 0;
 
 let GLOBAL_findOverlay_show = false;
+let GLOBAL_findOverlay_isBeingShownDueToMultiCursorMatching = false;
+let GLOBAL_findOverlay_isBeingShownDueToMultiCursorMatching_originMatchNumber = 0;
+
+let GLOBAL_offsetColumn_withRespectToThisIndexLine = 0;
+
+let GLOBAL_findOverlay_options_matchWord = false;
+
+let GLOBAL_findOverlay_wasSearched = false;
+
+let GLOBAL_offsetWithinSpan = 0;
 
 class EDITOR_Cursor {
 
@@ -809,9 +820,9 @@ function EDITOR_render_do_InsertLtr() {
                 let x = EDITOR_decoder.decode(cursor.gapBuffer.subarray(cursor.editRenderedDisplacement, cursor.editLength));
 
                 cursor.gapBufferWriteToSpanElement.textContent = 
-                    cursor.gapBufferWriteToSpanElement.textContent.slice(0, (cursor.gapBufferWriteToSpanElement_SpanTextContentRelativeIndex/* + get_EDITOR_offsetWithinSpan()*/) + cursor.editRenderedDisplacement) +
+                    cursor.gapBufferWriteToSpanElement.textContent.slice(0, (cursor.gapBufferWriteToSpanElement_SpanTextContentRelativeIndex/* + GLOBAL_offsetWithinSpan*/) + cursor.editRenderedDisplacement) +
                     x +
-                    cursor.gapBufferWriteToSpanElement.textContent.slice((cursor.gapBufferWriteToSpanElement_SpanTextContentRelativeIndex/* + get_EDITOR_offsetWithinSpan()*/) + cursor.editRenderedDisplacement);
+                    cursor.gapBufferWriteToSpanElement.textContent.slice((cursor.gapBufferWriteToSpanElement_SpanTextContentRelativeIndex/* + GLOBAL_offsetWithinSpan*/) + cursor.editRenderedDisplacement);
 
                 cursor.editRenderedDisplacement = cursor.editLength;
             }
@@ -1427,11 +1438,11 @@ function EDITOR_state_clear() {
     // So what I can do is mark the code paragraph for later decision making.
     GLOBAL_indexCursor = 0;
     offsetLine = 0;
-    set_EDITOR_offsetColumn_withRespectToThisIndexLine(0);
+    GLOBAL_offsetColumn_withRespectToThisIndexLine = 0;
     offsetColumn = 0;
     set_EDITOR_totalShift(0);
     EDITOR_offsetWithinSpan_withRespectToThisSpan = null;
-    set_EDITOR_offsetWithinSpan(0);
+    GLOBAL_offsetWithinSpan = 0;
     
     EDITOR_trackedSyntaxList.clear();
 }
@@ -4143,12 +4154,12 @@ function EDITOR_createCursorAtNextMatchSelection(event: KeyboardEvent) {
         return;
     }
 
-    if (GLOBAL_findOverlay_show && !get_EDITOR_findOverlay_isBeingShownDueToMultiCursorMatching()) {
+    if (GLOBAL_findOverlay_show && !GLOBAL_findOverlay_isBeingShownDueToMultiCursorMatching) {
         EDITOR_findOverlay_showSetter(false);
     }
 
     if (!GLOBAL_findOverlay_show) {
-        set_EDITOR_findOverlay_isBeingShownDueToMultiCursorMatching(true);
+        GLOBAL_findOverlay_isBeingShownDueToMultiCursorMatching = true;
         EDITOR_findOverlay_showSetter(true);
         EDITOR_findOverlay_doSearch();
 
@@ -4162,7 +4173,7 @@ function EDITOR_createCursorAtNextMatchSelection(event: KeyboardEvent) {
 	    if (!spanCurrent) return;
         let current = parseInt(spanCurrent.textContent, 10);
         if (current) {
-            set_EDITOR_findOverlay_isBeingShownDueToMultiCursorMatching_originMatchNumber(current);
+            GLOBAL_findOverlay_isBeingShownDueToMultiCursorMatching_originMatchNumber = current;
         }
         else {
             EDITOR_findOverlay_showSetter(false);
@@ -4181,7 +4192,7 @@ function EDITOR_createCursorAtNextMatchSelection(event: KeyboardEvent) {
 		if (upcomingNumber > total || upcomingNumber < 1) {
 			upcomingNumber = 1;
 		}
-        if (get_EDITOR_findOverlay_isBeingShownDueToMultiCursorMatching_originMatchNumber() === upcomingNumber) {
+        if (GLOBAL_findOverlay_isBeingShownDueToMultiCursorMatching_originMatchNumber === upcomingNumber) {
             return;
         }
 	}
@@ -4235,7 +4246,7 @@ function EDITOR_createCursorAtNextMatchSelection(event: KeyboardEvent) {
 
     let postPosition = EDITOR_getPositionIndex(EDITOR_primaryCursor);
 
-    if (prePosition != postPosition && postPosition != get_EDITOR_findOverlay_isBeingShownDueToMultiCursorMatching_originMatchNumber()) {
+    if (prePosition != postPosition && postPosition != GLOBAL_findOverlay_isBeingShownDueToMultiCursorMatching_originMatchNumber) {
         let input = document.getElementById('EDITOR_findOverlay_input_elementId');
         if (!input || !input.value) return;
 
@@ -4351,7 +4362,7 @@ function EDITOR_movementBasedCacheInvalidation(cursor: EDITOR_Cursor) {
     }
     cursor.enterKey_newLinePlusIndentation_byteList = null;
     cursor.cached_indentation_string = null;
-    set_EDITOR_findOverlay_isBeingShownDueToMultiCursorMatching(false);
+    GLOBAL_findOverlay_isBeingShownDueToMultiCursorMatching = false;
 }
 
 /**
@@ -4489,8 +4500,8 @@ function EDITOR_editEvent_theEditIself_InsertLtr(event: KeyboardEvent) {
         let cursor = EDITOR_cursorList[i];
         GLOBAL_indexCursor = i;
         EDITOR_movementBasedCacheInvalidation(cursor);
-        if (get_EDITOR_offsetColumn_withRespectToThisIndexLine() !== cursor.indexLine) {
-            set_EDITOR_offsetColumn_withRespectToThisIndexLine(cursor.indexLine);
+        if (GLOBAL_offsetColumn_withRespectToThisIndexLine !== cursor.indexLine) {
+            GLOBAL_offsetColumn_withRespectToThisIndexLine = cursor.indexLine;
             offsetColumn = 0;
         }
         // You can do this because the function 'EDITOR_NOTcanBatch_insert' was already checked for all the cursors, if it is possible to batch, the editKind will stay InsertLtr otherwise it is finalized and set to None.
@@ -4512,8 +4523,8 @@ function EDITOR_editEvent_theEditIself_DeleteLtr(event: KeyboardEvent) {
         let cursor = EDITOR_cursorList[i];
         GLOBAL_indexCursor = i;
         EDITOR_movementBasedCacheInvalidation(cursor);
-        if (get_EDITOR_offsetColumn_withRespectToThisIndexLine() !== cursor.indexLine) {
-            set_EDITOR_offsetColumn_withRespectToThisIndexLine(cursor.indexLine);
+        if (GLOBAL_offsetColumn_withRespectToThisIndexLine !== cursor.indexLine) {
+            GLOBAL_offsetColumn_withRespectToThisIndexLine = cursor.indexLine;
             offsetColumn = 0;
         }
         if (cursor.hasSelection()) {
@@ -4536,8 +4547,8 @@ function EDITOR_editEvent_theEditIself_BackspaceRtl(event: KeyboardEvent) {
         let cursor = EDITOR_cursorList[i];
         GLOBAL_indexCursor = i;
         EDITOR_movementBasedCacheInvalidation(cursor);
-        if (get_EDITOR_offsetColumn_withRespectToThisIndexLine() !== cursor.indexLine) {
-            set_EDITOR_offsetColumn_withRespectToThisIndexLine(cursor.indexLine);
+        if (GLOBAL_offsetColumn_withRespectToThisIndexLine !== cursor.indexLine) {
+            GLOBAL_offsetColumn_withRespectToThisIndexLine = cursor.indexLine;
             offsetColumn = 0;
         }
         if (cursor.hasSelection()) {
@@ -4868,11 +4879,11 @@ async function EDITOR_onKeyDown(event: KeyboardEvent) {
     // So what I can do is mark the code paragraph for later decision making.
     GLOBAL_indexCursor = 0;
     offsetLine = 0;
-    set_EDITOR_offsetColumn_withRespectToThisIndexLine(0);
+    GLOBAL_offsetColumn_withRespectToThisIndexLine = 0;
     offsetColumn = 0;
     set_EDITOR_totalShift(0);
     EDITOR_offsetWithinSpan_withRespectToThisSpan = null;
-    set_EDITOR_offsetWithinSpan(0);
+    GLOBAL_offsetWithinSpan = 0;
 
     switch (event.key) {
         case 'ArrowLeft':
@@ -4953,8 +4964,8 @@ function EDITOR_onKeyDown_ArrowLeft(event: KeyboardEvent) {
         let cursor = EDITOR_cursorList[i];
         GLOBAL_indexCursor = i;
         EDITOR_movementBasedCacheInvalidation(cursor);
-        if (get_EDITOR_offsetColumn_withRespectToThisIndexLine() !== cursor.indexLine) {
-            set_EDITOR_offsetColumn_withRespectToThisIndexLine(cursor.indexLine);
+        if (GLOBAL_offsetColumn_withRespectToThisIndexLine !== cursor.indexLine) {
+            GLOBAL_offsetColumn_withRespectToThisIndexLine = cursor.indexLine;
             offsetColumn = 0;
         }
 
@@ -5093,8 +5104,8 @@ function EDITOR_onKeyDown_ArrowRight(event: KeyboardEvent) {
         let cursor = EDITOR_cursorList[i];
         GLOBAL_indexCursor = i;
         EDITOR_movementBasedCacheInvalidation(cursor);
-        if (get_EDITOR_offsetColumn_withRespectToThisIndexLine() !== cursor.indexLine) {
-            set_EDITOR_offsetColumn_withRespectToThisIndexLine(cursor.indexLine);
+        if (GLOBAL_offsetColumn_withRespectToThisIndexLine !== cursor.indexLine) {
+            GLOBAL_offsetColumn_withRespectToThisIndexLine = cursor.indexLine;
             offsetColumn = 0;
         }
 
@@ -5346,9 +5357,9 @@ function EDITOR_onKeyDown_keyLengthEqualsOne_altKey(event: KeyboardEvent) {
                 event.preventDefault();
                 event.stopPropagation();
 
-                let local_findOverlay_isBeingShownDueToMultiCursorMatching = get_EDITOR_findOverlay_isBeingShownDueToMultiCursorMatching();
+                let local_findOverlay_isBeingShownDueToMultiCursorMatching = GLOBAL_findOverlay_isBeingShownDueToMultiCursorMatching;
                 EDITOR_movementBasedCacheInvalidation(EDITOR_primaryCursor);
-                set_EDITOR_findOverlay_isBeingShownDueToMultiCursorMatching(local_findOverlay_isBeingShownDueToMultiCursorMatching);
+                GLOBAL_findOverlay_isBeingShownDueToMultiCursorMatching = local_findOverlay_isBeingShownDueToMultiCursorMatching;
                 EDITOR_createCursorAtNextMatchSelection(event);
             }
             break;
@@ -5431,10 +5442,10 @@ function EDITOR_onMouseDown(event: MouseEvent) {
 
 async function EDITOR_onContextMenu(event: PointerEvent) {
     let optionList = [
-        new MenuOption(get_CommandKind_Cut(), 'Cut', null),
-        new MenuOption(get_CommandKind_Copy(), 'Copy', null),
-        new MenuOption(get_CommandKind_Paste(), 'Paste', null),
-        new MenuOption(get_CommandKind_Find(), 'Find', null),
+        new MenuOption(Menu_CommandKind.Cut, 'Cut', null),
+        new MenuOption(Menu_CommandKind.Copy, 'Copy', null),
+        new MenuOption(Menu_CommandKind.Paste, 'Paste', null),
+        new MenuOption(Menu_CommandKind.Find, 'Find', null),
     ];
 
     let menuLeft = recentBoundingClientRect_left + gutterWidthTotal + EDITOR_primaryCursor.cursorTranslateXValue - lastReadNumber_scrollLeft;
@@ -5465,7 +5476,7 @@ function EDITOR_findOverlay_doSearch() {
 	let spanTotal = document.getElementById('EDITOR_findOverlay_total');
 	if (!spanTotal) return;
     
-    set_EDITOR_findOverlay_wasSearched(true);
+    GLOBAL_findOverlay_wasSearched = true;
 
     let searchEncoded = EDITOR_encoder.encode(input.value);
 
@@ -5493,7 +5504,7 @@ function EDITOR_findOverlay_doSearch() {
         nextMatchPos = EDITOR_getPositionIndex(EDITOR_primaryCursor);
     }
     
-    if (get_EDITOR_findOverlay_options_matchWord() && ((searchEncoded[0] >= 97 && searchEncoded[0] <= 122) || (searchEncoded[0] >= 65 && searchEncoded[0] <= 90) || (searchEncoded[0] >= 48 && searchEncoded[0] <= 57) || (searchEncoded[0] === 95))) {
+    if (GLOBAL_findOverlay_options_matchWord && ((searchEncoded[0] >= 97 && searchEncoded[0] <= 122) || (searchEncoded[0] >= 65 && searchEncoded[0] <= 90) || (searchEncoded[0] >= 48 && searchEncoded[0] <= 57) || (searchEncoded[0] === 95))) {
 		for (let i = 0; i < EDITOR_textByteList.count; i++) {
 			if ((EDITOR_textByteList.bytes[i] >= 97 && EDITOR_textByteList.bytes[i] <= 122) || (EDITOR_textByteList.bytes[i] >= 65 && EDITOR_textByteList.bytes[i] <= 90) || (EDITOR_textByteList.bytes[i] >= 48 && EDITOR_textByteList.bytes[i] <= 57) || (EDITOR_textByteList.bytes[i] === 95)) {
 				if (EDITOR_textByteList.bytes[i] === searchEncoded[0]) {
@@ -5599,7 +5610,7 @@ function EDITOR_findOverlay_input_onkeydown(event: KeyboardEvent) {
             EDITOR_findOverlay_doSearch();
             break;
         case 'Escape':
-        	set_EDITOR_findOverlay_wasSearched(false);
+        	GLOBAL_findOverlay_wasSearched = false;
             EDITOR_findOverlay_showSetter(false);
             EDITOR_baseElement.focus();
             break;
@@ -5607,20 +5618,20 @@ function EDITOR_findOverlay_input_onkeydown(event: KeyboardEvent) {
 }
 
 function EDITOR_findOverlay_input_onblur() {
-	if (!get_EDITOR_findOverlay_wasSearched()) {
+	if (!GLOBAL_findOverlay_wasSearched) {
 		EDITOR_findOverlay_doSearch();
 	}
 }
 
 function EDITOR_findOverlay_input_onchange() {
-	set_EDITOR_findOverlay_wasSearched(false);
+	GLOBAL_findOverlay_wasSearched = false;
 }
 
 function EDITOR_findOverlay_checkboxMatchWord_onchange() {
 	// for an onchange event, event.target might always be precise?
-	let checkboxMatchWord = document.getElementById('EDITOR_findOverlay_checkboxMatchWord');
+	let checkboxMatchWord = document.getElementById('EDITOR_findOverlay_checkboxMatchWord') as HTMLInputElement;
     if (checkboxMatchWord) {
-    	set_EDITOR_findOverlay_options_matchWord(checkboxMatchWord.checked);
+    	GLOBAL_findOverlay_options_matchWord = checkboxMatchWord.checked;
     	EDITOR_findOverlay_doSearch();
     }
 }
@@ -5639,7 +5650,7 @@ function EDITOR_findOverlay_showSetter(showValue: boolean) {
         input.addEventListener('keydown', EDITOR_findOverlay_input_onkeydown);
         input.addEventListener('blur', EDITOR_findOverlay_input_onblur);
         EDITOR_findOverlay.appendChild(input);
-        if (!get_EDITOR_findOverlay_isBeingShownDueToMultiCursorMatching()) {
+        if (!GLOBAL_findOverlay_isBeingShownDueToMultiCursorMatching) {
             input.focus();
         }
         
@@ -5675,7 +5686,7 @@ function EDITOR_findOverlay_showSetter(showValue: boolean) {
         let checkboxMatchWord = document.createElement('input');
 	    checkboxMatchWord.type = 'checkbox';
 	    checkboxMatchWord.id = 'EDITOR_findOverlay_checkboxMatchWord';
-	    checkboxMatchWord.checked = Boolean(get_EDITOR_findOverlay_options_matchWord());
+	    checkboxMatchWord.checked = Boolean(GLOBAL_findOverlay_options_matchWord);
 	    checkboxMatchWord.addEventListener('change', EDITOR_findOverlay_checkboxMatchWord_onchange);
 	    divOptions.appendChild(checkboxMatchWord);
 	    let label_for_checkboxMatchWord = document.createElement('label');
@@ -5729,7 +5740,7 @@ function EDITOR_findOverlay_showSetter(showValue: boolean) {
         	checkboxMatchWord.removeEventListener('change', EDITOR_findOverlay_checkboxMatchWord_onchange);
         }
         EDITOR_findOverlay.innerHTML = '';
-        set_EDITOR_findOverlay_isBeingShownDueToMultiCursorMatching(false);
+        GLOBAL_findOverlay_isBeingShownDueToMultiCursorMatching = false;
     }
 
     GLOBAL_findOverlay_show = showValue;
@@ -8217,15 +8228,15 @@ function EDITOR_insertDo(cursor: EDITOR_Cursor, character: string) {
     */
     
     /*if (cursor.gapBufferWriteToSpanElement !== EDITOR_offsetWithinSpan_withRespectToThisSpan) {
-        set_EDITOR_offsetWithinSpan(0);
+        GLOBAL_offsetWithinSpan = 0;
         EDITOR_offsetWithinSpan_withRespectToThisSpan = cursor.gapBufferWriteToSpanElement;
     }
 
     if (cursor.gapBufferWriteToSpanElement) {
         cursor.gapBufferWriteToSpanElement.textContent = 
-            cursor.gapBufferWriteToSpanElement.textContent.slice(0, (cursor.gapBufferWriteToSpanElement_SpanTextContentRelativeIndex + get_EDITOR_offsetWithinSpan()) + cursor.gapBufferCount) +
+            cursor.gapBufferWriteToSpanElement.textContent.slice(0, (cursor.gapBufferWriteToSpanElement_SpanTextContentRelativeIndex + GLOBAL_offsetWithinSpan) + cursor.gapBufferCount) +
             character +
-            cursor.gapBufferWriteToSpanElement.textContent.slice((cursor.gapBufferWriteToSpanElement_SpanTextContentRelativeIndex + get_EDITOR_offsetWithinSpan()) + cursor.gapBufferCount);
+            cursor.gapBufferWriteToSpanElement.textContent.slice((cursor.gapBufferWriteToSpanElement_SpanTextContentRelativeIndex + GLOBAL_offsetWithinSpan) + cursor.gapBufferCount);
     }*/
 
     cursor.gapBuffer[cursor.gapBufferCount] = character.charCodeAt(0);
@@ -8234,7 +8245,7 @@ function EDITOR_insertDo(cursor: EDITOR_Cursor, character: string) {
     cursor.editLength++;
     cursor.indexColumn++;
 
-    set_EDITOR_offsetWithinSpan(get_EDITOR_offsetWithinSpan() + cursor.gapBufferCount);
+    GLOBAL_offsetWithinSpan = GLOBAL_offsetWithinSpan + cursor.gapBufferCount;
 }
 
 function EDITOR_stopTrackingIfTrackedSyntaxMadeToSpanSingleLine(cursor: EDITOR_Cursor) {
@@ -8408,22 +8419,22 @@ async function EDITOR_MenuOnClick(indexClicked: number, elementClicked: HTMLElem
     let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
 
     switch (commandKind) {
-        case get_CommandKind_Cut():
+        case Menu_CommandKind.Cut:
             EDITOR_finalizeAllCursors();
             await EDITOR_copySelection(EDITOR_primaryCursor);
             EDITOR_removeSelection(EDITOR_primaryCursor);
             EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
             return;
-        case get_CommandKind_Copy():
+        case Menu_CommandKind.Copy:
             EDITOR_finalizeAllCursors();
             return EDITOR_copySelection(EDITOR_primaryCursor);
-        case get_CommandKind_Paste():
+        case Menu_CommandKind.Paste:
             EDITOR_finalizeAllCursors();
             let clipboard = await window.myAPI.readClipboard();
             EDITOR_paste(EDITOR_primaryCursor, clipboard);
             EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
             return;
-        case get_CommandKind_Find():
+        case Menu_CommandKind.Find:
             EDITOR_findOverlay_showSetter(!GLOBAL_findOverlay_show);
             return;
     }
