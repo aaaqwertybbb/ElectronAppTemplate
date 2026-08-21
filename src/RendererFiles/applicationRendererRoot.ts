@@ -264,11 +264,11 @@ async function window_myAPI_onMessage(data: myAPI_languageServer_response) {
                 if (!EDITOR_listComponent) {
                     EDITOR_listComponent_SETTER(new DocumentSymbolListComponent());
                 }
-                EDITOR_listComponent.setItems(APP_lineHeight, APP_lineHeight + 'px',
-                    EDITOR_listComponent_drawItemAction,
-                    EDITOR_listComponent_onkeydownAction,
-                    EDITOR_listComponent_getItemsCountFunc);
-                return DIALOG_show_async(get_DialogKind_DocumentSymbol(), dialog_documentSymbol_onResizeAction);
+                if (!EDITOR_listComponent) {
+                    throw new Error();
+                }
+                EDITOR_listComponent.setItems(APP_lineHeight, APP_lineHeight + 'px');
+                return DIALOG_show_async(DialogKind.DocumentSymbol, dialog_documentSymbol_onResizeAction);
             }
         case 'textDocument/CustomFullFileLexRequest':
             {
@@ -454,7 +454,7 @@ class DocumentSymbolListComponent extends ListComponent {
 
 function dialog_documentSymbol_onResizeAction() {
     if (EDITOR_listComponent) {
-        EDITOR_listComponent.boundingClientRect = null;
+        EDITOR_listComponent.boundingClientRect_isValid = false;
         EDITOR_listComponent.event_scroll();
     }
 }
