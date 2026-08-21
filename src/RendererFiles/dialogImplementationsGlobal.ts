@@ -1,8 +1,14 @@
+import { APP_lineHeight } from './applicationRendererRoot';
 import { DIALOG_Settings_isDark, DIALOG_Settings_isDark_SETTER } from './dialogGlobal';
+import { TreeView_NodeKind, TreeViewComponent, TreeViewNodeList } from './treeViewComponent';
 
-class DIALOG_FindAll_TreeViewDirector {
+class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
+    actualData: (any | string)[] | null;
+    nodeList: any;
 
     constructor() {
+        super();
+
         /** @type {Array} object or string */
         this.actualData = null;
 
@@ -10,10 +16,9 @@ class DIALOG_FindAll_TreeViewDirector {
          * @type {TreeViewNodeList}
          * */
         this.nodeList = new TreeViewNodeList(32);
-        this.component = new TreeViewComponent();
     }
 
-    /** // Invoke this?: 'this.component.draw_render_fullReset_request();' */
+    /** // Invoke this?: 'this.draw_render_fullReset_request();' */
     setData_causes_state_reset(actualData) {
         this.actualData = actualData;
 
@@ -23,41 +28,41 @@ class DIALOG_FindAll_TreeViewDirector {
             return;
         }
 
-        this.component.setItems(this, APP_lineHeight, APP_lineHeight + 'px');
+        this.setItems(APP_lineHeight, APP_lineHeight + 'px');
 
         for (let i = 0; i < actualData.length; i++) {
-            let nodeKind = get_TreeViewNodeKind_isExpandable_NOTisExpanded();
+            let nodeKind = TreeView_NodeKind.isExpandable_NOTisExpanded;
             this.nodeList.insert(this.nodeList.count_abstract, nodeKind, i, 0);
         }
-        this.component.itemHeightTotal = this.tvd_getTotalCount() * this.component.itemHeightNumber;
-        this.component.virtualizationElement.style.height = this.component.itemHeightTotal + 'px';
+        this.itemHeightTotal = this.getTotalCount() * this.itemHeightNumber;
+        this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
     }
 
     /** 
-     * @param {number} caseThreeOrigin if left undefined or (falsey but not 0), this will default to 'this.component.beltIndexZero'
+     * @param {number} caseThreeOrigin if left undefined or (falsey but not 0), this will default to 'this.beltIndexZero'
      */
-    tvd_drawItem_BATCH(start, length, onePositiveDiff_twoNegativeDiff_orThreeFullScreen, caseThreeOrigin, timestamp) {
+    override drawItem_BATCH(start: number, length, onePositiveDiff_twoNegativeDiff_orThreeFullScreen, caseThreeOrigin, timestamp) {
         let upperBound = start + length;
         let totalCount = this.nodeList.count_abstract;
         let loopCounter = 0;
 
-        let lastIndex = this.component.beltIndexZero - 1;
+        let lastIndex = this.beltIndexZero - 1;
         if (lastIndex < 0) {
-            lastIndex += this.component.virtualCount; // TODO: 'this.component.virtualCount' or 'this.component.itemListElement.children.length'
+            lastIndex += this.virtualCount; // TODO: 'this.virtualCount' or 'this.itemListElement.children.length'
         }
 
         let loopTotalIterations = upperBound - start;
         let caseTwoDivIndex = lastIndex - (loopTotalIterations - 1);
         if (caseTwoDivIndex < 0) {
-            caseTwoDivIndex += this.component.itemListElement.children.length;
+            caseTwoDivIndex += this.itemListElement.children.length;
         }
 
-        let verticalStyleNumber = start * this.component.itemHeightNumber;
+        let verticalStyleNumber = start * this.itemHeightNumber;
 
         if (!caseThreeOrigin && caseThreeOrigin !== 0) {
-            caseThreeOrigin = this.component.beltIndexZero;
+            caseThreeOrigin = this.beltIndexZero;
         }
-        if (caseThreeOrigin < 0 || caseThreeOrigin >= this.component.itemListElement.children.length) {
+        if (caseThreeOrigin < 0 || caseThreeOrigin >= this.itemListElement.children.length) {
             throw new RangeError();
         }
 
@@ -71,22 +76,22 @@ class DIALOG_FindAll_TreeViewDirector {
 
             switch (onePositiveDiff_twoNegativeDiff_orThreeFullScreen) {
                 case 1:
-                    divIndex = this.component.beltIndexZero + loopCounter;
-                    if (divIndex >= this.component.itemListElement.children.length)
-                        divIndex -= this.component.itemListElement.children.length;
+                    divIndex = this.beltIndexZero + loopCounter;
+                    if (divIndex >= this.itemListElement.children.length)
+                        divIndex -= this.itemListElement.children.length;
                     break;
                 case 2:
                     divIndex = caseTwoDivIndex++;
-                    if (caseTwoDivIndex >= this.component.itemListElement.children.length)
-                        caseTwoDivIndex -= this.component.itemListElement.children.length;
+                    if (caseTwoDivIndex >= this.itemListElement.children.length)
+                        caseTwoDivIndex -= this.itemListElement.children.length;
                     break;
                 case 3:
                     divIndex = caseThreeOrigin + loopCounter;
-                    if (divIndex >= this.component.itemListElement.children.length)
-                        divIndex -= this.component.itemListElement.children.length;
+                    if (divIndex >= this.itemListElement.children.length)
+                        divIndex -= this.itemListElement.children.length;
                     break;
             }
-            divItem = this.component.itemListElement.children[divIndex];
+            divItem = this.itemListElement.children[divIndex];
 
             if (indexItem >= totalCount) {
                 // TODO: Will the user agent remove a text node that has an "empty" nodeValue?
@@ -129,29 +134,29 @@ class DIALOG_FindAll_TreeViewDirector {
             }
 
             divItem.style.transform = `translate(${EXPLORER_offsetPerDepth * depth}px, ${verticalStyleNumber}px)`;
-            verticalStyleNumber += this.component.itemHeightNumber;
+            verticalStyleNumber += this.itemHeightNumber;
 
             loopCounter++;
         }
 
         if (onePositiveDiff_twoNegativeDiff_orThreeFullScreen === 1) {
-            let newZerothIndex = this.component.beltIndexZero + loopCounter;
-            if (newZerothIndex >= this.component.itemListElement.children.length) {
-                newZerothIndex -= this.component.itemListElement.children.length;
+            let newZerothIndex = this.beltIndexZero + loopCounter;
+            if (newZerothIndex >= this.itemListElement.children.length) {
+                newZerothIndex -= this.itemListElement.children.length;
             }
-            this.component.beltIndexZero = newZerothIndex;
+            this.beltIndexZero = newZerothIndex;
         }
         else if (onePositiveDiff_twoNegativeDiff_orThreeFullScreen === 2) {
-            this.component.beltIndexZero = lastIndex - (loopTotalIterations - 1);
+            this.beltIndexZero = lastIndex - (loopTotalIterations - 1);
         }
     }
     
     /*** Not every key invokes this. */
-    async tvd_onkeydown_async(divItem, indexItem, key) {
+    override async onkeydown_async(divItem, indexItem, key) {
         
     }
     
-    async tvd_ondblclick_async(divItem, indexItem) {
+    override async ondblclick_async(divItem, indexItem) {
         this.nodeList.getElementAt(indexItem);
         let key = TreeView_pooledNode_key;
         let depth = TreeView_pooledNode_depth;
@@ -187,7 +192,7 @@ class DIALOG_FindAll_TreeViewDirector {
         }
     }
     
-    async tvd_oncontextmenu_async(divItem, indexItem, event, relativeIndex) {
+    override async oncontextmenu_async(divItem, indexItem, event, relativeIndex) {
         
     }
 
@@ -197,7 +202,7 @@ class DIALOG_FindAll_TreeViewDirector {
      * ...thus, you should consider checking the x position of the event against the x position of the nodeElement.children[0].
      * @param {*} event 
      */
-    async tvd_expandCollapseIconWasClicked_async(divItem, indexItem) {
+    override async expandCollapseIconWasClicked_async(divItem, indexItem) {
         this.nodeList.getElementAt(indexItem);
         let key = TreeView_pooledNode_key;
         let depth = TreeView_pooledNode_depth;
@@ -226,12 +231,12 @@ class DIALOG_FindAll_TreeViewDirector {
                     let nodeKind = get_TreeViewNodeKind_NOTisExpandable_NOTisExpanded();
                     // TODO: Insert range, or at the least 'pre-emptively' resize the list so that it fits each insertion without resizing per insertion.
                     this.nodeList.insert(indexItem + 1 + i, nodeKind, indexItem + 1 + i, depth + 1);
-                    this.component.itemHeightTotal = this.tvd_getTotalCount() * this.component.itemHeightNumber;
-                    this.component.virtualizationElement.style.height = this.component.itemHeightTotal + 'px';
+                    this.itemHeightTotal = this.tvd_getTotalCount() * this.itemHeightNumber;
+                    this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
                 }
             }
 
-            this.component.draw_render_fullReset_request();
+            this.draw_render_fullReset_request();
         }
         else if (nodeKind === get_TreeViewNodeKind_isExpandable_isExpanded()) {
 
@@ -255,23 +260,26 @@ class DIALOG_FindAll_TreeViewDirector {
                     // TODO: Maybe you could delay this cause you'd know there is an expansion at such and such and then on the fly sum it instead.
                     this.nodeList.setKey(i, this.nodeList.getKey(i) - countChildren);
                 }
-                this.component.itemHeightTotal = this.tvd_getTotalCount() * this.component.itemHeightNumber;
-                this.component.virtualizationElement.style.height = this.component.itemHeightTotal + 'px';
-                this.component.draw_render_fullReset_request();
+                this.itemHeightTotal = this.tvd_getTotalCount() * this.itemHeightNumber;
+                this.virtualizationElement.style.height = this.itemHeightTotal + 'px';
+                this.draw_render_fullReset_request();
             }
         }
     }
     
-    async tvd_arrowRight_async(divItem, indexItem) {
+    override async arrowRight_async(divItem, indexItem) {
         
 	}
     
-    async tvd_arrowLeft_async(divItem, indexItem) {
+    override async arrowLeft_async(divItem, indexItem) {
         
     }
 
-    tvd_getTotalCount() {
+    override getTotalCount() {
         return this.nodeList.count_abstract;
+    }
+
+    override drawItem_BATCH_PullDataDrawResult () {
     }
 
     addSpecificMenuOptionsForTarget(optionList, divItem, target) {
@@ -279,9 +287,7 @@ class DIALOG_FindAll_TreeViewDirector {
     }
 }
 
-/** @type {DIALOG_FindAll_TreeViewDirector} */
-let DIALOG_FindAll_TreeViewDirector_instance = null;
-
+let DIALOG_FindAll_TreeViewDirector_instance: DIALOG_FindAll_TreeViewDirector | null = null;
 
 export async function DIALOG_FindAll_Create_async() {
     let dialogBody = document.getElementById('DIALOG_body');
