@@ -158,8 +158,14 @@ async function DIALOG_render_do_Show() {
     DIALOG_createWindow();
 
     switch (DIALOG_currentDialogKind) {
+        case DialogKind.FindAll:
+            return DIALOG_FindAll_Create_async();
         case DialogKind.Settings:
             return DIALOG_Settings_Create_async();
+        case DialogKind.DocumentSymbol:
+            return DIALOG_DocumentSymbol_Create_async();
+        case DialogKind.Debug:
+            return DIALOG_Debug_Create_async();
     }
 }
 
@@ -181,8 +187,17 @@ async function DIALOG_render_do_Hide() {
     if (!DIALOG_element) return;
 
     switch (DIALOG_currentDialogKind) {
+        case DialogKind.FindAll:
+            await DIALOG_FindAll_Delete_async();
+            break;
         case DialogKind.Settings:
             await DIALOG_Settings_Delete_async();
+            break;
+        case DialogKind.DocumentSymbol:
+            await DIALOG_DocumentSymbol_Delete_async();
+            break;
+        case DialogKind.Debug:
+            await DIALOG_Debug_Delete_async();
             break;
     }
 
