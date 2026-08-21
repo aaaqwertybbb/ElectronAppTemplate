@@ -1,7 +1,7 @@
 import { EDITOR_textByteList, EDITOR_decoder, EDITOR_pooledTrackedSyntax_trackedSyntaxKind, EDITOR_trackedSyntaxList, EDITOR_pooledTrackedSyntax_start, EDITOR_pooledTrackedSyntax_length } from "./editorGlobal";
 import { TrackedSyntaxKind } from "./trackedSyntaxTypes";
 
-function JS_line_lex(div: HTMLElement, substart: number, lineEnd: number, childIndex: number) {
+export function JS_line_lex(div: HTMLElement, substart: number, lineEnd: number, childIndex: number): number {
     let pos = substart;
 
     let bytes = EDITOR_textByteList.bytes;

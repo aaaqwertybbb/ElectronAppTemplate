@@ -1,7 +1,7 @@
 import { TrackedSyntaxKind, TrackedSyntaxList } from "./trackedSyntaxTypes";
 import { ByteList, UInt32List } from './listTypes';
 import { DIALOG_Settings_editorDebugShowAdjacentCharacters } from './dialogGlobal';
-import { JS_line_lex_newVersion } from "./javascriptFeatures";
+import { JS_line_lex, JS_line_lex_newVersion } from "./javascriptFeatures";
 import { MenuOption, Menu_CommandKind } from "./menuGlobal";
 import { TOOLTIP_hide } from "./tooltipGlobal";
 
@@ -291,6 +291,8 @@ let GLOBAL_findOverlay_wasSearched = false;
 let GLOBAL_offsetWithinSpan = 0;
 
 let GLOBAL_totalShift = 0;
+
+let EDITOR_language_line_lex: (div: HTMLElement, substart: number, lineEnd: number, childIndex: number) => number;
 
 class EDITOR_Cursor {
 
@@ -3318,7 +3320,7 @@ function EDITOR_createStyleForSelection_indentMore(cursor: EDITOR_Cursor) {
     }
 
     if (!textSelectionDiv) {
-        throw new Error();'
+        throw new Error();
     }
 
     let extraWidth = 4 * EDITOR_characterWidth;
@@ -3713,7 +3715,7 @@ function EDITOR_onMouseMoveDetailRankTwo(event: MouseEvent, indexLineClicked: nu
             let goalCharacterKind = leftCharacterKind;
 
             let line = EDITOR_getLineBoundaryPositions(cursor.indexLine);
-            lineLength = line.end - line.start;
+            let lineLength = line.end - line.start;
             let rightWasFound = false;
 
             let tempPositionIndex = positionIndex;
@@ -3751,6 +3753,7 @@ function EDITOR_onMouseMoveDetailRankTwo(event: MouseEvent, indexLineClicked: nu
 function EDITOR_onMouseMoveDetailRankThree(event: MouseEvent, indexLineClicked: number, indexColumnClicked: number) {
     let cursor = EDITOR_primaryCursor;
 
+    // TODO: I remember this being bugged I think it makes sense why. You're checking if the cursor is exactly at the threshold rather than determining if the distance from previous event to this one puts you past the threshold.
     if (indexLineClicked === GLOBAL_detailRank3OriginLine) {
         if (cursor.positionIndex !== GLOBAL_detail_smallPosition) {
             let smallLineAndColumnPositionIndices = EDITOR_getLineAndColumnIndices(GLOBAL_detail_smallPosition);
