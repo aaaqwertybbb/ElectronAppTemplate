@@ -1,4 +1,5 @@
-import { DIALOG_show_async } from './dialogGlobal';
+import { DIALOG_show_async, DialogKind } from './dialogGlobal';
+import { EDITOR_getFinalizedEditsAndRawSaveFileData, EDITOR_textSourceIdentifier } from './editorGlobal';
 import { EXPLORER_firstSpanWidth_SETTER, EXPLORER_firstSpanWidthValue, EXPLORER_firstSpanWidthValue_SETTER, EXPLORER_setShow, EXPLORER_init, EXPLORER_director } from './explorerGlobal';
 
 /**
@@ -226,7 +227,7 @@ async function documentBody_onKeyDown(event: KeyboardEvent) {
             return;
         case 'F':
             if (!event.ctrlKey) return;
-            return DIALOG_show_async(get_DialogKind_FindAll());
+            return DIALOG_show_async(DialogKind.FindAll, null);
         case 'Escape':
             // TODO: Provide a way to disable the next (body, and useCapture) 'Escape' keypress...
             // ...so a widget can restore focus to the relevant UI rather than

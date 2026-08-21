@@ -1104,7 +1104,7 @@ function JS_line_lex(div: HTMLElement, substart: number, lineEnd: number, childI
     return childIndex;
 }
 
-function JS_line_lex_newVersion(div: HTMLElement, beltIndexOfDiv: number, trackedSyntax_I: number, lineStart: number) {
+export function JS_line_lex_newVersion(div: HTMLElement, beltIndexOfDiv: number, trackedSyntax_I: number, lineStart: number) {
     
     
     // 3. V8 Hidden Optimization Trick: textContent Hardcoding.

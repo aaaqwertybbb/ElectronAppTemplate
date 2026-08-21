@@ -1,6 +1,7 @@
 import { TrackedSyntaxKind, TrackedSyntaxList } from "./trackedSyntaxTypes";
 import { ByteList, UInt32List } from './listTypes';
 import { DIALOG_Settings_editorDebugShowAdjacentCharacters } from './dialogGlobal';
+import { JS_line_lex_newVersion } from "./javascriptFeatures";
 
 /*
 ###################################
@@ -507,7 +508,7 @@ let EDITOR_primaryCursor = new EDITOR_Cursor();
  */
 let EDITOR_cursorList = [EDITOR_primaryCursor];
 
-let EDITOR_textSourceIdentifier = '';
+export let EDITOR_textSourceIdentifier = '';
 let EDITOR_FORMATTED_textSourceIdentifier = '';
 let EDITOR_extensionKind = ExtensionKind.None;
 
@@ -849,14 +850,12 @@ function EDITOR_render_do_CreateViewport() {
             gutterLineElement.textContent = '~';
         }
         else {
-            gutterLineElement.textContent = indexLine + 1;
+            gutterLineElement.textContent = `${indexLine + 1}`;
         }
         gutterLineElement.className = 'eG';
         cached_EDITOR_gutter.appendChild(gutterLineElement);
-        gutterLineElement.style.top = top;
         gutterLineElement.style.width = gutterWidth;
 
-        let line = EDITOR_getLineBoundaryPositions(indexLine);
         let div = document.createElement('div');
         div.className = 'eT';
         cached_EDITOR_textElement.appendChild(div);
@@ -1040,7 +1039,7 @@ function EDITOR_render_do_Scroll(timestamp: number) {
 
         lineStart = lineEnd + 1;
         if (indexLine < EDITOR_lineEndPositionList_count) {
-            gutter.textContent = indexLine + 1;
+            gutter.textContent = `${indexLine + 1}`;
             lineEnd = EDITOR_lineEndPositionList_data[indexLine];
         }
         else {
@@ -1217,7 +1216,7 @@ function EDITOR_render_do_SyntaxHighlighting() {
     }
 
     let trackedSyntax_I = EDITOR_drawViewPort_FindTrackedSyntax_StartingIndex(indexLine);
-    if (trackedSyntax_I === NaN || trackedSyntax_I === -1)
+    if (Number.isNaN(trackedSyntax_I) || trackedSyntax_I === -1)
         trackedSyntax_I = EDITOR_trackedSyntaxList.count_abstract;
     
     for (; i < i_bounded; i++) {
@@ -1957,7 +1956,7 @@ function EDITOR_finalizeEdit_IndentMore(cursor: EDITOR_Cursor, indexLine_editOcc
 
     // # Update the 'START POSITIONS specifically' of the tracked syntax list by the total count of text that will be inserted.
     let trackedSyntaxReposition_i = EDITOR_trackedSyntaxReposition_find(startingLinePos_end + 1);
-    if (trackedSyntaxReposition_i === NaN || trackedSyntaxReposition_i === -1) {
+    if (Number.isNaN(trackedSyntaxReposition_i) || trackedSyntaxReposition_i === -1) {
         trackedSyntaxReposition_i = EDITOR_trackedSyntaxList.count_abstract;
     }
     for (var i = trackedSyntaxReposition_i; i < EDITOR_trackedSyntaxList.count_abstract; i++) {
@@ -2196,7 +2195,7 @@ function EDITOR_finalizeEdit_IndentLess(cursor: EDITOR_Cursor, indexLine_editOcc
     //}
 
     let trackedSyntaxReposition_i = EDITOR_trackedSyntaxReposition_find(EDITOR_indentLess_startingLinePos_end + 1);
-    if (trackedSyntaxReposition_i === NaN || trackedSyntaxReposition_i === -1) {
+    if (Number.isNaN(trackedSyntaxReposition_i) || trackedSyntaxReposition_i === -1) {
         trackedSyntaxReposition_i = EDITOR_trackedSyntaxList.count_abstract;
     }
     for (var i = trackedSyntaxReposition_i; i < EDITOR_trackedSyntaxList.count_abstract; i++) {
@@ -2580,7 +2579,7 @@ async function processLspQueue() {
  * @param {*} NOTfinalizePendingEdits if there is a pending edit, it needs to be finalized in order to see the updated text. The default behavior is to finalize the pending edits. To use default behavior, do NOT provide the parameter, or provide a falsey expression like 'null'.
  * @returns
  */
-function EDITOR_getFinalizedEditsAndRawSaveFileData(NOTfinalizePendingEdits: boolean) {
+export function EDITOR_getFinalizedEditsAndRawSaveFileData(NOTfinalizePendingEdits?: boolean) {
     if (!NOTfinalizePendingEdits) {
         EDITOR_finalizeAllCursors();
     }
@@ -2811,8 +2810,7 @@ function EDITOR_drawLine(indexLine: number, gutterLineElement: HTMLElement, text
     }
 
     let trackedSyntax_StartingIndex = EDITOR_drawViewPort_FindTrackedSyntax_StartingIndex(indexLine);
-    // TODO: This condition will always return 'false'.ts(2845)... Did you mean 'Number.isNaN(trackedSyntax_StartingIndex)'?
-    if (trackedSyntax_StartingIndex === NaN || trackedSyntax_StartingIndex === -1) {
+    if (Number.isNaN(trackedSyntax_StartingIndex) || trackedSyntax_StartingIndex === -1) {
         trackedSyntax_StartingIndex = EDITOR_trackedSyntaxList.count_abstract;
     }
     let line = EDITOR_getLineBoundaryPositions(indexLine);
@@ -2820,7 +2818,7 @@ function EDITOR_drawLine(indexLine: number, gutterLineElement: HTMLElement, text
 }
 
 /**
- * if (trackedSyntax_StartingIndex === NaN || trackedSyntax_StartingIndex === -1) { trackedSyntax_StartingIndex = EDITOR_trackedSyntaxList.count_abstract; }
+ * if (Number.isNaN(trackedSyntax_StartingIndex) || trackedSyntax_StartingIndex === -1) { trackedSyntax_StartingIndex = EDITOR_trackedSyntaxList.count_abstract; }
  * @param {*} indexLineAaa 
  * @returns 
  */
@@ -2862,7 +2860,7 @@ function EDITOR_drawViewPort_FindTrackedSyntax_StartingIndex(indexLineAaa: numbe
 }
 
 /**
- * if (trackedSyntax_StartingIndex === NaN || trackedSyntax_StartingIndex === -1) { trackedSyntax_StartingIndex = EDITOR_trackedSyntaxList.count_abstract; }
+ * if (Number.isNaN(trackedSyntax_StartingIndex) || trackedSyntax_StartingIndex === -1) { trackedSyntax_StartingIndex = EDITOR_trackedSyntaxList.count_abstract; }
  * Probably should make 1 of these and accept a predicate.
  */
 function EDITOR_trackedSyntaxReposition_find(positionIndex: number) {
@@ -7496,7 +7494,7 @@ function EDITOR_render_do_RemoveSelection() {
             cursor.editLength = 0;
 
             let indexTrackedSyntax = EDITOR_drawViewPort_FindTrackedSyntax_StartingIndex(cursor.indexLine);
-            if (indexTrackedSyntax === NaN || indexTrackedSyntax === -1) {
+            if (Number.isNaN(indexTrackedSyntax) || indexTrackedSyntax === -1) {
                 indexTrackedSyntax = EDITOR_trackedSyntaxList.count_abstract;
             }
             let possibleTrackedSyntaxToSpanSingleLine = false;
@@ -8199,7 +8197,7 @@ function EDITOR_insertDo(cursor: EDITOR_Cursor, character: string) {
 function EDITOR_stopTrackingIfTrackedSyntaxMadeToSpanSingleLine(cursor: EDITOR_Cursor) {
     // binary search for 'if (EDITOR_pooledTrackedSyntax_start + EDITOR_pooledTrackedSyntax_length > positionIndex)'
     let indexTrackedSyntax = EDITOR_drawViewPort_FindTrackedSyntax_StartingIndex(cursor.indexLine);
-    if (indexTrackedSyntax === NaN || indexTrackedSyntax === -1) {
+    if (Number.isNaN(indexTrackedSyntax) || indexTrackedSyntax === -1) {
         indexTrackedSyntax = EDITOR_trackedSyntaxList.count_abstract;
     }
     if (indexTrackedSyntax < EDITOR_trackedSyntaxList.count_abstract) {
