@@ -1,3 +1,4 @@
+import { WorkspaceDirectory } from './index';
 /*
 TODO: I'm pretty sure there's a package that contains all the lsp type definitions.
 */
@@ -8,7 +9,7 @@ export let messageId = 0;
  * @param {string} method 
  * @returns 
  */
-export function MAIN_constructMessageObject(method, params) {
+export function MAIN_constructMessageObject(method: string, params) {
     return {
         "method": method,
         "id": messageId++,
@@ -16,37 +17,48 @@ export function MAIN_constructMessageObject(method, params) {
     };
 }
 
+export type TextDocumentItem = {
+    uri: string,
+    languageId: string,
+    version: number,
+    text: string,
+};
+
 /** 
  * @param {string} uri @param {string} languageId @param {number} version @param {string} text @returns
  */
-export function MAIN_message_construct_textDocumentItem(uri, languageId, version, text) {
+export function MAIN_message_construct_textDocumentItem(uri: string, languageId: string, version: number, text: string) {
     /*interface TextDocumentItem {...}*/
     return {
         uri: uri,
         languageId: languageId,
         version: version,
         text: text,
-    };
+    } as TextDocumentItem;
 }
 
-export function MAIN_message_construct_textDocumentIdentifier(documentUri) {
+export type TextDocumentIdentifier = {
+    uri: string
+};
+
+export function MAIN_message_construct_textDocumentIdentifier(documentUri: string) {
     /*interface TextDocumentIdentifier {...}*/
     return {
         uri: documentUri
-    };
+    } as TextDocumentIdentifier;
 }
 
 /**
  * @param {*} textDocumentIdentifier MAIN_message_construct_textDocumentIdentifier(...)
  */
-export function MAIN_message_construct_didCloseTextDocumentNotification(textDocumentIdentifier) {
+export function MAIN_message_construct_didCloseTextDocumentNotification(textDocumentIdentifier: TextDocumentIdentifier) {
     return {
         method: 'textDocument/didClose',
         params: { textDocument: textDocumentIdentifier },
     }
 }
 
-export function MAIN_message_construct_didChangeTextDocumentNotification_Params(versionedTextDocumentIdentifier, textDocumentContentChangeEventArray) {
+export function MAIN_message_construct_didChangeTextDocumentNotification_Params(versionedTextDocumentIdentifier: VersionedTextDocumentIdentifier, textDocumentContentChangeEventArray) {
     /*interface DidCloseTextDocumentParams {...}*/
     return {
         textDocument: versionedTextDocumentIdentifier,
@@ -67,7 +79,7 @@ export function MAIN_message_construct_didChangeTextDocumentNotification(didChan
  * 
  * @param {*} textDocumentItem MAIN_message_construct_textDocumentItem(...)
  */
-export function MAIN_message_construct_didOpenTextDocumentNotification(textDocumentItem) {
+export function MAIN_message_construct_didOpenTextDocumentNotification(textDocumentItem: TextDocumentItem) {
     /* RELATED: interface DidOpenTextDocumentParams {...} */
     return {
         method: 'textDocument/didOpen',
@@ -75,7 +87,7 @@ export function MAIN_message_construct_didOpenTextDocumentNotification(textDocum
     };
 }
 
-export function MAIN_message_construct_DocumentSymbolsRequest(textDocumentIdentifier) {
+export function MAIN_message_construct_DocumentSymbolsRequest(textDocumentIdentifier: TextDocumentIdentifier) {
     return {
         id: messageId++,
         method: 'textDocument/documentSymbol',
@@ -83,7 +95,7 @@ export function MAIN_message_construct_DocumentSymbolsRequest(textDocumentIdenti
     };
 }
 
-export function MAIN_message_construct_GoToDefinitionRequest(textDocumentIdentifier, position) {
+export function MAIN_message_construct_GoToDefinitionRequest(textDocumentIdentifier: TextDocumentIdentifier, position: Position) {
     return {
         id: messageId++,
         method: 'textDocument/definition',
@@ -94,7 +106,7 @@ export function MAIN_message_construct_GoToDefinitionRequest(textDocumentIdentif
     };
 }
 
-export function MAIN_message_construct_HoverRequest(textDocumentIdentifier, position) {
+export function MAIN_message_construct_HoverRequest(textDocumentIdentifier: TextDocumentIdentifier, position: Position) {
 /*
 interface HoverParams {
     textDocument: string; // The text document's URI in string form
@@ -111,7 +123,7 @@ interface HoverParams {
     };
 }
 
-export function MAIN_message_construct_CompletionRequest(textDocumentIdentifier, position) {
+export function MAIN_message_construct_CompletionRequest(textDocumentIdentifier: TextDocumentIdentifier, position: Position) {
     return {
         id: messageId++,
         method: 'textDocument/completion',
@@ -122,7 +134,7 @@ export function MAIN_message_construct_CompletionRequest(textDocumentIdentifier,
     };
 }
 
-export function MAIN_message_construct_CompletionRequest_slice(textDocumentIdentifier, indexStart, indexEnd) {
+export function MAIN_message_construct_CompletionRequest_slice(textDocumentIdentifier: TextDocumentIdentifier, indexStart: number, indexEnd: number) {
     return {
         id: messageId++,
         method: 'textDocument/completion_slice',
@@ -134,7 +146,7 @@ export function MAIN_message_construct_CompletionRequest_slice(textDocumentIdent
     };
 }
 
-export function MAIN_message_construct_CustomFullFileLexRequest(textDocumentIdentifier) {
+export function MAIN_message_construct_CustomFullFileLexRequest(textDocumentIdentifier: TextDocumentIdentifier) {
     return {
         id: messageId++,
         // TODO: What are the rules for creating custom methods in LSP?
@@ -143,31 +155,46 @@ export function MAIN_message_construct_CustomFullFileLexRequest(textDocumentIden
     };
 }
 
-export function MAIN_message_construct_versionedTextDocumentIdentifier(uri, version)  {
+export type VersionedTextDocumentIdentifier = {
+    uri: string,
+    version: number,
+};
+
+export function MAIN_message_construct_versionedTextDocumentIdentifier(uri: string, version: number)  {
     /*interface VersionedTextDocumentIdentifier {...}*/
     return {
         uri: uri,
         version: version,
-    };
+    } as VersionedTextDocumentIdentifier;
 }
 
-export function MAIN_message_construct_position(line, character)  {
+export type Position = {
+    line: number,
+    character: number,
+};
+
+export function MAIN_message_construct_position(line: number, character: number)  {
     /*interface Position {...}*/
     return {
         line: line,
         character: character,
-    };
+    } as Position;
 }
 
-export function MAIN_message_construct_range(startPosition, endPosition)  {
+export type Range = {
+    start: Position,
+    end: Position,
+};
+
+export function MAIN_message_construct_range(startPosition: Position, endPosition: Position)  {
     /*interface Range {...}*/
     return {
         start: startPosition,
         end: endPosition,
-    }
+    } as Range;
 }
 
-export function MAIN_message_construct_textDocumentContentChangeEvent(range, text)  {
+export function MAIN_message_construct_textDocumentContentChangeEvent(range: Range, text: string)  {
     /*export type TextDocumentContentChangeEvent = {...} | { text: string; };*/
     if (range) {
         return {
@@ -290,7 +317,7 @@ export function MAIN_message_construct_clientCapabilities(rootPath) {
         }
 }
 
-export function MAIN_message_construct_initializeParams(rootPath, workspaceDirectories) {
+export function MAIN_message_construct_initializeParams(rootPath: string | null, workspaceDirectories: WorkspaceDirectory[] | null) {
 
 	if (workspaceDirectories) {
 		rootPath = null;

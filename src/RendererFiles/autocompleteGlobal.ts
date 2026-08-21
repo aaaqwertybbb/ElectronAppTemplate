@@ -286,12 +286,12 @@ function AUTOCOMPLETE_render_do_show(timestamp: number) {
     AUTOCOMPLETE_virtualIndex = 0;
 }
 
-function AUTOCOMPLETE_show(lspResult: myAPI_languageServer_SLICEresponse) {
+export function AUTOCOMPLETE_show(lspResult: myAPI_languageServer_SLICEresponse) {
     AUTOCOMPLETE_pending_lspResult = lspResult;
     AUTOCOMPLETE_render_request(Autocomplete_RenderKind.Show);
 }
 
-function AUTOCOMPLETE_slice(lspResult: myAPI_languageServer_SLICEresponse) {
+export function AUTOCOMPLETE_slice(lspResult: myAPI_languageServer_SLICEresponse) {
 
     AUTOCOMPLETE_scrollIsFetchingData = false;
     if (AUTOCOMPLETE_sliceVirtualIndex_SLICE != AUTOCOMPLETE_virtualIndex ||

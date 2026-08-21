@@ -573,11 +573,11 @@ let EDITOR_extensionKind: ExtensionKind = ExtensionKind.None;
 
 let EDITOR_lineEndString: string | null = null;
 
-let EDITOR_documentSymbolResult;
+export let EDITOR_documentSymbolResult;
 /**
  * @type {ListComponent}
  */
-let EDITOR_listComponent = null;
+export let EDITOR_listComponent = null;
 
 let EDITOR_onResize_timer: NodeJS.Timeout | null = null;
 let EDITOR_onResize_hasTrailingCall = false;
@@ -667,7 +667,7 @@ let EDITOR_mouseOver_event: MouseEvent | null = null;
 let EDITOR_isChecking_cursorBlinkTrailingEdge = false;
 let EDITOR_cursorBlinkLastTimestamp = 0;
 
-let EDITOR_mousemove_eventListener_isActive = false;
+export let EDITOR_mousemove_eventListener_isActive = false;
 
 export function EDITOR_init() {
 
@@ -8611,7 +8611,7 @@ function EDITOR_moveCursor_position(intValue: number) {
 /**
  * This clears the cursor's selection.
  */
-function EDITOR_moveCursor_indexLine_indexColumn(indexLine: number, indexColumn: number) {
+export function EDITOR_moveCursor_indexLine_indexColumn(indexLine: number, indexColumn: number) {
     let lastValidIndexColumn = EDITOR_getLastValidIndexColumn(indexLine);
 
     if (indexColumn > lastValidIndexColumn) {
