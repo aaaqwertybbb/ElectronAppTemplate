@@ -1,9 +1,10 @@
 import { AUTOCOMPLETE_show, AUTOCOMPLETE_slice } from './autocompleteGlobal';
 import { DIALOG_show_async, DialogKind } from './dialogGlobal';
-import { EDITOR_documentSymbolResult, EDITOR_documentSymbolResult_SETTER, EDITOR_getFinalizedEditsAndRawSaveFileData, EDITOR_init, EDITOR_listComponent, EDITOR_listComponent_SETTER, EDITOR_mousemove_eventListener_isActive, EDITOR_moveCursor_indexLine_indexColumn, EDITOR_textSourceIdentifier } from './editorGlobal';
+import { EDITOR_documentSymbolResult, EDITOR_documentSymbolResult_SETTER, EDITOR_getFinalizedEditsAndRawSaveFileData, EDITOR_init, EDITOR_lineEndPositionList, EDITOR_listComponent, EDITOR_listComponent_SETTER, EDITOR_mousemove_eventListener_isActive, EDITOR_moveCursor_indexLine_indexColumn, EDITOR_textSourceIdentifier, EDITOR_trackedSyntaxList, EDITOR_trackedSyntaxList_SETTER } from './editorGlobal';
 import { EXPLORER_firstSpanWidth_SETTER, EXPLORER_firstSpanWidthValue, EXPLORER_firstSpanWidthValue_SETTER, EXPLORER_setShow, EXPLORER_init, EXPLORER_director } from './explorerGlobal';
 import { ListComponent } from './listComponent';
 import { TOOLTIP_show } from './tooltipGlobal';
+import { TrackedSyntaxList } from './trackedSyntaxTypes';
 
 /**
  * This value ought to be an int (no decimal places) due to its high frequency usage in drawing UI,
@@ -295,7 +296,7 @@ async function window_myAPI_onMessage(data: myAPI_languageServer_response) {
 
                 let data_countAbstract = data.result.length / fieldCount;
 
-                let trackedSyntaxList = new TrackedSyntaxList(data_countAbstract);
+                let trackedSyntaxList = new TrackedSyntaxList(data_countAbstract, null);
 
                 // '_psuedoFourFieldTrackedSyntaxList.Add((int)TrackedSyntaxKind.Comment);'
                 // 
@@ -384,7 +385,7 @@ async function window_myAPI_onMessage(data: myAPI_languageServer_response) {
                 //    }
                 //}
 
-                EDITOR_trackedSyntaxList = trackedSyntaxList;
+                EDITOR_trackedSyntaxList_SETTER(trackedSyntaxList);
             }
         case 'textDocument/hover':
             {

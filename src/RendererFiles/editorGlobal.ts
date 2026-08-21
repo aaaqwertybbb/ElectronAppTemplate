@@ -198,6 +198,7 @@ export type LineAndColumnIndices = {
 
 
 export let EDITOR_trackedSyntaxList = new TrackedSyntaxList(32, null);
+export function EDITOR_trackedSyntaxList_SETTER(value: TrackedSyntaxList) { EDITOR_trackedSyntaxList = value; }
 
 /**
  * @type {UInt32List}
@@ -558,7 +559,7 @@ let EDITOR_lineEndPositionList_PENDING = new UInt32List(128);
  * IMPORTANT: use EDITOR_readLineEndPositionList(...) rather than indexing into this directly...
  * ...due to the possibility of pending edits.
  */
-let EDITOR_lineEndPositionList = new UInt32List(128);
+export let EDITOR_lineEndPositionList = new UInt32List(128);
 
 let gutterWidthTotal_withPxUnits: string;
 
