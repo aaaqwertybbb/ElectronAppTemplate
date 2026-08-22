@@ -9377,5 +9377,8 @@ oh my it is 2 minutes past my bed time I gotta go
 I recall Nosferatu - When Angels Cry being at 566 dislikes just from my memory alone.
 If you disliked it in relation to me you are a clown.
 
+I went to QuickChek to fill the cooler this morning.
+It was already filled so I came back home.
+
 */
 
