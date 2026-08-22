@@ -9368,5 +9368,7 @@ like once my birthday comes or something or one way or the other something
 
 I was born september 16 1998
 
+My birthday... is september 16
+
 */
 
