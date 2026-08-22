@@ -9270,3 +9270,12 @@ I had a nightmare that I was in highschool in an algebra 2 class and I failed a 
 - [ ] TypeScript version works by end of day
 
 */
+
+/*
+I've heard of "I Have No Mouth, and I Must Scream" many times.
+I never looked much into it.
+But I'm doing it right now and I'm really glad I am very interesting.
+Watching a video currently am 35:54 and it talked about the book a bit then has been going through
+the videogame adaptation
+*/
+
