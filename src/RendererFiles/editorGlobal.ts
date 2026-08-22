@@ -9308,5 +9308,15 @@ The ability to avoid repetitive entertainment and instead seek out
 new experiences, or challenges, as a form of entertainment
 is a mental switch that results in improved cognitive abilities throughout all of your life
 because you are constantly learning rather than just drooling on the floor
+
+I remember hearing stories of people that take amphetamine like drugs
+perhaps they're taking vyvanse or something.
+
+And they're like "oh I feel so good I wanna just lay down and enjoy this"
+
+Versus if you were to actually take it and do something.
+
+There always is some degree of decision making involved in everything.
+
 */
 
