@@ -9277,5 +9277,7 @@ I never looked much into it.
 But I'm doing it right now and I'm really glad I am very interesting.
 Watching a video currently am 35:54 and it talked about the book a bit then has been going through
 the videogame adaptation
+
+I gotta go to bed soon. Can't finish the video
 */
 
