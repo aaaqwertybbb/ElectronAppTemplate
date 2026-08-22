@@ -9328,5 +9328,10 @@ someone who'd take vyvanse and then without any restraint delusionally
 type up thousands and thousands of spaghetti code nonsense
 because they can't actually hold any responsibility they're just high pressing buttons on a keyboard
 
+====
+
+You can take all the xyz you want, if you suck you prob still gonna suck
+but now you a firehouse and flood everything you touch with garbage
+
 */
 
