@@ -9303,5 +9303,10 @@ equivalent to someone getting high on illegal drugs while they lay on the floor
 and rot doing nothing just experiencing a high of a drug.
 
 You can only learn so much from an MMO they're dead simple.
+
+The ability to avoid repetitive entertainment and instead seek out
+new experiences, or challenges, as a form of entertainment
+is a mental switch that results in improved cognitive abilities throughout all of your life
+because you are constantly learning rather than just drooling on the floor
 */
 
