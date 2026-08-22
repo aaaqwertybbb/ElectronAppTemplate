@@ -9295,5 +9295,13 @@ not I'm excited to achieve something irl but I'm excited to sit
 here for hours on end farming something for this game
 and in the process learn nothing, be sedentary and waste my life
 so that I can avoid processing everything that truly bothers me.
+
+"but it is fun etc..."
+
+After a certain point if you aren't learning from the experience you're
+equivalent to someone getting high on illegal drugs while they lay on the floor
+and rot doing nothing just experiencing a high of a drug.
+
+You can only learn so much from an MMO they're dead simple.
 */
 
