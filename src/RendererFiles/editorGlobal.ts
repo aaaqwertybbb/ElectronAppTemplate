@@ -9150,6 +9150,25 @@ function EDITOR_mouseOver(e: MouseEvent) {
 
     // HUH? the PerformanceEventTiming bug doesn't exist in the typescript version
 
+/*
+
+Google AI:
+
+> I actually maintain two separate repos, one is vanilla javascript, the other is typescript.
+> 
+> I checked the typescript version to see whether it has the PerformanceEventTiming bug. It actually doesn't have it seemingly?
+> 
+> It uses webpack as a bundler. Maybe it has the bug but the object is called something different... so weird
+
+< I've made a note of your project structure setups.
+< The fact that your TypeScript repository bundled with Webpack doesn't show the leak—even if the underlying hover logic was
+< written similarly—comes down to how TypeScript compiles variables and how Webpack scopes modules.
+<
+< ...
+
+
+*/
+
     //
     // Extract line and column stored in the DOM node's data attributes
     //const line = parseInt(tokenElement.dataset.line);
