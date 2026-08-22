@@ -9279,5 +9279,15 @@ Watching a video currently am 35:54 and it talked about the book a bit then has 
 the videogame adaptation
 
 I gotta go to bed soon. Can't finish the video
+
+======
+
+MMO's are a horrifying concept.
+Essentially anything that lends itself to "large amounts of repetitive time taking tasks"
+
+Sit there farming mobs over and over in order to escape from your life
+it is just a means of appeasing and numbing and wasting.
+
+rather than confrontation that you could find in experiencing a story or some such
 */
 
