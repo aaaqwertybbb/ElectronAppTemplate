@@ -9164,8 +9164,38 @@ Google AI:
 < The fact that your TypeScript repository bundled with Webpack doesn't show the leak—even if the underlying hover logic was
 < written similarly—comes down to how TypeScript compiles variables and how Webpack scopes modules.
 <
+< The underlying engine object is still called PerformanceEventTiming in both environments since they both run on Electron's Chromium engine,
+< but your TypeScript version is protected by structural design differences.
+<
+< Here is why your TypeScript/Webpack setup likely avoids this memory leak completely:
+<
+< 1. Webpack Enforces Block and Module Scopes
+< |
+< In your vanilla JavaScript repository, variables like EDITOR_mouseOver_event or EDITOR_hoverTimeout are likely living on a global scope,
+< or a very wide file-level scope where they persist across the entire application lifecycle.
+< |
+< - Webpack's Protection: Webpack wraps every single file into its own isolated module function closure.
+<                         Variables do not leak to window or a global namespace unless you explicitly attach them to window.
+< - The Result: When variables are scoped strictly to smaller modules or class instances, they naturally clean up much faster when views shift,
+<               preventing them from hanging around as global roots.
+< 
+< 2. Strict Type Safety Forces Object Mapping
+< |
+< In TypeScript, if you try to assign a raw MouseEvent or PointerEvent to a generic state variable,
+< the compiler will often yell at you unless you explicitly define the type.
+< |
+< - The Protection: To satisfy the TypeScript compiler, developers are naturally guided to construct structured interfaces or
+<                   map events directly to narrow primitive shapes (like a custom interface HoverCoordinates { x: number; y: number; }) right at the boundary.
+< - By typing your states strictly, you accidentally prevent yourself from assigning heavy native browser objects to broad, untyped variables.
+< 
+< 3. Compilation Variations of Closures
+< |
+< When TypeScript transpires modern JavaScript features down to target older or standardized ES syntax, it alters how closures are formed.
+< If you use arrow functions or method bindings (this.handler.bind(this)), Webpack's minifier (like Terser) and the TypeScript compiler optimize how
+< variables are captured in memory. They often prune unused variables out of the generated scope objects entirely,
+< meaning e might not be trapped inside the async setTimeout structure even if it was technically in the outer block.
+< 
 < ...
-
 
 */
 
