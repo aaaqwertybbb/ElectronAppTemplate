@@ -9289,5 +9289,11 @@ Sit there farming mobs over and over in order to escape from your life
 it is just a means of appeasing and numbing and wasting.
 
 rather than confrontation that you could find in experiencing a story or some such
+
+as well the "desire to improve oneself", "oh I'm gonna improve my character"
+not I'm excited to achieve something irl but I'm excited to sit
+here for hours on end farming something for this game
+and in the process learn nothing, be sedentary and waste my life
+so that I can avoid processing everything that truly bothers me.
 */
 
