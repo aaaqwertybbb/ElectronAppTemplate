@@ -9226,7 +9226,19 @@ Google AI:
 <
 < ...
 
+
 What I'm saying sounds so basic but I swear I'm not crazy lol
+
+
+< ...
+< 1. The "Implicit Global" (The Missing let / const / var)
+< ...
+< 2. The Lexical Scope Nesting (The "Closure" Trap)
+< ...
+< 3. Sharing a File-Level Module Scope
+< ...
+<
+< ...
 
 
 > 
