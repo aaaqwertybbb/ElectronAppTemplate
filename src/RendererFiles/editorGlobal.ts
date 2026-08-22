@@ -9141,9 +9141,15 @@ function EDITOR_mouseOver(e: MouseEvent) {
     //if (!tokenElement) return;
     //
     // Clear previous timer because the mouse is still moving
+
+
+
     if (EDITOR_hoverTimeout) {
         clearTimeout(EDITOR_hoverTimeout);
     }
+
+    // HUH? the PerformanceEventTiming bug doesn't exist in the typescript version
+
     //
     // Extract line and column stored in the DOM node's data attributes
     //const line = parseInt(tokenElement.dataset.line);
