@@ -9366,5 +9366,7 @@ very suspicious
 I was born in 1998 btw so I only am the same age due to an overlap you know what I mean
 like once my birthday comes or something or one way or the other something
 
+I was born september 16 1998
+
 */
 
