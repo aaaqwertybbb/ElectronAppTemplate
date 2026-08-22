@@ -9122,7 +9122,7 @@ function EDITOR_registerHandlers() {
 
     // Attach a single listener to your text container (Event Delegation)
     EDITOR_baseElement.addEventListener('mouseover', EDITOR_mouseOver);
-    EDITOR_baseElement.addEventListener('mouseout', EDITOR_mouseOut);
+    EDITOR_baseElement.addEventListener('mouseleave', EDITOR_mouseLeave);
     
     EDITOR_baseElement.addEventListener('focus', EDITOR_onfocus);
     EDITOR_baseElement.addEventListener('blur', EDITOR_onblur);
@@ -9269,7 +9269,7 @@ TODO: Look into every detail of:
     EDITOR_hoverTimeout = setTimeout(EDITOR_requestLspHover, 1000);
 }
 
-function EDITOR_mouseOut() {
+function EDITOR_mouseLeave() {
     // Clear timer if mouse leaves the token before 1000ms
     if (EDITOR_hoverTimeout) {
         clearTimeout(EDITOR_hoverTimeout);
