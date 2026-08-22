@@ -9493,5 +9493,15 @@ If you disliked it in relation to me you are a clown.
 I went to QuickChek to fill the cooler this morning.
 It was already filled so I came back home.
 
+===========
+
+"Sanitarium and the Underworld of Grief" at 23:06
+what he talks about with morrowind is so good.
+
+I don't regret the time I spent playing MMOs
+what I do "regret" is the idea that
+I'd spend any further time playing them.
+I enjoyed the time I spent and that time is over.
+
 */
 
