@@ -9320,5 +9320,13 @@ There always is some degree of decision making involved in everything.
 
 sloth
 
+====
+
+the other side is delusion.
+
+someone who'd take vyvanse and then without any restraint delusionally
+type up thousands and thousands of spaghetti code nonsense
+because they can't actually hold any responsibility they're just high pressing buttons on a keyboard
+
 */
 
