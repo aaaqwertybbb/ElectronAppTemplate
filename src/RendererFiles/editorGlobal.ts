@@ -9503,5 +9503,15 @@ what I do "regret" is the idea that
 I'd spend any further time playing them.
 I enjoyed the time I spent and that time is over.
 
+I was only at 26:04 when I said that
+he immediately started talking about anytime he goes back to playing Morrowind after I unpaused.
+I'm only at 26:17
+but the key thing for me is that I've done all the content.
+And time and time again if I return to an MMO I find myself once again
+trying to further and further escape anything in my life through pouring time into it.
+And it was a great escape for a time where my mind could not handle life.
+But now it is time to handle life to a degree and not spend so much time in an MMO.
+Preferably no time in an MMO.
+
 */
 
