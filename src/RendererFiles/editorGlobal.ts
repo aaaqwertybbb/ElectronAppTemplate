@@ -9197,6 +9197,40 @@ Google AI:
 < 
 < ...
 
+> Okay I just got reminded of a super confusing thing that I noticed by reading
+> "They often prune unused variables out of the generated scope objects entirely,
+>  meaning e might not be trapped inside the async setTimeout structure even if it was technically in the outer block.".
+> So I wanna ask it but it is slightly off topic so I'm just prepping you for the change in topic.
+
+< ...
+
+> I'll provide a code snippet at the end, but with words first I describe it as: In the vanilla javascript repo. I might have one function which declares a local variable. And I intended to pass this local variable to some other function when invoking the other function.
+> 
+> But I one time forgot to pass it, and didn't even add the variable to the argument list of "the other function". And yet, when I ran the code it resolved the variable correctly.
+> 
+> (I actually think I might understand why... I might locally made an "implicit global variable" by forgetting to use 'const, let, or var')...
+> 
+> ```js
+> function foo() {
+>     let text = 'hello world';
+>     bar();
+> }
+> 
+> function bar() {
+>     console.log(text);
+> }
+> ```
+
+< Your intuition is close, but there is a major twist here. In the exact code snippet you provided, if you run it as-is,
+< it will actually throw a ReferenceError: text is not defined in JavaScript.
+<
+< ...
+
+What I'm saying sounds so basic but I swear I'm not crazy lol
+
+
+> 
+
 */
 
     //
