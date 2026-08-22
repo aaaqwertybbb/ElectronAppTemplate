@@ -9251,7 +9251,9 @@ What I'm saying sounds so basic but I swear I'm not crazy lol
 < 
 < ...
 
-> 
+> It had to have been an accidental case of '1. The "Implicit Global" (The Missing let / const / var)'. The ''use strict';' point is good ty
+
+< ...
 
 */
 
