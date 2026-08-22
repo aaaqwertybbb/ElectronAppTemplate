@@ -9239,7 +9239,17 @@ What I'm saying sounds so basic but I swear I'm not crazy lol
 < ...
 <
 < ...
-
+<
+< How to stop this from ever happening again
+< To completely ban this silent behavior in your vanilla JavaScript repo, add this single string to the very first line of your JS files:
+< ```js
+< 'use strict';
+< ```
+< 
+< When Strict Mode is enabled, JavaScript will instantly crash and throw a clear error (ReferenceError: text is not defined)
+< the moment you try to assign a variable without let, const, or var. It forces your vanilla code to behave safely, just like TypeScript does.
+< 
+< ...
 
 > 
 
