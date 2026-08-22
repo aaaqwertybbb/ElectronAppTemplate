@@ -9360,5 +9360,8 @@ This girl in the thumbnail has blonde hair.
 
 Am I the star of girl interrupted all along?
 
+The description of the video, they show a blurb from it under the video title.
+very suspicious
+
 */
 
