@@ -9346,5 +9346,19 @@ not about what you type but what you don't type type ****
 I wanna watch La La Land I've never seen it, it isn't currently part
 of the youtube sanctioned free with ads movies thing so I gotta w8
 
+=====
+
+I keep getting recommended a video "Girl, Interrupted: when society defines sanity."
+I never saw this video, and I never saw the movie either.
+
+But everything I read the title I think that they're affirming what I'm saying
+like wait a second.
+"some thoughts on the film Girl, Interrupted... 27 years later"
+I'm 27...
+
+This girl in the thumbnail has blonde hair.
+
+Am I the star of girl interrupted all along?
+
 */
 
