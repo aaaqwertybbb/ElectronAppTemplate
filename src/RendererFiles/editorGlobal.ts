@@ -3191,9 +3191,6 @@ function EDITOR_createStyleForSelection(cursor: EDITOR_Cursor) {
                         cached_EDITOR_presentation.removeChild(textSelectionDiv);
                         cursor.selectionDivExists = false;
                     }
-                    else {
-                        throw new Error();
-                    }
                     break;
                 }
             }
