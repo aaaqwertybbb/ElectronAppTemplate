@@ -9363,5 +9363,8 @@ Am I the star of girl interrupted all along?
 The description of the video, they show a blurb from it under the video title.
 very suspicious
 
+I was born in 1998 btw so I only am the same age due to an overlap you know what I mean
+like once my birthday comes or something or one way or the other something
+
 */
 
