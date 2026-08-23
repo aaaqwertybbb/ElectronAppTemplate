@@ -4980,6 +4980,10 @@ hmmm is google AI just hyping me up... I need to clarify that those few conditio
  * This doesn't even run any async logic it just returns it???
  * 
  * Well the problem was always there then... the timing issue?
+ * Even with it async I wasn't actually doing anything.
+ * 
+ * < The browser's event listener engine ignores the return value of event handlers.
+ * < If you return a Promise, the browser treats it exactly like returning undefined, true, or a string. It drops the return value on the floor.
  */
 function EDITOR_onKeyDown(event: KeyboardEvent) {
     // Explicitly inlining 'clearMulticursorState()' because it currently is and I just don't want to make a decision about this right now.
