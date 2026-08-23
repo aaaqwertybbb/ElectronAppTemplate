@@ -4195,7 +4195,7 @@ function EDITOR_createCursorLineBelow() {
     EDITOR_render_request(RenderKind.Cursor_flag_scrollIntoViewExplicit);
 }
 
-function EDITOR_createCursorAtNextMatchSelection(event: KeyboardEvent) {
+function EDITOR_createCursorAtNextMatchSelection() {
     if (!EDITOR_primaryCursor.hasSelection()) {
         return;
     }
@@ -5421,7 +5421,7 @@ function EDITOR_onKeyDown_keyLengthEqualsOne_altKey(event: KeyboardEvent) {
                 let local_findOverlay_isBeingShownDueToMultiCursorMatching = GLOBAL_findOverlay_isBeingShownDueToMultiCursorMatching;
                 EDITOR_movementBasedCacheInvalidation(EDITOR_primaryCursor);
                 GLOBAL_findOverlay_isBeingShownDueToMultiCursorMatching = local_findOverlay_isBeingShownDueToMultiCursorMatching;
-                EDITOR_createCursorAtNextMatchSelection(event);
+                EDITOR_createCursorAtNextMatchSelection();
             }
             break;
     }
