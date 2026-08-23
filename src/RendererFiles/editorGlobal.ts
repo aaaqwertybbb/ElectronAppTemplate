@@ -9526,5 +9526,17 @@ and I feel like the crowns of my teeth are being destroyed by biting down on the
 
 and it makes me super anxious all day
 
+====
+
+I got the lb of 98% fat free ground chicken with sriracha in front of me.
+I gotta eat this asap.
+
+I go in to quickcheck every third day.
+Every 3 days I go in on the third day
+and I go inside the walk in cooler and fill everything and other things
+
+I went in yesterday but before I clocked in I saw there was nothing to do so I drove back home
+I gotta go in today then for sureski's
+
 */
 
