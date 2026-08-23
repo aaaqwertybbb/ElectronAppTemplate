@@ -9524,5 +9524,7 @@ by rotating outward of my mouth
 
 and I feel like the crowns of my teeth are being destroyed by biting down on the crunchy thing
 
+and it makes me super anxious all day
+
 */
 
