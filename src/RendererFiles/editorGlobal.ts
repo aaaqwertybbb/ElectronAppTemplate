@@ -9513,5 +9513,11 @@ And it was a great escape for a time where my mind could not handle life.
 But now it is time to handle life to a degree and not spend so much time in an MMO.
 Preferably no time in an MMO.
 
+make sure you buy carbohydrates tomorrow when u go to the store to get the 2 chicken
+cuz u didn't do that today
+and ended up hungry and
+there were mostly just these crunchy cracker things
+but I worry anxiety that they're breaking my teeth when I bite them
+
 */
 
