@@ -584,7 +584,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
         }
     }
     
-    override async arrowRight_async(divItem: HTMLElement, indexItem: number) {
+    override arrowRight_async(divItem: HTMLElement, indexItem: number) {
     	// TODO: !!!! You might need to be careful with async and the TreeView_pooledNode; I'm not certain whether you do or don't have to be careful, and I don't feel like looking into it at the moment.
         this.nodeList.getElementAt(indexItem);
         let key = TreeView_pooledNode_key;
@@ -602,9 +602,11 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
     	else if (nodeKind === TreeView_NodeKind.isExpandable_NOTisExpanded) {
     		return this.expandCollapseIconWasClicked_async(divItem, indexItem);
     	}
+
+        return Promise.resolve();
 	}
     
-    override async arrowLeft_async(divItem: HTMLElement, indexItem: number) {
+    override arrowLeft_async(divItem: HTMLElement, indexItem: number) {
     	// TODO: !!!! You might need to be careful with async and the TreeView_pooledNode; I'm not certain whether you do or don't have to be careful, and I don't feel like looking into it at the moment.
         this.nodeList.getElementAt(indexItem);
         let key = TreeView_pooledNode_key;
@@ -631,6 +633,8 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
         			indexItem - distanceToParent));
             }
         }
+
+        return Promise.resolve();
     }
 
     getTotalCount() {
@@ -646,7 +650,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
      * @param {*} indexItem 
      * @returns 
      */
-    async removeFromNodeList_async(indexItem: number) {
+    removeFromNodeList(indexItem: number) {
         this.nodeList.getElementAt(indexItem);
         let key = TreeView_pooledNode_key;
         let depth = TreeView_pooledNode_depth;
@@ -678,7 +682,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
     }
 
     /** TODO: any usage of this needs to respect the actual zeroth UI div not the literal. */
-    async setNodeListEntryId_async(indexItem: number, pathId: number) {
+    setNodeListEntryId(indexItem: number, pathId: number) {
         this.nodeList.setKey(indexItem, pathId);
     }
 
@@ -1045,7 +1049,7 @@ export async function EXPLORER_MenuOnClick(indexClicked: number, elementClicked:
                                         let countChanges;
                                         
                                         if (pasteResult.isDirectory) {
-                                            countChanges = await EXPLORER_director.removeFromNodeList_async(indexItem);
+                                            countChanges = EXPLORER_director.removeFromNodeList(indexItem);
                                             if (countChanges === undefined) {
                                                 return;
                                             }
@@ -1351,7 +1355,7 @@ async function get_CommandKind_DeleteFile_Directory_YesCancel_callback(result: W
     if (deleteFileResult) {
         let countOfMoreEntriesToShow = EXPLORER_director.getTotalCount() - (EXPLORER_director.virtualIndex_ofScrollTop + EXPLORER_director.virtualCount);
 
-        let countChanges = await EXPLORER_director.removeFromNodeList_async(WIDGET_target.indexItem);
+        let countChanges = EXPLORER_director.removeFromNodeList(WIDGET_target.indexItem);
         if (countChanges === undefined) {
             return;
         }
@@ -1427,7 +1431,7 @@ async function get_CommandKind_RenameFile_Directory_InputText_callback(result: W
     WIDGET_target_SETTER(WIDGET_target.MENU_target);
     let renameFileResult = await window.myAPI.renameFile(entry.absolutePath, result.value, /*isDirectory*/ true);
     if (renameFileResult.success) {
-        await EXPLORER_director.setNodeListEntryId_async(WIDGET_target.indexItem, renameFileResult.pathId);
+        EXPLORER_director.setNodeListEntryId(WIDGET_target.indexItem, renameFileResult.pathId);
         let divItem = EXPLORER_director.itemListElement.children[WIDGET_target.divRelativeIndex];
         if (divItem.lastChild instanceof Text) {
             // TODO: It doesn't like 'undefined' but it would take 'null'.
@@ -1443,7 +1447,7 @@ async function get_CommandKind_RenameFile_File_InputText_callback(result: Widget
     WIDGET_target_SETTER(WIDGET_target.MENU_target);
     let renameFileResult = await window.myAPI.renameFile(entry.absolutePath, result.value, /*isDirectory*/ false);
     if (renameFileResult.success) {
-        await EXPLORER_director.setNodeListEntryId_async(WIDGET_target.indexItem, renameFileResult.pathId);
+        EXPLORER_director.setNodeListEntryId(WIDGET_target.indexItem, renameFileResult.pathId);
         let divItem = EXPLORER_director.itemListElement.children[WIDGET_target.divRelativeIndex];
         if (divItem.lastChild instanceof Text) {
             // TODO: It doesn't like 'undefined' but it would take 'null'.
