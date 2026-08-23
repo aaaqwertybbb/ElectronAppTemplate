@@ -296,12 +296,12 @@ async function WIDGET_inputTextOnKeyDown(event: KeyboardEvent) {
     }
 }
 
-async function WIDGET_YesCancelButtonOnClick_yes(event: MouseEvent) {
+async function WIDGET_YesCancelButtonOnClick_yes() {
     await WIDGET_completeForm({isCancelled: false, value:'Yes'});
     await WIDGET_hide(true);
 }
 
-async function WIDGET_YesCancelButtonOnClick_cancel(event: MouseEvent) {
+async function WIDGET_YesCancelButtonOnClick_cancel() {
     await WIDGET_completeForm({isCancelled:true, value:'Cancel'});
     await WIDGET_hide(true);
 }
