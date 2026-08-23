@@ -9522,5 +9522,7 @@ but I worry anxiety that they're breaking my teeth when I bite them
 I've been trying to suck my top front teeth back into my mouth it feels like they're escaping my mouth
 by rotating outward of my mouth 
 
+and I feel like the crowns of my teeth are being destroyed by biting down on the crunchy thing
+
 */
 
