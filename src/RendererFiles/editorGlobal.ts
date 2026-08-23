@@ -9547,5 +9547,8 @@ I think it makes my acne worse too
 
 but "say la vi"?
 
+"what is that french saying say la vi"
+The French phrase "c'est la vie" (pronounced say la vee) literally translates to "that's life" or "such is life". People use it to accept a small bad thing or disappointment when they cannot change it
+
 */
 
