@@ -3514,13 +3514,13 @@ function EDITOR_onMouseMove_WRAPIT(event: MouseEvent) {
         cursor.indexColumn = indexColumn;
 
         if (GLOBAL_detailRank === 3) {
-            EDITOR_onMouseMoveDetailRankThree(event, indexLine, indexColumn);
+            EDITOR_onMouseMoveDetailRankThree(indexLine, indexColumn);
         }
         else if (GLOBAL_detailRank === 2) {
-            EDITOR_onMouseMoveDetailRankTwo(event, indexLine, indexColumn);
+            EDITOR_onMouseMoveDetailRankTwo(indexLine, indexColumn);
         }
         else if (GLOBAL_detailRank === 1) {
-            EDITOR_onMouseMoveDetailRankOne(event, indexLine, indexColumn);
+            EDITOR_onMouseMoveDetailRankOne(indexLine, indexColumn);
         }
 
         if (!EDITOR_isChecking_cursorBlinkTrailingEdge) {
@@ -3533,7 +3533,7 @@ function EDITOR_onMouseMove_WRAPIT(event: MouseEvent) {
     }
 }
 
-function EDITOR_onMouseMoveDetailRankOne(event: MouseEvent, indexLineClicked: number, indexColumnClicked: number) {
+function EDITOR_onMouseMoveDetailRankOne(indexLineClicked: number, indexColumnClicked: number) {
     let cursor = EDITOR_primaryCursor;
     cursor.indexLine = indexLineClicked;
     cursor.indexColumn = indexColumnClicked;
@@ -3662,7 +3662,7 @@ function EDITOR_getCharacterCurrent_KIND(indexColumn: number, positionIndex: num
     }
 }
 
-function EDITOR_onMouseMoveDetailRankTwo(event: MouseEvent, indexLineClicked: number, indexColumnClicked: number) {
+function EDITOR_onMouseMoveDetailRankTwo(indexLineClicked: number, indexColumnClicked: number) {
     let nextPositionIndex = EDITOR_getPositionIndex_Overload(indexLineClicked, indexColumnClicked);
     let cursor = EDITOR_primaryCursor;
 
@@ -3754,7 +3754,7 @@ function EDITOR_onMouseMoveDetailRankTwo(event: MouseEvent, indexLineClicked: nu
     }
 }
 
-function EDITOR_onMouseMoveDetailRankThree(event: MouseEvent, indexLineClicked: number, indexColumnClicked: number) {
+function EDITOR_onMouseMoveDetailRankThree(indexLineClicked: number, indexColumnClicked: number) {
     let cursor = EDITOR_primaryCursor;
 
     // TODO: I remember this being bugged I think it makes sense why. You're checking if the cursor is exactly at the threshold rather than determining if the distance from previous event to this one puts you past the threshold.
