@@ -9519,5 +9519,8 @@ and ended up hungry and
 there were mostly just these crunchy cracker things
 but I worry anxiety that they're breaking my teeth when I bite them
 
+I've been trying to suck my top front teeth back into my mouth it feels like they're escaping my mouth
+by rotating outward of my mouth 
+
 */
 
