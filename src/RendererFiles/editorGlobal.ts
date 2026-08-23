@@ -3861,12 +3861,12 @@ function EDITOR_getPositionIndex_raw(cursor: EDITOR_Cursor) {
     return EDITOR_getLineStart_pos_raw(cursor.indexLine) + cursor.indexColumn;
 }
 
-function EDITOR_onMouseDownDetailRankOne(event: MouseEvent, indexLineClicked: number, indexColumnClicked: number) {
+function EDITOR_onMouseDownDetailRankOne(event_button: number, event_shiftKey: boolean, indexLineClicked: number, indexColumnClicked: number) {
     let cursor = EDITOR_primaryCursor;
 
-    let selectionPlusContextMenuCase = event.button === 2 && cursor.hasSelection();
+    let selectionPlusContextMenuCase = event_button === 2 && cursor.hasSelection();
 
-    if (event.shiftKey && !selectionPlusContextMenuCase) {
+    if (event_shiftKey && !selectionPlusContextMenuCase) {
         if (!cursor.hasSelection()) {
             cursor.selectionAnchor = EDITOR_getPositionIndex(cursor);
         }
@@ -3879,7 +3879,7 @@ function EDITOR_onMouseDownDetailRankOne(event: MouseEvent, indexLineClicked: nu
     
         cursor.selectionEnd = EDITOR_getPositionIndex(cursor);
 
-        if (!event.shiftKey) {
+        if (!event_shiftKey) {
             cursor.selectionAnchor = cursor.selectionEnd;
         }
     }
@@ -3888,9 +3888,9 @@ function EDITOR_onMouseDownDetailRankOne(event: MouseEvent, indexLineClicked: nu
     EDITOR_render_request(RenderKind.Cursor_n + indexCursor);
 }
 
-function EDITOR_onMouseDownDetailRankTwo(event: MouseEvent, indexLineClicked: number, indexColumnClicked: number) {
-    if (event.shiftKey) {
-        EDITOR_onMouseDownDetailRankOne(event, indexLineClicked, indexColumnClicked);
+function EDITOR_onMouseDownDetailRankTwo(event_button: number, event_shiftKey: boolean, indexLineClicked: number, indexColumnClicked: number) {
+    if (event_shiftKey) {
+        EDITOR_onMouseDownDetailRankOne(event_button, event_shiftKey, indexLineClicked, indexColumnClicked);
         return;
     }
 
@@ -4007,9 +4007,9 @@ function EDITOR_onMouseDownDetailRankTwo(event: MouseEvent, indexLineClicked: nu
     }
 }
 
-function EDITOR_onMouseDownDetailRankThree(event: MouseEvent | {shiftKey:false}, indexLineClicked: number, indexColumnClicked: number) {
-    if (event.shiftKey) {
-        EDITOR_onMouseDownDetailRankOne(event, indexLineClicked, indexColumnClicked);
+function EDITOR_onMouseDownDetailRankThree(event_button: number, event_shiftKey: boolean, indexLineClicked: number, indexColumnClicked: number) {
+    if (event_shiftKey) {
+        EDITOR_onMouseDownDetailRankOne(event_button, event_shiftKey, indexLineClicked, indexColumnClicked);
         return;
     }
 
@@ -5476,7 +5476,7 @@ function EDITOR_onMouseDown(event: MouseEvent) {
 
     if (rX < -1 * gutterPaddingRightNumber) {
         GLOBAL_detailRank = 3;
-        EDITOR_onMouseDownDetailRankThree(event, indexLine, indexColumn);
+        EDITOR_onMouseDownDetailRankThree(event.button, event.shiftKey, indexLine, indexColumn);
         if (!EDITOR_isChecking_cursorBlinkTrailingEdge) {
             EDITOR_cursorBlink_startChecking();
         }
@@ -5485,15 +5485,15 @@ function EDITOR_onMouseDown(event: MouseEvent) {
 
     if (event.detail % 3 === 0) {
         GLOBAL_detailRank = 3;
-        EDITOR_onMouseDownDetailRankThree(event, indexLine, indexColumn);
+        EDITOR_onMouseDownDetailRankThree(event.button, event.shiftKey, indexLine, indexColumn);
     }
     else if (event.detail % 2 === 0) {
         GLOBAL_detailRank = 2;
-        EDITOR_onMouseDownDetailRankTwo(event, indexLine, indexColumn);
+        EDITOR_onMouseDownDetailRankTwo(event.button, event.shiftKey, indexLine, indexColumn);
     }
     else {
         GLOBAL_detailRank = 1;
-        EDITOR_onMouseDownDetailRankOne(event, indexLine, indexColumn);
+        EDITOR_onMouseDownDetailRankOne(event.button, event.shiftKey, indexLine, indexColumn);
     }
 
     if (!EDITOR_isChecking_cursorBlinkTrailingEdge) {
