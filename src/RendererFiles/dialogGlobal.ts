@@ -244,7 +244,7 @@ function DIALOG_resize_onmouseenter(event: MouseEvent) {
     // TODO: cache the bounding client rect
     let dialogBoundingClientRect = DIALOG_element.getBoundingClientRect();
 
-    DIALOG_resize_setCursor(event, dialogBoundingClientRect, resize);
+    DIALOG_resize_setCursor(event.clientX, event.clientY, dialogBoundingClientRect, resize);
 }
 
 function DIALOG_resize_onmousedown(event: MouseEvent) {
@@ -257,7 +257,7 @@ function DIALOG_resize_onmousedown(event: MouseEvent) {
     // TODO: cache the bounding client rect
     let dialogBoundingClientRect = DIALOG_element.getBoundingClientRect();
 
-    DIALOG_resize_setCursor(event, dialogBoundingClientRect, resize);
+    DIALOG_resize_setCursor(event.clientX, event.clientY, dialogBoundingClientRect, resize);
 
     DIALOG_before_X = event.clientX;
     DIALOG_before_Y = event.clientY;
@@ -464,27 +464,27 @@ function DIALOG_resize_body_onmousemove(event: MouseEvent) {
     DIALOG_render_request(Dialog_RenderKind.DimensionsChanged);
 }
 
-function DIALOG_resize_setCursor(event: MouseEvent, dialogBoundingClientRect: DOMRect, resize: HTMLElement) {
-    let rX = event.clientX - dialogBoundingClientRect.left;
-    let rY = event.clientY - dialogBoundingClientRect.top;
+function DIALOG_resize_setCursor(clientX: number, clientY: number, dialogBoundingClientRect: DOMRect, resize: HTMLElement) {
+    let rX = clientX - dialogBoundingClientRect.left;
+    let rY = clientY - dialogBoundingClientRect.top;
     // left to right
     //     top to bottom
     if (rX < 0) {
         if (rY < 0) {
             resize.style.cursor = 'nw-resize';
         }
-        else if (event.clientY < dialogBoundingClientRect.top + dialogBoundingClientRect.height) {
+        else if (clientY < dialogBoundingClientRect.top + dialogBoundingClientRect.height) {
             resize.style.cursor = 'w-resize';
         }
         else {
             resize.style.cursor = 'sw-resize';
         }
     }
-    else if (event.clientX < dialogBoundingClientRect.left + dialogBoundingClientRect.width) {
+    else if (clientX < dialogBoundingClientRect.left + dialogBoundingClientRect.width) {
         if (rY < 0) {
             resize.style.cursor = 'n-resize';
         }
-        else if (event.clientY < dialogBoundingClientRect.top + dialogBoundingClientRect.height) {
+        else if (clientY < dialogBoundingClientRect.top + dialogBoundingClientRect.height) {
             //resize.style.cursor = 'ns-resize';
         }
         else {
@@ -495,7 +495,7 @@ function DIALOG_resize_setCursor(event: MouseEvent, dialogBoundingClientRect: DO
         if (rY < 0) {
             resize.style.cursor = 'ne-resize';
         }
-        else if (event.clientY < dialogBoundingClientRect.top + dialogBoundingClientRect.height) {
+        else if (clientY < dialogBoundingClientRect.top + dialogBoundingClientRect.height) {
             resize.style.cursor = 'e-resize';
         }
         else {
