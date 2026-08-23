@@ -9538,5 +9538,14 @@ and I go inside the walk in cooler and fill everything and other things
 I went in yesterday but before I clocked in I saw there was nothing to do so I drove back home
 I gotta go in today then for sureski's
 
+It's like 25 degrees fahrenheit in the walk in cooler
+and you do a decent amount of physical activity so you sweat
+
+I can't stand it in there been doing it for like a year
+
+I think it makes my acne worse too
+
+but "say la vi"?
+
 */
 
