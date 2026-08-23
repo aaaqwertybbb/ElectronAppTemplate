@@ -197,8 +197,8 @@ class DIALOG_FindAll_TreeViewDirector extends TreeViewComponent {
         }
     }
     
-    override async oncontextmenu_async(divItem: HTMLElement, indexItem: number, event: MouseEvent, relativeIndex: number) {
-        
+    override oncontextmenu_async(divItem: HTMLElement, indexItem: number, event_button: number, event_clientX: number, event_clientY: number, relativeIndex: number) {
+        return Promise.resolve();
     }
 
     /**

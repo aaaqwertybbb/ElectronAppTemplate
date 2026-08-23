@@ -492,7 +492,7 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
         }
     }
     
-    override async oncontextmenu_async(divItem: HTMLElement, indexItem: number, event: MouseEvent, relativeIndex: number) {
+    override oncontextmenu_async(divItem: HTMLElement, indexItem: number, event_button: number, event_clientX: number, event_clientY: number, relativeIndex: number) {
         let optionList = [
             new MenuOption(Menu_CommandKind.Copy, 'Copy', null),
             new MenuOption(Menu_CommandKind.CopyAbsolutePath, 'Copy Absolute Path', null),
@@ -514,12 +514,12 @@ This comment is from 'tvd_drawItem_BATCH', it was in my way
             divRelativeIndex: relativeIndex,
         };
 
-        if (event.button === 2) {
+        if (event_button === 2) {
             this.addSpecificMenuOptionsForTarget(optionList, divItem, target);
-            await menuSet('EXPLORER', target, optionList, menuOptionX=event.clientX, menuOptionY=event.clientY, undefined, undefined, null);
+            return menuSet('EXPLORER', target, optionList, menuOptionX=event_clientX, menuOptionY=event_clientY, undefined, undefined, null);
         } else {
             this.addSpecificMenuOptionsForTarget(optionList, divItem, target);
-            await menuSet('EXPLORER', target, optionList, menuOptionX=this.boundingClientRect_left, menuOptionY=(this.boundingClientRect_top + ((this.cursorIndex + 1) * this.itemHeightNumber) - this.rootElement.scrollTop), undefined, undefined, null);
+            return menuSet('EXPLORER', target, optionList, menuOptionX=this.boundingClientRect_left, menuOptionY=(this.boundingClientRect_top + ((this.cursorIndex + 1) * this.itemHeightNumber) - this.rootElement.scrollTop), undefined, undefined, null);
         }
     }
 

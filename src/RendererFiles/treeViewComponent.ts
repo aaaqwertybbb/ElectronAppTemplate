@@ -425,7 +425,7 @@ export abstract class TreeViewComponent implements EventListenerObject {
     handleEvent(event: Event): void {
         switch (event.type) {
             case 'click':
-                this.event_click(event as MouseEvent);
+                this.event_click((event as MouseEvent).clientY, event.target);
                 break;
             case 'keydown':
                 this.event_keydown(event as KeyboardEvent);
@@ -579,10 +579,10 @@ export abstract class TreeViewComponent implements EventListenerObject {
      * ...thus, you should consider checking the x position of the event against the x position of the nodeElement.children[0].
      * @param {*} event 
      */
-    async event_click(event: MouseEvent) {
+    async event_click(event_clientY: number, event_target: EventTarget | null) {
         this.ensure_boundingClientRect();
 
-        let rY = event.clientY - this.boundingClientRect_top + this.lastReadNumber_scrollTop;
+        let rY = event_clientY - this.boundingClientRect_top + this.lastReadNumber_scrollTop;
         let indexItem = Math.floor(rY / this.itemHeightNumber);
         indexItem = this.state_cursor_validateIndex(indexItem);
 
@@ -597,7 +597,7 @@ export abstract class TreeViewComponent implements EventListenerObject {
         if (beltIndexItem < 0) return;
         let divItem = this.TREEVIEW_ArrayFrom_itemListElement_children[beltIndexItem];
 
-        if (event.target === divItem.children[0]) {
+        if (event_target === divItem.children[0]) {
             return this.expandCollapseIconWasClicked_async(divItem, indexItem);
         }
         else {
@@ -638,7 +638,7 @@ export abstract class TreeViewComponent implements EventListenerObject {
         }
     }
 
-    async event_contextmenu(event: MouseEvent) {
+    event_contextmenu(event: MouseEvent) {
         this.ensure_boundingClientRect();
 
         if (event.button === 2) {
@@ -658,7 +658,7 @@ export abstract class TreeViewComponent implements EventListenerObject {
             else beltIndexItem = (beltIndexItem + this.beltIndexZero) % this.virtualCount;
 
             if (beltIndexItem < 0) return;
-            return this.oncontextmenu_async(this.TREEVIEW_ArrayFrom_itemListElement_children[beltIndexItem], this.cursorIndex, event, beltIndexItem);
+            return this.oncontextmenu_async(this.TREEVIEW_ArrayFrom_itemListElement_children[beltIndexItem], this.cursorIndex, event.button, event.clientX, event.clientY, beltIndexItem);
         } else {
             if (this.cursorIndex >= this.getTotalCount()) {
                 return;
@@ -678,11 +678,11 @@ export abstract class TreeViewComponent implements EventListenerObject {
             if (beltIndexItem < 0) return;
 
             // TODO: Handle context menu with keyboard when active node is out of view
-            return this.oncontextmenu_async(this.TREEVIEW_ArrayFrom_itemListElement_children[beltIndexItem], this.cursorIndex, event, beltIndexItem);
+            return this.oncontextmenu_async(this.TREEVIEW_ArrayFrom_itemListElement_children[beltIndexItem], this.cursorIndex, event.button, event.clientX, event.clientY, beltIndexItem);
         }
     }
 
-    async event_keydown(event: KeyboardEvent) {
+    event_keydown(event: KeyboardEvent) {
         switch (event.key) {
             case 'ArrowDown':
                 event.preventDefault();
@@ -909,7 +909,7 @@ export abstract class TreeViewComponent implements EventListenerObject {
 
     protected abstract arrowRight_async(divItem: HTMLElement, indexItem: number): Promise<void>;
 
-    protected abstract oncontextmenu_async(divItem: HTMLElement, indexItem: number, event: MouseEvent, relativeIndex: number): Promise<void>;
+    protected abstract oncontextmenu_async(divItem: HTMLElement, indexItem: number, event_button: number, event_clientX: number, event_clientY: number, relativeIndex: number): Promise<void>;
 
     protected abstract ondblclick_async(divItem: HTMLElement, indexItem: number): Promise<void>;
 
