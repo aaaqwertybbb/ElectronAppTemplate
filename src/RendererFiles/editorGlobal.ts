@@ -5359,6 +5359,8 @@ function EDITOR_onKeyDown_PageUp(event: KeyboardEvent) {
  * In otherwords:
  * - EDITOR_copySelection
  * - window.myAPI.readClipboard
+ *     - Solutions:
+ *         - The synchronous paste event
 */
 async function EDITOR_onKeyDown_keyLengthEqualsOne_ctrlKey(event: KeyboardEvent) {
     let indexCursor = 0; // TODO: Actually get the correct indexCursor instead of just hardcoding '0'
