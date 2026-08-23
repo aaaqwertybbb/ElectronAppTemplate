@@ -5501,7 +5501,7 @@ function EDITOR_onMouseDown(event: MouseEvent) {
     }
 }
 
-async function EDITOR_onContextMenu(event: PointerEvent) {
+function EDITOR_onContextMenu() {
     let optionList = [
         new MenuOption(Menu_CommandKind.Cut, 'Cut', null),
         new MenuOption(Menu_CommandKind.Copy, 'Copy', null),
@@ -5512,7 +5512,7 @@ async function EDITOR_onContextMenu(event: PointerEvent) {
     let menuLeft = recentBoundingClientRect_left + gutterWidthTotal + EDITOR_primaryCursor.cursorTranslateXValue - lastReadNumber_scrollLeft;
     let menuTop = recentBoundingClientRect_top + EDITOR_primaryCursor.cursorTranslateYValue + lineHeight - lastReadNumber_scrollTop;
 
-    await menuSet('EDITOR', null, optionList, menuLeft, menuTop, undefined, undefined, null);
+    return menuSet('EDITOR', null, optionList, menuLeft, menuTop, undefined, undefined, null);
 }
 
 function EDITOR_onWheel(event: WheelEvent) {
