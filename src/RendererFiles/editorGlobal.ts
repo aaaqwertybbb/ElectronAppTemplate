@@ -668,7 +668,8 @@ let EDITOR_indentLess_startingLinePos_end = 0;
 
 let EDITOR_hoverTimeout: NodeJS.Timeout | null = null;
 
-let EDITOR_mouseOver_event: MouseEvent | null = null;
+let EDITOR_mouseOver_event_clientY = 0;
+let EDITOR_mouseOver_event_clientX = 0;
 
 let EDITOR_isChecking_cursorBlinkTrailingEdge = false;
 let EDITOR_cursorBlinkLastTimestamp = 0;
@@ -9135,7 +9136,8 @@ function EDITOR_registerHandlers() {
  */
 function EDITOR_mouseOver(e: MouseEvent) {
 
-    EDITOR_mouseOver_event = e;
+    EDITOR_mouseOver_event_clientY = e.clientY;
+    EDITOR_mouseOver_event_clientX = e.clientX;
     
     //const tokenElement = event.target.closest('.editor-token');
     //if (!tokenElement) return;
@@ -9275,7 +9277,6 @@ function EDITOR_mouseLeave() {
         clearTimeout(EDITOR_hoverTimeout);
         EDITOR_hoverTimeout = null;
     }
-    EDITOR_mouseOver_event = null;
     EDITOR_hideTooltip();
 }
 
@@ -9288,11 +9289,8 @@ function EDITOR_doEditorGoToDefinitionRequest() {
 }
 
 function EDITOR_requestLspHover() {
-    let event = EDITOR_mouseOver_event;
-    if (!event) {
-        throw new Error();
-    }
-    EDITOR_mouseOver_event = null;
+    let event_clientY = EDITOR_mouseOver_event_clientY;
+    let event_clientX = EDITOR_mouseOver_event_clientX;
 
     ///////////
     ///////////
@@ -9306,8 +9304,8 @@ function EDITOR_requestLspHover() {
         recentBoundingClientRect_isNull_intFalsey = 0;
     }
 
-    let rY = event.clientY - recentBoundingClientRect_top + lastReadNumber_scrollTop;
-    let rX = event.clientX - recentBoundingClientRect_left - gutterWidthTotal + lastReadNumber_scrollLeft;
+    let rY = event_clientY - recentBoundingClientRect_top + lastReadNumber_scrollTop;
+    let rX = event_clientX - recentBoundingClientRect_left - gutterWidthTotal + lastReadNumber_scrollLeft;
     
     let indexLine = Math.floor(rY / lineHeight);
     let indexColumn = Math.round(rX / EDITOR_characterWidth);
